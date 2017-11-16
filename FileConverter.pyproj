@@ -12,8 +12,7 @@
     <OutputPath>.</OutputPath>
     <Name>FileConverter</Name>
     <RootNamespace>FileConverter</RootNamespace>
-    <InterpreterId>
-    </InterpreterId>
+    <InterpreterId>MSBuild|testenv|$(MSBuildProjectFullPath)</InterpreterId>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>true</DebugSymbols>
@@ -117,6 +116,17 @@
     <Content Include="tests\testdata\WideTableForm_Results.xlsx" />
     <Content Include="tests\__pycache__\test_MSCalculate.cpython-36.pyc" />
     <Content Include="tests\__pycache__\test_MSRawData.cpython-36.pyc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Interpreter Include="testenv\">
+      <Id>testenv</Id>
+      <Version>3.6</Version>
+      <Description>testenv (Python 3.6 (64-bit))</Description>
+      <InterpreterPath>Scripts\python.exe</InterpreterPath>
+      <WindowsInterpreterPath>Scripts\pythonw.exe</WindowsInterpreterPath>
+      <PathEnvironmentVariable>PYTHONPATH</PathEnvironmentVariable>
+      <Architecture>X64</Architecture>
+    </Interpreter>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
   <!-- Uncomment the CoreCompile target to enable the Build command in
