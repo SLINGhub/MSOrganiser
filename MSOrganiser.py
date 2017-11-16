@@ -69,10 +69,6 @@ with warnings.catch_warnings():
     warnings.filterwarnings("ignore", category=UserWarning)
     from weasyprint import HTML
 
-#Switch buffer off but only allowed in binary mode
-#nonbuffered_stdout = os.fdopen(sys.stdout.fileno(), 'wb')
-#sys.stdout = nonbuffered_stdout
-
 @Gooey(program_name='MS Data Organiser',required_cols=1,optional_cols=1,advanced=True,default_size=(610,710),group_by_type=False)
 def parse_args():
     """ Use ArgParser to build up the arguments we will use in our script"""
@@ -143,7 +139,7 @@ def parse_args():
 
     #Check if Output_Options is selected
     if not args_dict['Output_Options']:
-        print("Please key in at least one result to output")
+        print("Please key in at least one result to output",flush=True)
         sys.exit(-1)
 
     # Store the values of the arguments so we have them next time we run
@@ -153,8 +149,8 @@ def parse_args():
             # Using vars(args) returns the data as a dictionary
             json.dump(vars(args), data_file)
     except Exception as e:
-        print("Warning: Unable to save input settings in " + args_file + " due to this error message")
-        print(e)
+        print("Warning: Unable to save input settings in " + args_file + " due to this error message",flush=True)
+        print(e,flush=True)
         #sys.exit(-1)
 
     return args
@@ -166,8 +162,8 @@ def start_logger(log_directory_path):
     try:
         os.makedirs(logdirectory, exist_ok=True)
     except Exception as e:
-        print("Unable to create log directory in " + logdirectory + " due to this error message")
-        print(e)
+        print("Unable to create log directory in " + logdirectory + " due to this error message",flush=True)
+        print(e,flush=True)
         sys.exit(-1)
 
     logger = logging.getLogger("MSOrganiser")
@@ -237,7 +233,7 @@ def df_to_file(writer,output_format,output_option,df,logger=None,ingui=False,tra
         if logger:
             logger.warning('%s has no data. Please check the input file',output_option)
         if ingui:
-            print(output_option + ' has no data. Please check the input file')
+            print(output_option + ' has no data. Please check the input file',flush=True)
         return
 
     if transpose:
@@ -257,8 +253,8 @@ def df_to_file(writer,output_format,output_option,df,logger=None,ingui=False,tra
                     continue
                 worksheet.column_dimensions[get_column_letter(i)].width = width + 1
         except Exception as e:
-            print("Unable to write df to excel file")
-            print(e)
+            print("Unable to write df to excel file",flush=True)
+            print(e,flush=True)
     elif output_format=="csv":
          df.to_csv(writer + output_option + '_Results.csv',sep=',',index=False)
 
@@ -276,8 +272,8 @@ def end_writer(writer,output_format,logger=None,ingui=False):
             writer.save()
         except Exception as e:
             if ingui:
-                print('Unable to save Excel file due to:')
-                print(e)
+                print('Unable to save Excel file due to:',flush=True)
+                print(e,flush=True)
             if logger:
                 logger.error('Unable to save Excel file due to:')
                 logger.error(e)
@@ -325,7 +321,7 @@ if __name__ == '__main__':
     #Start log on a job
     logger = start_logger(conf.Log_Directory)
     logger.info("Starting the job.")
-    print("Starting the job.")
+    print("Starting the job.",flush=True)
 
     #log_file = "timed_test.log"
     #create_timed_rotating_log(log_file)
@@ -333,7 +329,7 @@ if __name__ == '__main__':
     #We do this for every mass hunter file output
     for MS_File in conf.MS_Files.split(';'):
 
-        print("Working on " + MS_File)
+        print("Working on " + MS_File,flush=True)
         logger.info("Working on " + MS_File)
 
         #Initiate the ISTD
@@ -419,7 +415,7 @@ if __name__ == '__main__':
 
     #End log on a job
     logger.info("Job is finished.")
-    print("Job is finished")
+    print("Job is finished",flush=True)
 
 
 #Jeremy's style

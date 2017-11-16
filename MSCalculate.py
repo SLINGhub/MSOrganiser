@@ -27,7 +27,7 @@ class ISTD_Operations():
             if logger:
                 logger.error('A ISTD map file is required to perform this calculation: %s', column_name)
             if ingui:
-                print('A ISTD map file is required to perform this calculation: ' + column_name)
+                print('A ISTD map file is required to perform this calculation: ' + column_name,flush=True)
             sys.exit(-1)
 
         #Check if file exists
@@ -35,7 +35,7 @@ class ISTD_Operations():
             if logger:
                 logger.error('%s does not exists. Please check the input file',filepath)
             if ingui:
-                print(filepath + ' does not exists. Please check the input file')
+                print(filepath + ' does not exists. Please check the input file',flush=True)
             sys.exit(-1)
 
         #Read the excel file
@@ -47,8 +47,8 @@ class ISTD_Operations():
                 logger.error("Unable to read excel file %s",filepath)
                 logger.error(e)
             if ingui:
-                print("Unable to read excel file " + filepath)
-                print(e)
+                print("Unable to read excel file " + filepath,flush=True)
+                print(e,flush=True)
             sys.exit(-1)
         
         #Check if the excel file has the sheet "ISTDmap"
@@ -56,7 +56,7 @@ class ISTD_Operations():
             if logger:
                 logger.error('Sheet name ISTDmap does not exists. Please check the input ISTD map file')
             if ingui:
-                print('Sheet name ISTDmap does not exists. Please check the input ISTD map file')
+                print('Sheet name ISTDmap does not exists. Please check the input ISTD map file',flush=True)
             sys.exit(-1)
         else:
             #Convert worksheet to a dataframe
@@ -79,7 +79,7 @@ class ISTD_Operations():
             if logger:
                 logger.error('Sheet name ISTDannot does not exists. Please check the input ISTD map file')
             if ingui:
-                print('Sheet name ISTDannot does not exists. Please check the input ISTD map file')
+                print('Sheet name ISTDannot does not exists. Please check the input ISTD map file',flush=True)
             sys.exit(-1)
         else:
             #Convert worksheet to a dataframe
@@ -110,12 +110,12 @@ class ISTD_Operations():
                 if logger:
                     logger.warning('There are ISTD in ISTD_map not mentioned in ISTD_annot.')
                 if ingui:
-                    print('There are ISTD in ISTD_map not mentioned in ISTD_annot.')
+                    print('There are ISTD in ISTD_map not mentioned in ISTD_annot.',flush=True)
                 for compound in missing_ISTD:
                     if logger:
                         logger.warning('/"%s/"',compound)
                     if ingui:
-                        print('\"' + compound + '\"')
+                        print('\"' + compound + '\"',flush=True)
             #Merge the two data frame by common ISTD
             ISTD_map_df = pd.merge(ISTD_map_df, ISTD_annot_df, on='ISTD', how='outer')
         
@@ -131,14 +131,14 @@ class ISTD_Operations():
             if logger:
                 logger.warning("The input ISTD map data frame has no data.")
             if ingui:
-                print("The input ISTD map data frame has no data.")
+                print("The input ISTD map data frame has no data.",flush=True)
             sys.exit(-1)
 
         if 'Compound' not in ISTD_map_df:
             if logger:
                 logger.error('The ISTD map file is missing the column Compound.')
             if ingui:
-                print('The ISTD map file is missing the column Compound.')
+                print('The ISTD map file is missing the column Compound.',flush=True)
             sys.exit(-1)
 
         #Check if Compound column has duplicate compounds
@@ -148,14 +148,14 @@ class ISTD_Operations():
             if logger:
                 logger.error("The Compound column in the ISTD map data has duplicate compounds at row %s", ', '.join(duplicatelist))
             if ingui:
-                print("The Compound column in the ISTD map data has duplicate compounds at row " + ', '.join(duplicatelist))
+                print("The Compound column in the ISTD map data has duplicate compounds at row " + ', '.join(duplicatelist),flush=True)
             sys.exit(-1)
 
         if 'ISTD' not in ISTD_map_df:
             if logger:
                 logger.error('The ISTD map file is missing the column ISTD.')
             if ingui:
-                print('The ISTD map file is missing the column ISTD.')
+                print('The ISTD map file is missing the column ISTD.',flush=True)
             sys.exit(-1)
 
     def validate_ISTD_annot(ISTD_annot_df,logger=None,ingui=False):
@@ -174,7 +174,7 @@ class ISTD_Operations():
             if logger:
                 logger.error('The ISTD annot file is missing the column ISTD.')
             if ingui:
-                print('The ISTD annot file is missing the column ISTD.')
+                print('The ISTD annot file is missing the column ISTD.',flush=True)
             sys.exit(-1)
 
         #Check if ISTD column has duplicate ISTD
@@ -184,7 +184,7 @@ class ISTD_Operations():
             if logger:
                 logger.error("The ISTD column in the ISTD annot data has duplicate ISTD at row %s", ', '.join(duplicatelist))
             if ingui:
-                print("The ISTD column in the ISTD annot data has duplicate ISTD at row " + ', '.join(duplicatelist))
+                print("The ISTD column in the ISTD annot data has duplicate ISTD at row " + ', '.join(duplicatelist),flush=True)
             sys.exit(-1)
 
     def validate_Compound_df(Compound_df,logger=None,ingui=False):
@@ -192,7 +192,7 @@ class ISTD_Operations():
             if logger:
                 logger.error("The input data frame does not contain the column Data File")
             if ingui:
-                print("The input data frame does not contain the column Data File")
+                print("The input data frame does not contain the column Data File",flush=True)
             sys.exit(-1)
 
 
@@ -224,33 +224,33 @@ class ISTD_Operations():
         #Check ISTD_report for any problems
         if "!Missing Compounds in map file" in ISTD_report['ISTD'].unique():
             if ingui:
-                print("There are compounds in data set not mentioned in the map file.")
+                print("There are compounds in data set not mentioned in the map file.",flush=True)
                 for things in ISTD_report.loc[ ISTD_report['ISTD'] == "!Missing Compounds in map file" , 'Compound' ]:
-                    print('\"' + things + '\"')
+                    print('\"' + things + '\"',flush=True)
 
         if "!Duplicate ISTD in map file" in ISTD_report['ISTD'].unique():
             if ingui:
-                print("There are compounds in data set with more than one internal standards mentioned in the map file.")
+                print("There are compounds in data set with more than one internal standards mentioned in the map file.",flush=True)
                 for things in ISTD_report.loc[ ISTD_report['ISTD'] == "!Duplicate ISTD in map file" , 'Compound' ]:
-                    print('\"' + things + '\"')
+                    print('\"' + things + '\"',flush=True)
 
         if "!Blank ISTD in map file" in ISTD_report['ISTD'].unique():
             if ingui:
-                print("There are compounds in data set mentioned in the map file but has a blank internal standard.")
+                print("There are compounds in data set mentioned in the map file but has a blank internal standard.",flush=True)
                 for things in ISTD_report.loc[ ISTD_report['ISTD'] == "!Blank ISTD in map file" , 'Compound' ]:
-                    print('\"' + things + '\"')
+                    print('\"' + things + '\"',flush=True)
 
         if "!Missing ISTD in data" in ISTD_report['ISTD'].unique():
             if ingui:
-                print("There are internal standards in the map file that cannot be found in data set.")
+                print("There are internal standards in the map file that cannot be found in data set.",flush=True)
                 for things in ISTD_report.loc[ ISTD_report['ISTD'] == "!Missing ISTD in data" , 'Compound' ]:
-                    print('\"' + things + '\"')
+                    print('\"' + things + '\"',flush=True)
 
         if "!Duplicate ISTD in data" in ISTD_report['ISTD'].unique():
             if ingui:
-                print("There are internal standards in the map file that are duplicated in data set. Please check compound file")
+                print("There are internal standards in the map file that are duplicated in data set. Please check compound file",flush=True)
                 for things in ISTD_report.loc[ ISTD_report['ISTD'] == "!Duplicate ISTD in data" , 'Compound' ]:
-                    print('\"' + things + '\"')
+                    print('\"' + things + '\"',flush=True)
 
         #Make ISTD column to be the index
         ISTD_report = ISTD_report.set_index(['ISTD'])
@@ -295,7 +295,7 @@ class ISTD_Operations():
             if logger:
                 logger.warning("%s has an invalid ISTD of %s. Please check ISTD map file",x.name,str(ISTD_list[0]))
             if ingui:
-                print(x.name + " has an invalid ISTD of " + str(ISTD_list[0]) + ". Please check ISTD map file")
+                print(x.name + " has an invalid ISTD of " + str(ISTD_list[0]) + ". Please check ISTD map file",flush=True)
             sys.exit(-1)
 
     def update_ISTD_data_from_Compound_df(x,Compound_dict,Compound_df,ISTD_report_list,logger=None,ingui=False):
@@ -333,7 +333,7 @@ class ISTD_Operations():
             if logger:
                 logger.warning("The input Compound data frame has no data. Skipping normalisation by ISTD")
             if ingui:
-                print("The input Compound data frame has no data. Skipping normalisation by ISTD")
+                print("The input Compound data frame has no data. Skipping normalisation by ISTD",flush=True)
             return [pd.DataFrame(),pd.DataFrame(),pd.DataFrame()]
 
         #Create empty dataframe with a preset column name and index
@@ -374,7 +374,7 @@ class ISTD_Operations():
             if logger:
                 logger.warning("\"%s\" is not a column in the ISTD map file. Returning an empty data frame",ISTD_column)
             if ingui:
-                print("\"" + ISTD_column + "\" is not a column in the ISTD map file. Returning an empty data frame")
+                print("\"" + ISTD_column + "\" is not a column in the ISTD map file. Returning an empty data frame",flush=True)
             return [ISTD_data]
 
         for index, row in ISTD_map_df.iterrows():
@@ -390,7 +390,7 @@ class ISTD_Operations():
             if logger:
                 logger.warning("The input Compound data frame has no data. Skipping step to get normConc")
             if ingui:
-                print("The input Compound data frame has no data. Skipping step to get normConc")
+                print("The input Compound data frame has no data. Skipping step to get normConc",flush=True)
             return [pd.DataFrame(),pd.DataFrame(),pd.DataFrame()]
 
         Conc_df = pd.DataFrame(columns=Compound_df.columns, index=Compound_df.index)
@@ -410,7 +410,7 @@ class ISTD_Operations():
             if logger:
                 logger.warning("Empty ISTDannot sheet is given or merging of ISTDmap and ISTDannot sheets is unsuccessful. Skipping step to get normConc")
             if ingui:
-                print("Empty ISTDannot sheet is given or merging of ISTDmap and ISTDannot sheets is unsuccessful. Skipping step to get normConc")
+                print("Empty ISTDannot sheet is given or merging of ISTDmap and ISTDannot sheets is unsuccessful. Skipping step to get normConc",flush=True)
             return [Conc_df,Conc_df,Conc_df]
 
         return [Conc_df,ISTD_Conc_df,ISTD_Samp_Ratio_df]

@@ -17,13 +17,13 @@ class MSRawData:
         """Check if filepath exists and is a file"""
         if not filepath.exists():
             if self.__ingui:
-                print('Filepath ' + str(filepath) + ' could not be found')
+                print('Filepath ' + str(filepath) + ' could not be found',flush=True)
             if self.__logger:
                 self.__logger.error('Filepath %s could not be found',filepath.absolute())
                 sys.exit(-1)
         elif not filepath.is_file():
             if self.__ingui:
-                print('Filepath ' + str(filepath) + ' is not a file')
+                print('Filepath ' + str(filepath) + ' is not a file',flush=True)
             if self.__logger:
                 self.__logger.error('Filepath %s is not a file.',filepath.absolute())
                 sys.exit(-1)
@@ -70,7 +70,7 @@ class AgilentMSRawData(MSRawData):
         else:
             self.__logger.error('%s is not a valid column in MassHunter or not available as a valid output for this program.',column_name)
             if self.__ingui:
-                print(column_name + ' is not a valid column in MassHunter or not available as a valid output for this program.')
+                print(column_name + ' is not a valid column in MassHunter or not available as a valid output for this program.',flush=True)
             sys.exit(-1)
 
         #Extract the data  with the given column name and group
@@ -154,7 +154,7 @@ class AgilentMSRawData(MSRawData):
         if CompoundName_df.empty:
             self.__logger.error('%s has no column containing \"Name\" in Compound Method. Please check the input file',self.__filename)
             if self.__ingui:
-                print(self.__filename + ' has no column containing \"Name\" in Compound Method. Please check the input file')
+                print(self.__filename + ' has no column containing \"Name\" in Compound Method. Please check the input file',flush=True)
             sys.exit(-1)
 
         #We remove the first and second row because the column names are given
@@ -183,7 +183,7 @@ class AgilentMSRawData(MSRawData):
         if DataFileName_df.empty:
             self.__logger.error('%s has no column containing \"Data File\". Please check the input file',self.__filename)
             if self.__ingui:
-                print(self.__filename + ' has no column containing \"Data File\". Please check the input file')
+                print(self.__filename + ' has no column containing \"Data File\". Please check the input file',flush=True)
             sys.exit(-1)
 
         colnames = ["Data File"]
@@ -210,7 +210,7 @@ class AgilentMSRawData(MSRawData):
         if DataFileName_df.empty:
             self.__logger.error('%s has no column containing \"Data File\". Please check the input file',self.__filename)
             if self.__ingui:
-                print(self.__filename + ' has no column containing \"Data File\". Please check the input file')
+                print(self.__filename + ' has no column containing \"Data File\". Please check the input file',flush=True)
             sys.exit(-1)
 
         colnames = ["Data File"]
@@ -231,7 +231,7 @@ class AgilentMSRawData(MSRawData):
         if not filepath:
             self.__logger.error('%s is empty. Please give an input file', str(filepath))
             if self.__ingui:
-                print(str(filepath) + ' is empty. Please give an input file')
+                print(str(filepath) + ' is empty. Please give an input file',flush=True)
             sys.exit(-1)
 
         #Check if the file exists for reading
@@ -239,7 +239,7 @@ class AgilentMSRawData(MSRawData):
             if self.__logger:
                 self.__logger.error('%s does not exists. Please check the input file',str(filepath))
             if self.__ingui:
-                print(str(filepath) + ' does not exists. Please check the input file')
+                print(str(filepath) + ' does not exists. Please check the input file',flush=True)
                 sys.exit(-1)
 
         self.RawData = pd.read_csv(filepath, header=None,low_memory=False)
@@ -249,7 +249,7 @@ class AgilentMSRawData(MSRawData):
             if self.__logger:
                 self.__logger.error('%s is an empty file. Please check the input file',str(filepath))
             if self.__ingui:
-                print(str(filepath) + ' is an empty file. Please check the input file')
+                print(str(filepath) + ' is an empty file. Please check the input file',flush=True)
             sys.exit(-1)
 
         self.RawData.iloc[0,:] = self.RawData.iloc[0,:].fillna(method='ffill')
@@ -265,5 +265,5 @@ class AgilentMSRawData(MSRawData):
             if self.__logger:
                 self.__logger.error('%s is not in Wide Table or Compound Table form. Please check the input file',str(filepath))
             if self.__ingui:
-                print(str(filepath) + ' is not in Wide Table or Compound Table form. Please check the input file')
+                print(str(filepath) + ' is not in Wide Table or Compound Table form. Please check the input file',flush=True)
             sys.exit(-1)
