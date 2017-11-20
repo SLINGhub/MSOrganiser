@@ -186,7 +186,8 @@ class AgilentMSRawData(MSRawData):
                 print(self.__filename + ' has no column containing \"Data File\". Please check the input file',flush=True)
             sys.exit(-1)
 
-        colnames = ["Data File"]
+        #We standardise the name to Sample_Name
+        colnames = ["Sample_Name"]
         DataFileName_df.columns = colnames
 
         #We remove the first and second row because the column names are given
@@ -197,6 +198,9 @@ class AgilentMSRawData(MSRawData):
 
         #Strip the whitespaces for each string columns
         DataFileName_df = self.remove_whiteSpaces(DataFileName_df)
+
+        #Remove the .d extention for Agilent Files
+        DataFileName_df["Sample_Name"] = DataFileName_df["Sample_Name"].replace('.d$','',regex=True)
 
         return DataFileName_df
 
@@ -213,7 +217,8 @@ class AgilentMSRawData(MSRawData):
                 print(self.__filename + ' has no column containing \"Data File\". Please check the input file',flush=True)
             sys.exit(-1)
 
-        colnames = ["Data File"]
+        #We standardise the name to Sample Name
+        colnames = ["Sample_Name"]
         DataFileName_df.columns = colnames
         
         #Reset the row index
@@ -221,6 +226,10 @@ class AgilentMSRawData(MSRawData):
 
         #Strip the whitespaces for each string columns
         DataFileName_df = self.remove_whiteSpaces(DataFileName_df)
+
+        #Remove the .d extention for Agilent Files
+
+        DataFileName_df["Sample_Name"] = DataFileName_df["Sample_Name"].replace('.d$','',regex=True)
 
         return DataFileName_df
 
@@ -267,3 +276,79 @@ class AgilentMSRawData(MSRawData):
             if self.__ingui:
                 print(str(filepath) + ' is not in Wide Table or Compound Table form. Please check the input file',flush=True)
             sys.exit(-1)
+
+class SciexMSRawData(MSRawData):
+    """To describe raw data obtained from the Sciex MS machine"""
+
+    VALID_COMPOUND_RESULTS = ('Area','RT','FWHM','S/N')
+
+    def __init__(self, filepath, logger=None, ingui=True):
+        MSRawData.__init__(self,filepath, ingui = ingui,logger=logger)
+        self.__logger = logger
+        self.__ingui = ingui
+        self.__readfile(filepath)
+        self.__filename = os.path.basename(filepath)
+
+    def __readfile(self,filepath):
+        """Function to read the input file"""
+
+        #Check if input is blank/None
+        if not filepath:
+            self.__logger.error('%s is empty. Please give an input file', str(filepath))
+            if self.__ingui:
+                print(str(filepath) + ' is empty. Please give an input file',flush=True)
+            sys.exit(-1)
+
+        #Check if the file exists for reading
+        if not os.path.isfile(filepath):
+            if self.__logger:
+                self.__logger.error('%s does not exists. Please check the input file',str(filepath))
+            if self.__ingui:
+                print(str(filepath) + ' does not exists. Please check the input file',flush=True)
+                sys.exit(-1)
+
+        self.RawData = pd.read_csv(filepath,sep='\t',header=0,low_memory=False)
+
+        #Check if the file has content
+        if self.RawData.empty:
+            if self.__logger:
+                self.__logger.error('%s is an empty file. Please check the input file',str(filepath))
+            if self.__ingui:
+                print(str(filepath) + ' is an empty file. Please check the input file',flush=True)
+            sys.exit(-1)
+
+        #Check if 'Sample Name' and 'Component Name' is inside RawData
+        if 'Sample Name' not in list(self.RawData.columns.values) or "Component Name" not in list(self.RawData.columns.values):
+            if self.__logger:
+                self.__logger.error('%s must have Sample Name and Component Name present in the Sciex file.',str(filepath))
+            if self.__ingui:
+                print(str(filepath) + ' must have Sample Name and Component Name present in the Sciex file.',flush=True)
+            sys.exit(-1)
+
+    def AgilentColumnName_to_SciexColumnName(column_name):
+        '''By default the Output Option name follows Agilent, we need to convert it to Sciex form'''
+
+        if column_name not in SciexMSRawData.VALID_COMPOUND_RESULTS:
+            self.__logger.error('%s is not a valid column in Sciex or not available as a valid output for this program.',column_name)
+            if self.__ingui:
+                print(column_name + ' is not a valid column in Sciex or not available as a valid output for this program.',flush=True)
+            sys.exit(-1)
+
+        if column_name == 'RT':
+            return('Retention Time')
+        elif column_name == 'FWHM':
+            return('Width at 50%')
+        elif column_name == 'S/N':
+            return('Signal / Noise')
+        else:
+            return(column_name)
+
+    def get_table(self,column_name,is_numeric=True):
+
+        column_name = SciexMSRawData.AgilentColumnName_to_SciexColumnName(column_name)
+
+        Area_df = self.RawData.pivot(index='Sample Name' ,columns='Component Name',values=column_name)
+        Area_df = Area_df.reset_index()
+        Area_df.columns.name = None
+        return(Area_df)
+

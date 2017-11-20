@@ -7,6 +7,7 @@
 
 
 from MSRawData import AgilentMSRawData
+from MSRawData import SciexMSRawData
 from MSCalculate import ISTD_Operations
 from logging.handlers import TimedRotatingFileHandler
 import argparse
@@ -100,13 +101,15 @@ def parse_args():
 
     #Required Arguments 
     parser.add_argument('MS_Files',action='store',nargs="+",help="Input the MS raw files.\nData File is a required column for MassHunter", widget="MultiFileChooser",default=stored_args.get('MS_Files'))
+    #parser.add_argument('MS_Files_Type',action='store',nargs="+",help="Input the MS raw files.\nData File is a required column for MassHunter", widget="MultiFileChooser",default=stored_args.get('MS_Files'))
     parser.add_argument('Output_Directory',action='store', help="Output directory to save summary report.", widget="DirChooser",default=stored_args.get('Output_Directory'))
     parser.add_argument('--Output_Format', required=True, choices=['Excel'], help='Select specific file type to output', default=Output_Format)
-    parser.add_argument('--Transpose_Results',required=True, choices=['True','False'], help='Set this option to True to let the samples be the columns instead of the compounds',default=Transpose_Results)
+    parser.add_argument('--Transpose_Results',required=True, choices=['True','False'], help='Set this option to True to let the samples be the columns instead of the Transition_Names',default=Transpose_Results)
     
     #Optional Arguments 
     parser.add_argument('--ISTD_Map', action='store', help='Input the ISTD map file. Required for normalisation', widget="FileChooser",default=stored_args.get('ISTD_Map'))
-    parser.add_argument('--Output_Options', choices=['Area','normArea by ISTD','normConc by ISTD','RT','FWHM','S/N','Precursor Ion','Product Ion'], nargs="+", help='Select specific information to output', widget="Listbox", default=stored_args.get('Output_Options'))
+    #parser.add_argument('--Output_Options', choices=['Area','normArea by ISTD','normConc by ISTD','RT','FWHM','S/N','Precursor Ion','Product Ion'], nargs="+", help='Select specific information to output', widget="Listbox", default=stored_args.get('Output_Options'))
+    parser.add_argument('--Output_Options', choices=['Area','normArea by ISTD','RT','FWHM','S/N','Precursor Ion','Product Ion'], nargs="+", help='Select specific information to output', widget="Listbox", default=stored_args.get('Output_Options'))
     parser.add_argument('--Testing', action='store_true', help='Testing mode will generate more output tables.')
 
     #parser.add_argument('--Transpose_Results', action='store_false', help='Select this option to let the samples be the columns',default=defaults.get('Transpose_Results'))
@@ -218,7 +221,7 @@ def transpose_MSdata(MS_df):
     #We remove the first row because the column names are given
     MS_df = MS_df.iloc[1:]
     #Rename the first column to Compound Name
-    MS_df.rename(columns={'Data File':'Compound'}, inplace=True)
+    MS_df.rename(columns={'Sample_Name':'Transition_Name'}, inplace=True)
     return MS_df
 
 def df_to_file(writer,output_format,output_option,df,logger=None,ingui=False,transpose=False):
@@ -332,7 +335,7 @@ if __name__ == '__main__':
         print("Working on " + MS_File,flush=True)
         logger.info("Working on " + MS_File)
 
-        #Initiate the ISTD
+        #Initiate the ISTD report
         pdfs = []
 
         #Generate the parameters report
@@ -342,7 +345,11 @@ if __name__ == '__main__':
         html = HTML(string=html_string)
         pdfs.append(html.render(stylesheets=[stylesheet_file]))
 
-        RawData = AgilentMSRawData(filepath=MS_File,logger=logger)
+        #Check if file is from Agilent or Sciex
+        if MS_File.endswith('.csv'):
+            RawData = AgilentMSRawData(filepath=MS_File,logger=logger)
+        elif MS_File.endswith('.txt'):
+            RawData = SciexMSRawData(filepath=MS_File,logger=logger)
         output_filename = os.path.splitext(os.path.basename(MS_File))[0]
 
         #Set up the file writing configuration for Excel, ...
