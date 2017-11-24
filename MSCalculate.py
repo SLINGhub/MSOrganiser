@@ -38,8 +38,15 @@ class ISTD_Operations():
                 print(filepath + ' does not exists. Please check the input file',flush=True)
             sys.exit(-1)
 
-        #Read the excel file
+        if filepath.endswith('.csv'):
+            if logger:
+                logger.error('This program no longer accept csv file as input for the ISTD map file. Please use the excel template file given')
+            if ingui:
+                print('This program no longer accept csv file as input for the ISTD map file. Please use the excel template file given',flush=True)
+            sys.exit(-1)
         #ISTD_map_df = pd.read_csv(filepath)
+
+        #Read the excel file
         try:
             wb = load_workbook(filename=filepath,data_only=True)
         except Exception as e:
@@ -64,6 +71,8 @@ class ISTD_Operations():
             Transition_Name_Annot_df = worksheet.values
             cols = next(Transition_Name_Annot_df)[0:]
             Transition_Name_Annot_df = pd.DataFrame(Transition_Name_Annot_df, columns=cols)
+            #Remove rows with all None, NA,NaN
+            Transition_Name_Annot_df = Transition_Name_Annot_df.dropna(axis=0, how='all')
 
         #Remove whitespaces in column names
         Transition_Name_Annot_df.columns = Transition_Name_Annot_df.columns.str.strip()
@@ -86,6 +95,9 @@ class ISTD_Operations():
             #Convert worksheet to a dataframe
             worksheet = wb.get_sheet_by_name("ISTD_Annot")
             ISTD_Annot_df = worksheet.values
+            #print(pd.DataFrame(ISTD_Annot_df))
+            #print(pd.DataFrame(ISTD_Annot_df).fillna(method='ffill'))
+            #sys.exit(0)
             cols = next(ISTD_Annot_df)[0:]
             ISTD_Annot_df = pd.DataFrame(ISTD_Annot_df, columns=cols)
         '''
