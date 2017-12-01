@@ -23,6 +23,7 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Annotation.py" />
     <Compile Include="MSCalculate.py" />
     <Compile Include="MSOrganiser.py" />
     <Compile Include="MSRawData.py" />
