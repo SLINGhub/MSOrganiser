@@ -63,7 +63,7 @@ class ISTD_Operations():
             if logger:
                 logger.error('Sheet name Transition_Name_Annot does not exists. Please check the input ISTD map file')
             if ingui:
-                print('Sheet name Transition_Name_Annot does not exists. Please check the input Transition_Name_Annot map file',flush=True)
+                print('Sheet name Transition_Name_Annot does not exists. Please check the input ISTD map file',flush=True)
             sys.exit(-1)
         else:
             #Convert worksheet to a dataframe
@@ -71,17 +71,19 @@ class ISTD_Operations():
             Transition_Name_Annot_df = worksheet.values
             cols = next(Transition_Name_Annot_df)[0:]
             Transition_Name_Annot_df = pd.DataFrame(Transition_Name_Annot_df, columns=cols)
+
             #Remove rows with all None, NA,NaN
             Transition_Name_Annot_df = Transition_Name_Annot_df.dropna(axis=0, how='all')
+            Transition_Name_Annot_df = Transition_Name_Annot_df.dropna(axis=1, how='all')
+
+        #Validate the Transition_Name_Annot sheet is valid (Has the Transition_Name and Transition_Name_ISTD columns abd not empty)
+        ISTD_Operations.validate_Transition_Name_Annot_map(Transition_Name_Annot_df,logger,ingui)
 
         #Remove whitespaces in column names
         Transition_Name_Annot_df.columns = Transition_Name_Annot_df.columns.str.strip()
-
+            
         #Remove whitespace for each string column
         Transition_Name_Annot_df = ISTD_Operations.remove_whiteSpaces(Transition_Name_Annot_df)
-
-        #Validate the Transition_Name_Annot sheet is valid (Has the Transition_Name and Transition_Name_ISTD columns)
-        ISTD_Operations.validate_Transition_Name_Annot_map(Transition_Name_Annot_df,logger,ingui)
 
         '''
         #Check if the excel file has the sheet "ISTDmap"
@@ -100,10 +102,10 @@ class ISTD_Operations():
             #sys.exit(0)
             cols = next(ISTD_Annot_df)[0:]
             ISTD_Annot_df = pd.DataFrame(ISTD_Annot_df, columns=cols)
-        '''
 
         #Close the workbook
         wb.close()
+        '''
 
         #When there are inputs in this sheet
         '''

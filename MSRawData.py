@@ -350,5 +350,6 @@ class SciexMSRawData(MSRawData):
         Area_df = self.RawData.pivot(index='Sample Name' ,columns='Component Name',values=column_name)
         Area_df = Area_df.reset_index()
         Area_df.columns.name = None
+        Area_df.rename(columns={'Sample Name':'Sample_Name'}, inplace=True)
         return(Area_df)
 
