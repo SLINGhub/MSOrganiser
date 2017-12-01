@@ -5,6 +5,7 @@ import os
 import logging
 
 from openpyxl import load_workbook
+from Annotation import MS_Template
 
 class ISTD_Operations():
     """A collection of functions to perform calculation"""
@@ -22,188 +23,39 @@ class ISTD_Operations():
 
     def read_ISTD_map(filepath,column_name,logger=None,ingui=False):
 
-        #Check if input is blank/None
-        if not filepath:
-            if logger:
-                logger.error('A ISTD map file is required to perform this calculation: %s', column_name)
-            if ingui:
-                print('A ISTD map file is required to perform this calculation: ' + column_name,flush=True)
-            sys.exit(-1)
+        AnnotationList = MS_Template(filepath=filepath,column_name=column_name, logger=logger,ingui=ingui)
+        Transition_Name_Annot_df = AnnotationList.Read_Transition_Name_Annot_Sheet()
+        ISTD_Annot_df = AnnotationList.Read_ISTD_Annot_Sheet()
 
-        #Check if file exists
-        if not os.path.isfile(filepath):
-            if logger:
-                logger.error('%s does not exists. Please check the input file',filepath)
-            if ingui:
-                print(filepath + ' does not exists. Please check the input file',flush=True)
-            sys.exit(-1)
-
-        if filepath.endswith('.csv'):
-            if logger:
-                logger.error('This program no longer accept csv file as input for the ISTD map file. Please use the excel template file given')
-            if ingui:
-                print('This program no longer accept csv file as input for the ISTD map file. Please use the excel template file given',flush=True)
-            sys.exit(-1)
+        #print(ISTD_Annot_df)
+        #print(Transition_Name_Annot_df)
         #ISTD_map_df = pd.read_csv(filepath)
-
-        #Read the excel file
-        try:
-            wb = load_workbook(filename=filepath,data_only=True)
-        except Exception as e:
-            if logger:
-                logger.error("Unable to read excel file %s",filepath)
-                logger.error(e)
-            if ingui:
-                print("Unable to read excel file " + filepath,flush=True)
-                print(e,flush=True)
-            sys.exit(-1)
+        #sys.exit(0)
         
-        #Check if the excel file has the sheet "Transition_Name_Annot"
-        if "Transition_Name_Annot" not in wb.get_sheet_names():
-            if logger:
-                logger.error('Sheet name Transition_Name_Annot does not exists. Please check the input ISTD map file')
-            if ingui:
-                print('Sheet name Transition_Name_Annot does not exists. Please check the input ISTD map file',flush=True)
-            sys.exit(-1)
-        else:
-            #Convert worksheet to a dataframe
-            worksheet = wb.get_sheet_by_name("Transition_Name_Annot")
-            Transition_Name_Annot_df = worksheet.values
-            cols = next(Transition_Name_Annot_df)[0:]
-            Transition_Name_Annot_df = pd.DataFrame(Transition_Name_Annot_df, columns=cols)
-
-            #Remove rows with all None, NA,NaN
-            Transition_Name_Annot_df = Transition_Name_Annot_df.dropna(axis=0, how='all')
-            Transition_Name_Annot_df = Transition_Name_Annot_df.dropna(axis=1, how='all')
-
-        #Validate the Transition_Name_Annot sheet is valid (Has the Transition_Name and Transition_Name_ISTD columns abd not empty)
-        ISTD_Operations.validate_Transition_Name_Annot_map(Transition_Name_Annot_df,logger,ingui)
-
-        #Remove whitespaces in column names
-        Transition_Name_Annot_df.columns = Transition_Name_Annot_df.columns.str.strip()
-            
-        #Remove whitespace for each string column
-        Transition_Name_Annot_df = ISTD_Operations.remove_whiteSpaces(Transition_Name_Annot_df)
-
-        '''
-        #Check if the excel file has the sheet "ISTDmap"
-        if "ISTD_Annot" not in wb.get_sheet_names():
-            if logger:
-                logger.error('Sheet name ISTD_Annot does not exists. Please check the input ISTD map file')
-            if ingui:
-                print('Sheet name ISTD_Annot does not exists. Please check the input ISTD map file',flush=True)
-            sys.exit(-1)
-        else:
-            #Convert worksheet to a dataframe
-            worksheet = wb.get_sheet_by_name("ISTD_Annot")
-            ISTD_Annot_df = worksheet.values
-            #print(pd.DataFrame(ISTD_Annot_df))
-            #print(pd.DataFrame(ISTD_Annot_df).fillna(method='ffill'))
-            #sys.exit(0)
-            cols = next(ISTD_Annot_df)[0:]
-            ISTD_Annot_df = pd.DataFrame(ISTD_Annot_df, columns=cols)
-
-        #Close the workbook
-        wb.close()
-        '''
-
-        #When there are inputs in this sheet
-        '''
         if not ISTD_Annot_df.empty:
-            #Remove whitespaces in column names
-            ISTD_Annot_df.columns = ISTD_Annot_df.columns.str.strip()
-            
-            #Remove whitespace for each string column
-            ISTD_Annot_df = ISTD_Operations.remove_whiteSpaces(ISTD_Annot_df)
-            
-            #Validate the ISTD_Annot sheet is valid (Has the Transition_Name_ISTD column)
-            ISTD_Operations.validate_ISTD_Annot(ISTD_Annot_df,logger,ingui)
-
-            #Additional check on ISTD_map_file to ensure each Transition_Name with ISTD has ISTD concentration and IS to Sample ratio values
-            ISTD_list_in_Transition_Name_Annot_sheet = list(filter(None,ISTD_map_df['Transition_Name_ISTD'].unique()))
+            #Additional check to ensure each Transition_Name_ISTD in Transition_Name_Annot sheet has 
+            #Also appears in  the ISTD_Annot sheet
+            ISTD_list_in_Transition_Name_Annot_sheet = list(filter(None,Transition_Name_Annot_df['Transition_Name_ISTD'].unique()))
             ISTD_list_in_Annot_sheet = list(filter(None,ISTD_Annot_df['Transition_Name_ISTD'].unique()))
             missing_ISTD = set(ISTD_list_in_Transition_Name_Annot_sheet) - set(ISTD_list_in_Annot_sheet)
             if missing_ISTD:
-                if logger:
-                    logger.warning('There are Transition_Name_ISTD in Transition_Name_Annot not mentioned in ISTD_Annot.')
-                if ingui:
-                    print('There are Transition_Name_ISTD in Transition_Name_Annot not mentioned in ISTD_Annot.',flush=True)
+                if self.__logger:
+                    self.__logger.warning('There are Transition_Name_ISTD in Transition_Name_Annot not mentioned in ISTD_Annot.')
+                if self.__ingui:
+                    self.__print('There are Transition_Name_ISTD in Transition_Name_Annot not mentioned in ISTD_Annot.',flush=True)
                 for Transition_Name in missing_ISTD:
-                    if logger:
-                        logger.warning('/"%s/"',Transition_Name)
-                    if ingui:
+                    if self.__logger:
+                        self.__logger.warning('/"%s/"',Transition_Name)
+                    if self.__ingui:
                         print('\"' + Transition_Name + '\"',flush=True)
             #Merge the two data frame by common ISTD
             Transition_Name_Annot_df = pd.merge(Transition_Name_Annot_df, ISTD_Annot_df, on='Transition_Name_ISTD', how='outer')
-        '''
-        
-        #We leave this alone as users may put access ISTD 
+
+        #We leave this alone as users may put excess ISTD 
         #Remove Rows with ISTD with no Transition_Names
-        #ISTD_map_df = ISTD_map_df.dropna(subset=['Transition_Name'])
+        Transition_Name_Annot_df = Transition_Name_Annot_df.dropna(subset=['Transition_Name'])
 
         return Transition_Name_Annot_df
-
-    def validate_Transition_Name_Annot_map(Transition_Name_Annot_df,logger=None,ingui=False):
-        #Validate the Transition_Name_Annot shet is valid with some compulsory columns
-        if Transition_Name_Annot_df.empty:
-            if logger:
-                logger.warning("The input Transition_Name_Annot data frame has no data.")
-            if ingui:
-                print("The input Transition_Name_Annot data frame has no data.",flush=True)
-            sys.exit(-1)
-
-        if 'Transition_Name' not in Transition_Name_Annot_df:
-            if logger:
-                logger.error('The Transition_Name_Annot sheet is missing the column Transition_Name.')
-            if ingui:
-                print('The Transition_Name_Annot sheet is missing the column Transition_Name.',flush=True)
-            sys.exit(-1)
-
-        #Check if Transition_Name column has duplicate Transition_Names
-        duplicateValues = Transition_Name_Annot_df['Transition_Name'].duplicated()
-        if duplicateValues.any():
-            duplicatelist = [ str(int(i) + 2)  for i in duplicateValues[duplicateValues==True].index.tolist()]
-            if logger:
-                logger.error("The Transition_Name column in the Transition_Name_Annot data has duplicate transition names at row %s", ', '.join(duplicatelist))
-            if ingui:
-                print("The Transition_Name column in the Transition_Name_Annot data has duplicate transition names at row " + ', '.join(duplicatelist),flush=True)
-            sys.exit(-1)
-
-        if 'Transition_Name_ISTD' not in Transition_Name_Annot_df:
-            if logger:
-                logger.error('The Transition_Name_Annot sheet is missing the column Transition_Name_ISTD.')
-            if ingui:
-                print('The Transition_Name_Annot file is missing the column Transition_Name_ISTD.',flush=True)
-            sys.exit(-1)
-
-    def validate_ISTD_Annot(ISTD_annot_df,logger=None,ingui=False):
-        #Validate the ISTD_Annot sheet is valid with some compulsory columns
-        #This data frame can be empty
-        '''
-        if ISTD_Annot_df.empty:
-            if logger:
-                logger.error("The input ISTD_Annot sheet has no data.")
-            if ingui:
-                print("The input ISTD_Annot sheet has no data.")
-            sys.exit(-1)
-        '''
-
-        if 'Transition_Name_ISTD' not in ISTD_Annot_df:
-            if logger:
-                logger.error('The ISTD_Annot file is missing the column Transition_Name_ISTD.')
-            if ingui:
-                print('The ISTD_Annot file is missing the column Transition_Name_ISTD.',flush=True)
-            sys.exit(-1)
-
-        #Check if Transition_Name_ISTD column has duplicate Transition_Name_ISTD
-        duplicateValues = ISTD_Annot_df['Transition_Name_ISTD'].duplicated()
-        if duplicateValues.any():
-            duplicatelist = [ str(int(i) + 2)  for i in duplicateValues[duplicateValues==True].index.tolist()]
-            if logger:
-                logger.error("The Transition_Name_ISTD column in the ISTD_Annot sheet has duplicate Transition_Name_ISTD at row %s", ', '.join(duplicatelist))
-            if ingui:
-                print("The Transition_Name_ISTD column in the ISTD_Annot data has duplicate Transition_Name_ISTD at row " + ', '.join(duplicatelist),flush=True)
-            sys.exit(-1)
 
     def validate_Transition_Name_df(Transition_Name_df,logger=None,ingui=False):
         if "Sample_Name" not in Transition_Name_df:
@@ -216,7 +68,6 @@ class ISTD_Operations():
                 print("If input raw file is from MassHunter, make sure the column Data File is present",flush=True)
                 print("If input raw file is from Sciex, make sure the column Sample Name is present")
             sys.exit(-1)
-
 
     def create_ISTD_data_from_Transition_Name_df(Transition_Name_df,Transition_Name_Annot_df,logger=None,ingui=False):
 
@@ -403,7 +254,7 @@ class ISTD_Operations():
         
         return(ISTD_data)
 
-    def getConc_by_ISTD(Transition_Name_df,Transition_Name_Annot_df,logger=None,ingui=False):
+    def getConc_by_ISTD(Transition_Name_df,Transition_Name_Annot_df,Exp_Medium,logger=None,ingui=False):
         '''Perform calculation of conc using values from Transition_Name_Annot_ISTD'''
         #If the Transition_Name table or ISTD map df is empty, return an empty data frame
         if Transition_Name_df.empty:
@@ -419,18 +270,39 @@ class ISTD_Operations():
         ISTD_Operations.validate_Transition_Name_df(Transition_Name_df,logger,ingui)
         Conc_df["Sample_Name"] = Transition_Name_df["Sample_Name"]
 
-        #Create the ISTD data from Transition_Name df and ISTD map file
-        if "ISTD_Conc" in list(Transition_Name_Annot_df.columns.values) and "ISTD_to_Samp_Vol_Ratio" in list(Transition_Name_Annot_df.columns.values):
-            ISTD_Conc_df = ISTD_Operations.create_ISTD_data_from_Transition_Name_Annot(Transition_Name_df,Transition_Name_Annot_df,"ISTD_Conc",logger,ingui)
-            ISTD_Samp_Ratio_df = ISTD_Operations.create_ISTD_data_from_Transition_Name_Annot(Transition_Name_df,Transition_Name_Annot_df,"ISTD_to_Samp_Vol_Ratio",logger,ingui)
-            #Perform an elementwise multiplication so that it is easy to debug.
-            Conc_df.iloc[:,1:] = Transition_Name_df.iloc[:,1:].astype('float64') * ISTD_Conc_df.iloc[:,1:].astype('float64') * ISTD_Samp_Ratio_df.iloc[:,1:].astype('float64')
-        else:
-            #Return empty data set
-            if logger:
-                logger.warning("Empty ISTD_Annot sheet is given or merging of Transition_Name_Annot and ISTD_Annot sheets is unsuccessful. Skipping step to get normConc")
-            if ingui:
-                print("Empty ISTD_Annot sheet is given or merging of Transition_Name_Annot and ISTD_Annot sheets is unsuccessful. Skipping step to get normConc",flush=True)
-            return [Conc_df,Conc_df,Conc_df]
+        #If we have a plasma experiment
+        if Exp_Medium == "Plasma":
+            Annot_Columns = list(Transition_Name_Annot_df.columns.values)
+            if all(things in Annot_Columns for things in ["ISTD_Conc_nM","ISTD_Mixture_Volume","Plasma_Volume"]):
+                ISTD_Conc_df = ISTD_Operations.create_ISTD_data_from_Transition_Name_Annot(Transition_Name_df,Transition_Name_Annot_df,"ISTD_Conc_nM",logger,ingui)
 
+                if Transition_Name_Annot_df["ISTD_Conc_nM"].isnull().any():
+                    if logger:
+                        logger.warning("Some ISTD_Conc_nM input values are missing. Please check the ISTD_Annot sheet. Remember to save your file")
+                    if ingui:
+                        print("Some ISTD_Conc_nM input values are missing. Please check the ISTD_Annot sheet. Remember to save your file",flush=True)
+                if Transition_Name_Annot_df["ISTD_Mixture_Volume"].isnull().all():
+                    if logger:
+                        logger.warning("ISTD_Mixture input value is missing. Skipping step to get normConc")
+                    if ingui:
+                        print("ISTD_Mixture input value is missing. Skipping step to get normConc",flush=True)
+                if Transition_Name_Annot_df["Plasma_Volume"].isnull().all():
+                    if logger:
+                        logger.warning("Plasma_Volume input value is missing. Skipping step to get normConc")
+                    if ingui:
+                        print("Plasma_Volume value is missing. Skipping step to get normConc",flush=True)
+
+                ISTD_Conc_df = ISTD_Operations.create_ISTD_data_from_Transition_Name_Annot(Transition_Name_df,Transition_Name_Annot_df,"ISTD_Conc_nM",logger,ingui)
+                Transition_Name_Annot_df["ISTD_to_Plasma_Vol_Ratio"] = Transition_Name_Annot_df["ISTD_Mixture_Volume"].astype('float64') / Transition_Name_Annot_df["Plasma_Volume"].astype('float64')
+                ISTD_Samp_Ratio_df = ISTD_Operations.create_ISTD_data_from_Transition_Name_Annot(Transition_Name_df,Transition_Name_Annot_df,"ISTD_to_Plasma_Vol_Ratio",logger,ingui)
+                #Perform an elementwise multiplication so that it is easy to debug.
+                Conc_df.iloc[:,1:] = Transition_Name_df.iloc[:,1:].astype('float64') * ISTD_Conc_df.iloc[:,1:].astype('float64') * ISTD_Samp_Ratio_df.iloc[:,1:].astype('float64')
+            else:
+                #Return empty data set
+                if logger:
+                    logger.warning("Empty ISTD_Annot sheet is given or merging of Transition_Name_Annot and ISTD_Annot sheets is unsuccessful. Skipping step to get normConc")
+                if ingui:
+                    print("Empty ISTD_Annot sheet is given or merging of Transition_Name_Annot and ISTD_Annot sheets is unsuccessful. Skipping step to get normConc",flush=True)
+                return [Conc_df,Conc_df,Conc_df]
+ 
         return [Conc_df,ISTD_Conc_df,ISTD_Samp_Ratio_df]

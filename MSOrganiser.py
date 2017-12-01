@@ -70,7 +70,7 @@ with warnings.catch_warnings():
     warnings.filterwarnings("ignore", category=UserWarning)
     from weasyprint import HTML
 
-@Gooey(program_name='MS Data Organiser',required_cols=1,optional_cols=1,advanced=True,default_size=(610,710),group_by_type=False)
+@Gooey(program_name='MS Data Organiser',required_cols=1,optional_cols=1,advanced=True,default_size=(610,810),group_by_type=False)
 def parse_args():
     """ Use ArgParser to build up the arguments we will use in our script"""
 
@@ -94,6 +94,11 @@ def parse_args():
     else:
         Output_Format = stored_args.get('Output_Format')
 
+    if not stored_args.get('Exp_Medium'):
+        Exp_Medium = 'Plasma'
+    else:
+        Exp_Medium = stored_args.get('Exp_Medium')
+
     if not stored_args.get('Transpose_Results'):
         Transpose_Results = 'False'
     else:
@@ -104,29 +109,34 @@ def parse_args():
     #parser.add_argument('MS_Files_Type',action='store',nargs="+",help="Input the MS raw files.\nData File is a required column for MassHunter", widget="MultiFileChooser",default=stored_args.get('MS_Files'))
     parser.add_argument('Output_Directory',action='store', help="Output directory to save summary report.", widget="DirChooser",default=stored_args.get('Output_Directory'))
     parser.add_argument('--Output_Format', required=True, choices=['Excel'], help='Select specific file type to output', default=Output_Format)
+    parser.add_argument('--Exp_Medium', required=True, choices=['Plasma'], help='Select your experimental medium', default=Exp_Medium)
     parser.add_argument('--Transpose_Results',required=True, choices=['True','False'], help='Set this option to True to let the samples be the columns instead of the Transition_Names',default=Transpose_Results)
     
     #Optional Arguments 
     parser.add_argument('--ISTD_Map', action='store', help='Input the ISTD map file. Required for normalisation', widget="FileChooser",default=stored_args.get('ISTD_Map'))
-    #parser.add_argument('--Output_Options', choices=['Area','normArea by ISTD','normConc by ISTD','RT','FWHM','S/N','Precursor Ion','Product Ion'], nargs="+", help='Select specific information to output', widget="Listbox", default=stored_args.get('Output_Options'))
-    parser.add_argument('--Output_Options', choices=['Area','normArea by ISTD','RT','FWHM','S/N','Precursor Ion','Product Ion'], nargs="+", help='Select specific information to output', widget="Listbox", default=stored_args.get('Output_Options'))
+    parser.add_argument('--Output_Options', choices=['Area','normArea by ISTD','normConc by ISTD','RT','FWHM','S/N','Precursor Ion','Product Ion'], nargs="+", help='Select specific information to output', widget="Listbox", default=stored_args.get('Output_Options'))
+    #parser.add_argument('--Output_Options', choices=['Area','normArea by ISTD','RT','FWHM','S/N','Precursor Ion','Product Ion'], nargs="+", help='Select specific information to output', widget="Listbox", default=stored_args.get('Output_Options'))
     parser.add_argument('--Testing', action='store_true', help='Testing mode will generate more output tables.')
 
     #parser.add_argument('--Transpose_Results', action='store_false', help='Select this option to let the samples be the columns',default=defaults.get('Transpose_Results'))
 
     #We need this if exe file is called in a UNC path
+    '''
     if not stored_args.get('Log_Directory'):
         logdirectory = os.path.dirname(os.path.abspath(__file__))
     else:
         logdirectory = stored_args.get('Log_Directory')
-    parser.add_argument('--Log_Directory', action='store', help="Directory to save log files.", widget="DirChooser",default=logdirectory)
+    '''
+    parser.add_argument('--Log_Directory', action='store', help="Directory to save log files.", widget="DirChooser",default=os.path.dirname(os.path.abspath(__file__)))
 
     #We need this if exe file is called in a UNC path
+    '''
     if not stored_args.get('Settings_Directory'):
         settings_directory = os.path.dirname(os.path.abspath(__file__))
     else:
         settings_directory = stored_args.get('Settings_Directory')
-    parser.add_argument('--Settings_Directory', action='store', help="Directory to save settings", widget="DirChooser",default=settings_directory)
+    '''
+    parser.add_argument('--Settings_Directory', action='store', help="Directory to save settings", widget="DirChooser",default=os.path.dirname(os.path.abspath(__file__)))
 
     args = parser.parse_args()
 
@@ -397,7 +407,7 @@ if __name__ == '__main__':
                             pdfs.append(html.render(stylesheets=[stylesheet_file]))
 
                     #Perform concentration calculation
-                    [norm_Conc_df,ISTD_Conc_df,ISTD_Samp_Ratio_df] = ISTD_Operations.getConc_by_ISTD(norm_Area_df,ISTD_map_df,logger,ingui=True)
+                    [norm_Conc_df,ISTD_Conc_df,ISTD_Samp_Ratio_df] = ISTD_Operations.getConc_by_ISTD(norm_Area_df,ISTD_map_df,conf.Exp_Medium,logger,ingui=True)
                     if conf.Testing:
                         df_to_file(writer,conf.Output_Format,"ISTD Conc",ISTD_Conc_df,logger,ingui=True,transpose=conf.Transpose_Results)
                         df_to_file(writer,conf.Output_Format,"ISTD to Samp Vol Ratio",ISTD_Samp_Ratio_df,logger,ingui=True,transpose=conf.Transpose_Results)
