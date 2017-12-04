@@ -70,7 +70,7 @@ with warnings.catch_warnings():
     warnings.filterwarnings("ignore", category=UserWarning)
     from weasyprint import HTML
 
-@Gooey(program_name='MS Data Organiser',required_cols=1,optional_cols=1,advanced=True,default_size=(610,810),group_by_type=False)
+@Gooey(program_name='MS Data Organiser',required_cols=1,optional_cols=1,advanced=True,default_size=(610,710),group_by_type=False)
 def parse_args():
     """ Use ArgParser to build up the arguments we will use in our script"""
 
@@ -105,7 +105,8 @@ def parse_args():
         Transpose_Results = stored_args.get('Transpose_Results')
 
     #Required Arguments 
-    parser.add_argument('MS_Files',action='store',nargs="+",help="Input the MS raw files.\nData File is a required column for MassHunter", widget="MultiFileChooser",default=stored_args.get('MS_Files'))
+    parser.add_argument('MS_Files',action='store',nargs="+",help="Input the MS raw files.\nData File is a required column for MassHunter\nSample Name and Component Name are required columns for Sciex", 
+                        widget="MultiFileChooser",default=stored_args.get('MS_Files'))
     #parser.add_argument('MS_Files_Type',action='store',nargs="+",help="Input the MS raw files.\nData File is a required column for MassHunter", widget="MultiFileChooser",default=stored_args.get('MS_Files'))
     parser.add_argument('Output_Directory',action='store', help="Output directory to save summary report.", widget="DirChooser",default=stored_args.get('Output_Directory'))
     parser.add_argument('--Output_Format', required=True, choices=['Excel'], help='Select specific file type to output', default=Output_Format)
@@ -119,24 +120,6 @@ def parse_args():
     parser.add_argument('--Testing', action='store_true', help='Testing mode will generate more output tables.')
 
     #parser.add_argument('--Transpose_Results', action='store_false', help='Select this option to let the samples be the columns',default=defaults.get('Transpose_Results'))
-
-    #We need this if exe file is called in a UNC path
-    '''
-    if not stored_args.get('Log_Directory'):
-        logdirectory = os.path.dirname(os.path.abspath(__file__))
-    else:
-        logdirectory = stored_args.get('Log_Directory')
-    '''
-    parser.add_argument('--Log_Directory', action='store', help="Directory to save log files.", widget="DirChooser",default=os.path.dirname(os.path.abspath(__file__)))
-
-    #We need this if exe file is called in a UNC path
-    '''
-    if not stored_args.get('Settings_Directory'):
-        settings_directory = os.path.dirname(os.path.abspath(__file__))
-    else:
-        settings_directory = stored_args.get('Settings_Directory')
-    '''
-    parser.add_argument('--Settings_Directory', action='store', help="Directory to save settings", widget="DirChooser",default=os.path.dirname(os.path.abspath(__file__)))
 
     args = parser.parse_args()
 
@@ -155,8 +138,9 @@ def parse_args():
         print("Please key in at least one result to output",flush=True)
         sys.exit(-1)
 
-    # Store the values of the arguments so we have them next time we run
-    args_file = os.path.join(args_dict['Settings_Directory'],args_file)
+    #Store the values of the arguments so we have them next time we run
+    #Json file will be the same directory as the exe file
+    args_file = os.path.join(os.path.abspath(os.path.dirname(sys.argv[0])),args_file)
     try:
         with open(args_file, 'w') as data_file:
             # Using vars(args) returns the data as a dictionary
@@ -332,7 +316,8 @@ if __name__ == '__main__':
     conf = parse_args()
 
     #Start log on a job
-    logger = start_logger(conf.Log_Directory)
+    #Logfile will be the same directory as the exe file
+    logger = start_logger(os.path.abspath(os.path.dirname(sys.argv[0])))
     logger.info("Starting the job.")
     print("Starting the job.",flush=True)
 
