@@ -94,29 +94,22 @@ def parse_args():
     else:
         Output_Format = stored_args.get('Output_Format')
 
-    if not stored_args.get('Exp_Medium'):
-        Exp_Medium = 'Plasma'
-    else:
-        Exp_Medium = stored_args.get('Exp_Medium')
-
     if not stored_args.get('Transpose_Results'):
         Transpose_Results = 'False'
     else:
         Transpose_Results = stored_args.get('Transpose_Results')
 
     #Required Arguments 
-    parser.add_argument('MS_Files',action='store',nargs="+",help="Input the MS raw files.\nData File is a required column for MassHunter\nSample Name and Component Name are required columns for Sciex", 
+    parser.add_argument('--MS_Files',action='store',nargs="+",help="Input the MS raw files.\nData File is a required column for MassHunter\nSample Name and Component Name are required columns for Sciex", 
                         widget="MultiFileChooser",default=stored_args.get('MS_Files'))
     #parser.add_argument('MS_Files_Type',action='store',nargs="+",help="Input the MS raw files.\nData File is a required column for MassHunter", widget="MultiFileChooser",default=stored_args.get('MS_Files'))
-    parser.add_argument('Output_Directory',action='store', help="Output directory to save summary report.", widget="DirChooser",default=stored_args.get('Output_Directory'))
-    parser.add_argument('--Output_Format', required=True, choices=['Excel'], help='Select specific file type to output', default=Output_Format)
-    parser.add_argument('--Exp_Medium', required=True, choices=['Plasma'], help='Select your experimental medium', default=Exp_Medium)
-    parser.add_argument('--Transpose_Results',required=True, choices=['True','False'], help='Set this option to True to let the samples be the columns instead of the Transition_Names',default=Transpose_Results)
+    parser.add_argument('--Output_Directory',action='store', help="Output directory to save summary report.", widget="DirChooser",default=stored_args.get('Output_Directory'))
+    parser.add_argument('--Output_Format', choices=['Excel'], help='Select specific file type to output', default=Output_Format)
+    parser.add_argument('--Transpose_Results', choices=['True','False'], help='Set this option to True to let the samples be the columns instead of the Transition_Names',default=Transpose_Results)
     
     #Optional Arguments 
     parser.add_argument('--ISTD_Map', action='store', help='Input the ISTD map file. Required for normalisation', widget="FileChooser",default=stored_args.get('ISTD_Map'))
     parser.add_argument('--Output_Options', choices=['Area','normArea by ISTD','normConc by ISTD','RT','FWHM','S/N','Precursor Ion','Product Ion'], nargs="+", help='Select specific information to output', widget="Listbox", default=stored_args.get('Output_Options'))
-    #parser.add_argument('--Output_Options', choices=['Area','normArea by ISTD','RT','FWHM','S/N','Precursor Ion','Product Ion'], nargs="+", help='Select specific information to output', widget="Listbox", default=stored_args.get('Output_Options'))
     parser.add_argument('--Testing', action='store_true', help='Testing mode will generate more output tables.')
 
     #parser.add_argument('--Transpose_Results', action='store_false', help='Select this option to let the samples be the columns',default=defaults.get('Transpose_Results'))
