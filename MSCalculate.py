@@ -26,11 +26,6 @@ class ISTD_Operations():
         AnnotationList = MS_Template(filepath=filepath,column_name=column_name, logger=logger,ingui=ingui)
         Transition_Name_Annot_df = AnnotationList.Read_Transition_Name_Annot_Sheet()
         ISTD_Annot_df = AnnotationList.Read_ISTD_Annot_Sheet()
-
-        #print(ISTD_Annot_df)
-        #print(Transition_Name_Annot_df)
-        #ISTD_map_df = pd.read_csv(filepath)
-        #sys.exit(0)
         
         if not ISTD_Annot_df.empty:
             #Additional check to ensure each Transition_Name_ISTD in Transition_Name_Annot sheet has 
@@ -39,23 +34,27 @@ class ISTD_Operations():
             ISTD_list_in_Annot_sheet = list(filter(None,ISTD_Annot_df['Transition_Name_ISTD'].unique()))
             missing_ISTD = set(ISTD_list_in_Transition_Name_Annot_sheet) - set(ISTD_list_in_Annot_sheet)
             if missing_ISTD:
-                if self.__logger:
-                    self.__logger.warning('There are Transition_Name_ISTD in Transition_Name_Annot not mentioned in ISTD_Annot.')
-                if self.__ingui:
-                    self.__print('There are Transition_Name_ISTD in Transition_Name_Annot not mentioned in ISTD_Annot.',flush=True)
+                if logger:
+                    logger.warning('There are Transition_Name_ISTD in Transition_Name_Annot not mentioned in ISTD_Annot.')
+                if ingui:
+                    print('There are Transition_Name_ISTD in Transition_Name_Annot not mentioned in ISTD_Annot.',flush=True)
                 for Transition_Name in missing_ISTD:
-                    if self.__logger:
-                        self.__logger.warning('/"%s/"',Transition_Name)
-                    if self.__ingui:
+                    if logger:
+                        logger.warning('/"%s/"',Transition_Name)
+                    if ingui:
                         print('\"' + Transition_Name + '\"',flush=True)
             #Merge the two data frame by common ISTD
             Transition_Name_Annot_df = pd.merge(Transition_Name_Annot_df, ISTD_Annot_df, on='Transition_Name_ISTD', how='outer')
-
-        #We leave this alone as users may put excess ISTD 
+ 
         #Remove Rows with ISTD with no Transition_Names
         Transition_Name_Annot_df = Transition_Name_Annot_df.dropna(subset=['Transition_Name'])
 
         return Transition_Name_Annot_df
+
+    def read_Sample_Annot(filepath,MS_FilePathList,column_name,logger=None,ingui=False):
+        AnnotationList = MS_Template(filepath=filepath,column_name=column_name, logger=logger,ingui=ingui)
+        Sample_Annot_df = AnnotationList.Read_Sample_Annot_Sheet(MS_FilePathList)
+        return Sample_Annot_df
 
     def validate_Transition_Name_df(Transition_Name_df,logger=None,ingui=False):
         if "Sample_Name" not in Transition_Name_df:
@@ -254,7 +253,7 @@ class ISTD_Operations():
         
         return(ISTD_data)
 
-    def getConc_by_ISTD(Transition_Name_df,Transition_Name_Annot_df,Exp_Medium,logger=None,ingui=False):
+    def getConc_by_ISTD(Transition_Name_df,Transition_Name_Annot_df,logger=None,ingui=False):
         '''Perform calculation of conc using values from Transition_Name_Annot_ISTD'''
         #If the Transition_Name table or ISTD map df is empty, return an empty data frame
         if Transition_Name_df.empty:
@@ -271,38 +270,37 @@ class ISTD_Operations():
         Conc_df["Sample_Name"] = Transition_Name_df["Sample_Name"]
 
         #If we have a plasma experiment
-        if Exp_Medium == "Plasma":
-            Annot_Columns = list(Transition_Name_Annot_df.columns.values)
-            if all(things in Annot_Columns for things in ["ISTD_Conc_nM","ISTD_Mixture_Volume","Plasma_Volume"]):
-                ISTD_Conc_df = ISTD_Operations.create_ISTD_data_from_Transition_Name_Annot(Transition_Name_df,Transition_Name_Annot_df,"ISTD_Conc_nM",logger,ingui)
+        Annot_Columns = list(Transition_Name_Annot_df.columns.values)
+        if all(things in Annot_Columns for things in ["ISTD_Conc_nM","ISTD_Mixture_Volume","Plasma_Volume"]):
+            ISTD_Conc_df = ISTD_Operations.create_ISTD_data_from_Transition_Name_Annot(Transition_Name_df,Transition_Name_Annot_df,"ISTD_Conc_nM",logger,ingui)
 
-                if Transition_Name_Annot_df["ISTD_Conc_nM"].isnull().any():
-                    if logger:
-                        logger.warning("Some ISTD_Conc_nM input values are missing. Please check the ISTD_Annot sheet. Remember to save your file")
-                    if ingui:
-                        print("Some ISTD_Conc_nM input values are missing. Please check the ISTD_Annot sheet. Remember to save your file",flush=True)
-                if Transition_Name_Annot_df["ISTD_Mixture_Volume"].isnull().all():
-                    if logger:
-                        logger.warning("ISTD_Mixture input value is missing. Skipping step to get normConc")
-                    if ingui:
-                        print("ISTD_Mixture input value is missing. Skipping step to get normConc",flush=True)
-                if Transition_Name_Annot_df["Plasma_Volume"].isnull().all():
-                    if logger:
-                        logger.warning("Plasma_Volume input value is missing. Skipping step to get normConc")
-                    if ingui:
-                        print("Plasma_Volume value is missing. Skipping step to get normConc",flush=True)
-
-                ISTD_Conc_df = ISTD_Operations.create_ISTD_data_from_Transition_Name_Annot(Transition_Name_df,Transition_Name_Annot_df,"ISTD_Conc_nM",logger,ingui)
-                Transition_Name_Annot_df["ISTD_to_Plasma_Vol_Ratio"] = Transition_Name_Annot_df["ISTD_Mixture_Volume"].astype('float64') / Transition_Name_Annot_df["Plasma_Volume"].astype('float64')
-                ISTD_Samp_Ratio_df = ISTD_Operations.create_ISTD_data_from_Transition_Name_Annot(Transition_Name_df,Transition_Name_Annot_df,"ISTD_to_Plasma_Vol_Ratio",logger,ingui)
-                #Perform an elementwise multiplication so that it is easy to debug.
-                Conc_df.iloc[:,1:] = Transition_Name_df.iloc[:,1:].astype('float64') * ISTD_Conc_df.iloc[:,1:].astype('float64') * ISTD_Samp_Ratio_df.iloc[:,1:].astype('float64')
-            else:
-                #Return empty data set
+            if Transition_Name_Annot_df["ISTD_Conc_nM"].isnull().any():
                 if logger:
-                    logger.warning("Empty ISTD_Annot sheet is given or merging of Transition_Name_Annot and ISTD_Annot sheets is unsuccessful. Skipping step to get normConc")
+                    logger.warning("Some ISTD_Conc_nM input values are missing. Please check the ISTD_Annot sheet. Remember to save your file")
                 if ingui:
-                    print("Empty ISTD_Annot sheet is given or merging of Transition_Name_Annot and ISTD_Annot sheets is unsuccessful. Skipping step to get normConc",flush=True)
-                return [Conc_df,Conc_df,Conc_df]
+                    print("Some ISTD_Conc_nM input values are missing. Please check the ISTD_Annot sheet. Remember to save your file",flush=True)
+            if Transition_Name_Annot_df["ISTD_Mixture_Volume"].isnull().all():
+                if logger:
+                    logger.warning("ISTD_Mixture input value is missing. Skipping step to get normConc")
+                if ingui:
+                    print("ISTD_Mixture input value is missing. Skipping step to get normConc",flush=True)
+            if Transition_Name_Annot_df["Plasma_Volume"].isnull().all():
+                if logger:
+                    logger.warning("Plasma_Volume input value is missing. Skipping step to get normConc")
+                if ingui:
+                    print("Plasma_Volume value is missing. Skipping step to get normConc",flush=True)
+
+            ISTD_Conc_df = ISTD_Operations.create_ISTD_data_from_Transition_Name_Annot(Transition_Name_df,Transition_Name_Annot_df,"ISTD_Conc_nM",logger,ingui)
+            Transition_Name_Annot_df["ISTD_to_Plasma_Vol_Ratio"] = Transition_Name_Annot_df["ISTD_Mixture_Volume"].astype('float64') / Transition_Name_Annot_df["Plasma_Volume"].astype('float64')
+            ISTD_Samp_Ratio_df = ISTD_Operations.create_ISTD_data_from_Transition_Name_Annot(Transition_Name_df,Transition_Name_Annot_df,"ISTD_to_Plasma_Vol_Ratio",logger,ingui)
+            #Perform an elementwise multiplication so that it is easy to debug.
+            Conc_df.iloc[:,1:] = Transition_Name_df.iloc[:,1:].astype('float64') * ISTD_Conc_df.iloc[:,1:].astype('float64') * ISTD_Samp_Ratio_df.iloc[:,1:].astype('float64')
+        else:
+            #Return empty data set
+            if logger:
+                logger.warning("Empty ISTD_Annot sheet is given or merging of Transition_Name_Annot and ISTD_Annot sheets is unsuccessful. Skipping step to get normConc")
+            if ingui:
+                print("Empty ISTD_Annot sheet is given or merging of Transition_Name_Annot and ISTD_Annot sheets is unsuccessful. Skipping step to get normConc",flush=True)
+            return [Conc_df,Conc_df,Conc_df]
  
         return [Conc_df,ISTD_Conc_df,ISTD_Samp_Ratio_df]

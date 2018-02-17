@@ -269,12 +269,12 @@ def end_writer(writer,output_format,logger=None,ingui=False):
                 logger.error(e)
             sys.exit(-1)
 
-def get_Parameters_df(conf,MS_File):
+def get_Parameters_df(conf,MS_FilePath):
     Parameter_list = []
     args_dict = vars(conf)
 
     #Get specific keys into the parameters list
-    Parameter_list.append(("Input_File",os.path.basename(MS_File)))
+    Parameter_list.append(("Input_File",os.path.basename(MS_FilePath)))
 
     if args_dict['Output_Format']:
         Parameter_list.append(("Output_Format",args_dict['Output_Format']))
@@ -318,27 +318,27 @@ if __name__ == '__main__':
     #create_timed_rotating_log(log_file)
 
     #We do this for every mass hunter file output
-    for MS_File in conf.MS_Files.split(';'):
+    for MS_FilePath in conf.MS_Files.split(';'):
 
-        print("Working on " + MS_File,flush=True)
-        logger.info("Working on " + MS_File)
+        print("Working on " + MS_FilePath,flush=True)
+        logger.info("Working on " + MS_FilePath)
 
         #Initiate the ISTD report
         pdfs = []
 
         #Generate the parameters report
-        Parameters_df = get_Parameters_df(conf,MS_File)
+        Parameters_df = get_Parameters_df(conf,MS_FilePath)
         template_vars = {"title": "Parameters", "Parameter_Report": Parameters_df.to_html(index=False)}
         html_string = Parameters_report_template.render(template_vars)
         html = HTML(string=html_string)
         pdfs.append(html.render(stylesheets=[stylesheet_file]))
 
         #Check if file is from Agilent or Sciex
-        if MS_File.endswith('.csv'):
-            RawData = AgilentMSRawData(filepath=MS_File,logger=logger)
-        elif MS_File.endswith('.txt'):
-            RawData = SciexMSRawData(filepath=MS_File,logger=logger)
-        output_filename = os.path.splitext(os.path.basename(MS_File))[0]
+        if MS_FilePath.endswith('.csv'):
+            RawData = AgilentMSRawData(filepath=MS_FilePath,logger=logger)
+        elif MS_FilePath.endswith('.txt'):
+            RawData = SciexMSRawData(filepath=MS_FilePath,logger=logger)
+        output_filename = os.path.splitext(os.path.basename(MS_FilePath))[0]
 
         #Set up the file writing configuration for Excel, ...
         writer = start_writer(conf.Output_Format,conf.Output_Directory,output_filename)
@@ -385,7 +385,9 @@ if __name__ == '__main__':
                             pdfs.append(html.render(stylesheets=[stylesheet_file]))
 
                     #Perform concentration calculation
-                    [norm_Conc_df,ISTD_Conc_df,ISTD_Samp_Ratio_df] = ISTD_Operations.getConc_by_ISTD(norm_Area_df,ISTD_map_df,conf.Exp_Medium,logger,ingui=True)
+                    #Get Sample_Annot_df
+                    Sample_Annot_df = ISTD_Operations.read_Sample_Annot(conf.ISTD_Map,[os.path.basename(MS_FilePath)],column_name,logger,ingui=True)
+                    [norm_Conc_df,ISTD_Conc_df,ISTD_Samp_Ratio_df] = ISTD_Operations.getConc_by_ISTD(norm_Area_df,ISTD_map_df,logger,ingui=True)
                     if conf.Testing:
                         df_to_file(writer,conf.Output_Format,"ISTD Conc",ISTD_Conc_df,logger,ingui=True,transpose=conf.Transpose_Results)
                         df_to_file(writer,conf.Output_Format,"ISTD to Samp Vol Ratio",ISTD_Samp_Ratio_df,logger,ingui=True,transpose=conf.Transpose_Results)
