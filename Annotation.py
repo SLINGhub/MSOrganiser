@@ -182,7 +182,6 @@ class MS_Template():
 
         #Remove whitespaces in column names
         ISTD_Annot_df.columns = ISTD_Annot_df.columns.str.strip()
-        print(ISTD_Annot_df.info())
 
         #Convert all but first column to numeric
         #ISTD_Annot_df = ISTD_Annot_df.apply(pd.to_numeric, errors='ignore')

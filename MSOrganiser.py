@@ -387,7 +387,7 @@ if __name__ == '__main__':
                     #Perform concentration calculation
                     #Get Sample_Annot_df
                     Sample_Annot_df = ISTD_Operations.read_Sample_Annot(conf.ISTD_Map,[os.path.basename(MS_FilePath)],column_name,logger,ingui=True)
-                    [norm_Conc_df,ISTD_Conc_df,ISTD_Samp_Ratio_df] = ISTD_Operations.getConc_by_ISTD(norm_Area_df,ISTD_map_df,logger,ingui=True)
+                    [norm_Conc_df,ISTD_Conc_df,ISTD_Samp_Ratio_df] = ISTD_Operations.getConc_by_ISTD(norm_Area_df,ISTD_map_df,Sample_Annot_df,logger,ingui=True)
                     if conf.Testing:
                         df_to_file(writer,conf.Output_Format,"ISTD Conc",ISTD_Conc_df,logger,ingui=True,transpose=conf.Transpose_Results)
                         df_to_file(writer,conf.Output_Format,"ISTD to Samp Vol Ratio",ISTD_Samp_Ratio_df,logger,ingui=True,transpose=conf.Transpose_Results)

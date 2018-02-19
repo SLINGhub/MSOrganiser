@@ -4,6 +4,12 @@ import sys
 import os
 import logging
 
+
+import psutil
+def usage():
+    process1 = psutil.Process(os.getpid())
+    print(process1.memory_info()[0] / float(2 ** 20),flush=True)
+
 from openpyxl import load_workbook
 from Annotation import MS_Template
 
@@ -66,6 +72,14 @@ class ISTD_Operations():
                 print("The input data frame does not contain the Sample_Name",flush=True)
                 print("If input raw file is from MassHunter, make sure the column Data File is present",flush=True)
                 print("If input raw file is from Sciex, make sure the column Sample Name is present")
+            sys.exit(-1)
+
+    def validate_Sample_Annot_df(Sample_Annot_df,logger=None,ingui=False):
+        if "Sample_Name" not in Sample_Annot_df:
+            if logger:
+                logger.error("The sample annotation file does not contain the column Sample_Name")
+            if ingui:
+                print("The sample annotation file does not contain the Sample_Name",flush=True)
             sys.exit(-1)
 
     def create_ISTD_data_from_Transition_Name_df(Transition_Name_df,Transition_Name_Annot_df,logger=None,ingui=False):
@@ -253,54 +267,111 @@ class ISTD_Operations():
         
         return(ISTD_data)
 
-    def getConc_by_ISTD(Transition_Name_df,Transition_Name_Annot_df,logger=None,ingui=False):
+    def getConc_by_ISTD(Transition_Name_df,ISTD_Annot_df,Sample_Annot_df,logger=None,ingui=False):
         '''Perform calculation of conc using values from Transition_Name_Annot_ISTD'''
-        #If the Transition_Name table or ISTD map df is empty, return an empty data frame
+        #If the Transition_Name_df or Sample_Annot_df is empty, return an empty data frame
         if Transition_Name_df.empty:
             if logger:
-                logger.warning("The input Transition_Name data frame has no data. Skipping step to get normConc")
+                logger.warning("Skipping step to get normConc. The input Transition_Name data frame has no data.")
             if ingui:
-                print("The input Transition_Name data frame has no data. Skipping step to get normConc",flush=True)
+                print("Skipping step to get normConc. The input Transition_Name data frame has no data.",flush=True)
             return [pd.DataFrame(),pd.DataFrame(),pd.DataFrame()]
 
-        Conc_df = pd.DataFrame(columns=Transition_Name_df.columns, index=Transition_Name_df.index)
+        if ISTD_Annot_df.empty:
+            if logger:
+                logger.warning("Skipping step to get normConcThe input ISTD_Annot data frame has no data.")
+            if ingui:
+                print("Skipping step to get normConc. The input ISTD_Annot data frame has no data.",flush=True)
+            return [pd.DataFrame(),pd.DataFrame(),pd.DataFrame()]
+
+        if Sample_Annot_df.empty:
+            if logger:
+                logger.warning("Skipping step to get normConc. The Sample Annotation data frame has no data.")
+            if ingui:
+                print("Skipping step to get normConc .The Sample Annotation data frame has no data.",flush=True)
+            return [pd.DataFrame(),pd.DataFrame(),pd.DataFrame()]
 
         #Sample_Name must be present
         ISTD_Operations.validate_Transition_Name_df(Transition_Name_df,logger,ingui)
+        ISTD_Operations.validate_Sample_Annot_df(Sample_Annot_df,logger,ingui)
+
+        #Creating the normConc dataframe
+        Conc_df = pd.DataFrame(columns=Transition_Name_df.columns, index=Transition_Name_df.index)
         Conc_df["Sample_Name"] = Transition_Name_df["Sample_Name"]
-
-        #If we have a plasma experiment
-        Annot_Columns = list(Transition_Name_Annot_df.columns.values)
-        if all(things in Annot_Columns for things in ["ISTD_Conc_nM","ISTD_Mixture_Volume","Plasma_Volume"]):
-            ISTD_Conc_df = ISTD_Operations.create_ISTD_data_from_Transition_Name_Annot(Transition_Name_df,Transition_Name_Annot_df,"ISTD_Conc_nM",logger,ingui)
-
-            if Transition_Name_Annot_df["ISTD_Conc_nM"].isnull().any():
-                if logger:
-                    logger.warning("Some ISTD_Conc_nM input values are missing. Please check the ISTD_Annot sheet. Remember to save your file")
-                if ingui:
-                    print("Some ISTD_Conc_nM input values are missing. Please check the ISTD_Annot sheet. Remember to save your file",flush=True)
-            if Transition_Name_Annot_df["ISTD_Mixture_Volume"].isnull().all():
-                if logger:
-                    logger.warning("ISTD_Mixture input value is missing. Skipping step to get normConc")
-                if ingui:
-                    print("ISTD_Mixture input value is missing. Skipping step to get normConc",flush=True)
-            if Transition_Name_Annot_df["Plasma_Volume"].isnull().all():
-                if logger:
-                    logger.warning("Plasma_Volume input value is missing. Skipping step to get normConc")
-                if ingui:
-                    print("Plasma_Volume value is missing. Skipping step to get normConc",flush=True)
-
-            ISTD_Conc_df = ISTD_Operations.create_ISTD_data_from_Transition_Name_Annot(Transition_Name_df,Transition_Name_Annot_df,"ISTD_Conc_nM",logger,ingui)
-            Transition_Name_Annot_df["ISTD_to_Plasma_Vol_Ratio"] = Transition_Name_Annot_df["ISTD_Mixture_Volume"].astype('float64') / Transition_Name_Annot_df["Plasma_Volume"].astype('float64')
-            ISTD_Samp_Ratio_df = ISTD_Operations.create_ISTD_data_from_Transition_Name_Annot(Transition_Name_df,Transition_Name_Annot_df,"ISTD_to_Plasma_Vol_Ratio",logger,ingui)
-            #Perform an elementwise multiplication so that it is easy to debug.
-            Conc_df.iloc[:,1:] = Transition_Name_df.iloc[:,1:].astype('float64') * ISTD_Conc_df.iloc[:,1:].astype('float64') * ISTD_Samp_Ratio_df.iloc[:,1:].astype('float64')
+        
+        #Creating the ISTD_Conc_df
+        ISTD_Annot_Columns = list(ISTD_Annot_df.columns.values)
+        if "ISTD_Conc_[nM]" in ISTD_Annot_Columns:
+            #Some values may be missing because some transition names have no ISTD, logging it may be unnecessary 
+            #if ISTD_Annot_df["ISTD_Conc_[nM]"].isnull().any():
+                #if logger:
+                #    logger.warning("Some ISTD_Conc_nM input values are missing. Please check the ISTD_Annot sheet. Remember to save your file")
+                #if ingui:
+                #    print("Some ISTD_Conc_nM input values are missing. Please check the ISTD_Annot sheet. Remember to save your file",flush=True)
+            ISTD_Conc_df = ISTD_Operations.create_ISTD_data_from_Transition_Name_Annot(Transition_Name_df,ISTD_Annot_df,"ISTD_Conc_[nM]",logger,ingui)
         else:
             #Return empty data set
             if logger:
-                logger.warning("Empty ISTD_Annot sheet is given or merging of Transition_Name_Annot and ISTD_Annot sheets is unsuccessful. Skipping step to get normConc")
+                logger.warning("Skipping step to get normConc. ISTD_Annot sheet does not have column ISTD_Conc_[nM].")
             if ingui:
-                print("Empty ISTD_Annot sheet is given or merging of Transition_Name_Annot and ISTD_Annot sheets is unsuccessful. Skipping step to get normConc",flush=True)
+                print("Skipping step to get normConc. ISTD_Annot sheet does not have column name ISTD_Conc_[nM].",flush=True)
             return [Conc_df,Conc_df,Conc_df]
- 
+
+        #Creating the ISTD_Samp_Ratio_df
+
+        #Ensure that the necessary columns are there
+        Sample_Annot_Columns = list(Sample_Annot_df.columns.values)
+        if not all(things in Sample_Annot_Columns for things in ["Raw_Data_File_Name","Sample_Amount","Sample_Amount_Unit","ISTD_Mixture_Volume_[uL]"]):
+            #Return empty data set
+            if logger:
+                logger.warning("Skipping step to get normConc. Sample Annotation data frame is missing column %s" , ', '.join(["Raw_Data_File_Name","Sample_Amount","Sample_Amount_Unit","ISTD_Mixture_Volume_[uL]"]) )
+            if ingui:
+                print("Skipping step to get normConc. Sample Annotation data frame is missing column " , ', '.join(["Raw_Data_File_Name","Sample_Amount","Sample_Amount_Unit","ISTD_Mixture_Volume_[uL]"]),flush=True)
+            return [Conc_df,Conc_df,Conc_df]
+
+        #We cannot accept duplicated Raw_Data_File_path
+        if(len(Sample_Annot_df.Raw_Data_File_Name.unique()) > 1):
+            #Return empty data set
+            if logger:
+                logger.error('Skipping step to get normConc. Sample Annotation data frame has duplicate Raw_Data_File_Name.')
+            if ingui:
+                print('Skipping step to get normConc. Sample Annotation data frame has duplicate Raw_Data_File_Name.' ,flush=True)
+            for things in Sample_Annot_df.Raw_Data_File_Name.unique():
+                if logger:
+                    logger.warning('/"%s/"',things)
+                if ingui:
+                    print('\"' + things + '\"',flush=True)
+            return [Conc_df,Conc_df,Conc_df]
+
+        #We cannot accept duplicated Sample_Amount_Unit
+        if(len(Sample_Annot_df.Sample_Amount_Unit.unique()) > 1):
+            #Return empty data set
+            if logger:
+                logger.error('Skipping step to get normConc. Sample Annotation data frame has duplicate Sample_Amount_Unit.')
+            if ingui:
+                print('Skipping step to get normConc. Sample Annotation data frame has duplicate Sample_Amount_Unit.' ,flush=True)
+            for things in Sample_Annot_df.Sample_Amount_Unit.unique():
+                if logger:
+                    logger.warning('/"%s/"',things)
+                if ingui:
+                    print('\"' + things + '\"',flush=True)
+            return [Conc_df,Conc_df,Conc_df]
+
+        Sample_Annot_df["ISTD_to_Sample_Amount_Ratio"] = Sample_Annot_df["ISTD_Mixture_Volume_[uL]"].astype('float64') / Sample_Annot_df["Sample_Amount"].astype('float64')
+        Sample_Annot_df["ISTD_to_Sample_Amount_Ratio"] = Sample_Annot_df["ISTD_to_Sample_Amount_Ratio"].replace([np.inf, -np.inf], np.nan)
+
+        merged_df = Transition_Name_df.loc[:, Transition_Name_df.columns == 'Sample_Name']
+        merged_df = pd.merge(merged_df, Sample_Annot_df.loc[:, ["Sample_Name","ISTD_to_Sample_Amount_Ratio"]], on="Sample_Name")
+
+        ISTD_Samp_Ratio_df = pd.DataFrame(index=Transition_Name_df.index, columns=Transition_Name_df.columns,dtype='float64')
+        ISTD_Samp_Ratio_df.apply(lambda x: x.update(merged_df["ISTD_to_Sample_Amount_Ratio"]) ,axis=0)
+
+        #Assignment of string must come after df apply
+        ISTD_Samp_Ratio_df['Sample_Name'] = Transition_Name_df['Sample_Name']
+        #print(ISTD_Samp_Ratio_df,flush=True)
+        #print(ISTD_Samp_Ratio_df.info())
+
+        #Perform an elementwise multiplication so that it is easy to debug.
+        Conc_df.iloc[:,1:] = Transition_Name_df.iloc[:,1:].astype('float64') * ISTD_Conc_df.iloc[:,1:].astype('float64') * ISTD_Samp_Ratio_df.iloc[:,1:].astype('float64')
+
         return [Conc_df,ISTD_Conc_df,ISTD_Samp_Ratio_df]
