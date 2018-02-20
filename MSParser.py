@@ -8,8 +8,7 @@ import sys
 @Gooey(program_name='MS Data Organiser',
        program_description='Create summary tables from MassHunter csv files',
        advanced=True,
-       default_size=(610,710),
-       group_by_type=False)
+       default_size=(610,710))
 
 def parse_MSOrganiser_args(args_json_file_path=""):
     """ Use ArgParser to build up the arguments we will use in our script"""
@@ -29,26 +28,32 @@ def parse_MSOrganiser_args(args_json_file_path=""):
 
     #Update the args with the most recent parameter settings
     args = parser.parse_args()
+    stored_args = vars(args)
 
     #Verify that the arguments are valid before saving/using them
     #Check if Output_Options is selected
-    if not args.Output_Options:
+    if not stored_args['Output_Options']:
         print("Please key in at least one result to output",flush=True)
         sys.exit(-1)
-
-    #Update the stored_args with the most recent parameter settings
-    stored_args = vars(args)
 
     #Store the values of the arguments so we have them next time we run
     __save_args_to_json(args_file,stored_args)
 
     #Convert the string in Transpose Results to boolean
-    if args.Transpose_Results == 'True':
-        args.Transpose_Results = True
-    else:
-        args.Transpose_Results = False
+    #if args.Transpose_Results == 'True':
+    #    args.Transpose_Results = True
+    #else:
+    #    args.Transpose_Results = False
 
-    return args
+    #return args
+
+    #Convert the string in Transpose Results to boolean
+    if stored_args['Transpose_Results'] == 'True':
+        stored_args['Transpose_Results'] = True
+    else:
+        stored_args['Transpose_Results'] = False
+
+    return stored_args
 
 def __load_args_from_json(args_file):
 
@@ -64,9 +69,6 @@ def __load_args_from_json(args_file):
 
 def __save_args_to_json(args_file,stored_args):
     #Store the values of the arguments so we have them next time we run
-
-    #Join the list of file paths into one string separated by semicolon
-    stored_args['MS_Files'] = ";".join(stored_args['MS_Files'])
 
     #By default json file will be the same directory as the exe file
     try:
@@ -96,8 +98,11 @@ def create_Gooey_Parser(stored_args):
     optional_args = parser.add_argument_group(gooey_options={'show_border': True, 'columns': 2 } )
 
     #Required Arguments 
-    required_args.add_argument('--MS_Files',action='store',nargs="+",help="Input the MS raw files.\nData File is a required column for MassHunter\nSample Name and Component Name are required columns for Sciex", 
-                               widget="MultiFileChooser", 
+    #required_args.add_argument('--MS_Files',action='store',nargs="+",help="Input the MS raw files.\nData File is a required column for MassHunter\nSample Name and Component Name are required columns for Sciex", 
+    #                           widget="MultiFileChooser", 
+    #                           default=stored_args.get('MS_Files'))
+    required_args.add_argument('--MS_Files',help="Input the MS raw files.\nData File is a required column for MassHunter\nSample Name and Component Name are required columns for Sciex", 
+                               widget='MultiFileChooser', 
                                default=stored_args.get('MS_Files'))
     #required_args.add_argument('MS_Files_Type',action='store',nargs="+",help="Input the MS raw files.\nData File is a required column for MassHunter", widget="MultiFileChooser",default=stored_args.get('MS_Files'))
     required_args.add_argument('--Output_Directory',action='store', help="Output directory to save summary report.", 

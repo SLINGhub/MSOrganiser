@@ -18,9 +18,9 @@ openpyxl==2.5.0
 pandas==0.22.0
 pdfrw==0.4
 pefile==2017.11.5
-Pillow==4.3.0
+Pillow==5.0.0
 pip==9.0.1
-psutil==5.4.2
+psutil==5.4.3
 pycparser==2.18
 PyInstaller==3.3.1
 Pyphen==0.9.4
@@ -35,4 +35,4 @@ tabulate==0.8.2
 tinycss2==0.6.1
 WeasyPrint==0.42.2
 webencodings==0.5.1
-wxPython==4.0.0b1
+wxPython==4.0.1

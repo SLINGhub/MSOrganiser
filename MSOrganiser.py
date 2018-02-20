@@ -13,11 +13,8 @@ import MSDataOutput
 from MSDataReport import MSDataReport_PDF
 
 from logging.handlers import TimedRotatingFileHandler
-#import argparse
+
 import os
-import json
-from gooey import Gooey
-from gooey import GooeyParser
 import sys
 import logging
 import pandas as pd
@@ -54,21 +51,20 @@ def start_logger(log_directory_path):
     logger.addHandler(fh)
     return logger
 
-def get_Parameters_df(conf,MS_FilePath):
+def get_Parameters_df(stored_args,MS_FilePath):
     Parameter_list = []
-    args_dict = vars(conf)
 
     #Get specific keys into the parameters list
     Parameter_list.append(("Input_File",os.path.basename(MS_FilePath)))
 
-    if args_dict['Output_Format']:
-        Parameter_list.append(("Output_Format",args_dict['Output_Format']))
+    if stored_args['Output_Format']:
+        Parameter_list.append(("Output_Format",stored_args['Output_Format']))
 
-    if args_dict['ISTD_Map']:
-        Parameter_list.append(("ISTD_Map_File",os.path.basename(args_dict['ISTD_Map'])))
+    if stored_args['ISTD_Map']:
+        Parameter_list.append(("ISTD_Map_File",os.path.basename(stored_args['ISTD_Map'])))
 
-    if args_dict['Output_Options']:
-        for things in args_dict['Output_Options']:
+    if stored_args['Output_Options']:
+        for things in stored_args['Output_Options']:
             Parameter_list.append(("Output_Options",things))
 
     Parameters_df = pd.DataFrame(Parameter_list,columns=['Parameters', 'Value'])
@@ -77,16 +73,16 @@ def get_Parameters_df(conf,MS_FilePath):
 if __name__ == '__main__':
 
     #Read the parser
-    conf = MSParser.parse_MSOrganiser_args()
+    stored_args = MSParser.parse_MSOrganiser_args()
 
     #Start log on a job
     #Logfile will be the same directory as the exe file
     logger = start_logger(os.path.abspath(os.path.dirname(sys.argv[0])))
     logger.info("Starting the job.")
     print("Starting the job.",flush=True)
-
     #We do this for every mass hunter file output
-    for MS_FilePath in conf.MS_Files.split(';'):
+    #MS_Files is not a long string of paths separated by ;, we split them into a list
+    for MS_FilePath in stored_args['MS_Files'].split(';'):
 
         print("Working on " + MS_FilePath,flush=True)
         logger.info("Working on " + MS_FilePath)
@@ -99,30 +95,30 @@ if __name__ == '__main__':
         output_filename = os.path.splitext(os.path.basename(MS_FilePath))[0]
 
         #Initiate the pdf report file
-        PDFReport = MSDataReport_PDF(output_file_path = os.path.join(conf.Output_Directory , output_filename), logger=logger)
+        PDFReport = MSDataReport_PDF(output_file_path = os.path.join(stored_args['Output_Directory'] , output_filename), logger=logger)
 
         #Generate the parameters report
-        Parameters_df = get_Parameters_df(conf,MS_FilePath)
+        Parameters_df = get_Parameters_df(stored_args,MS_FilePath)
         PDFReport.create_parameters_report(Parameters_df)
 
         #Set up the file writing configuration for Excel, ...
-        writer = MSDataOutput.start_writer(conf.Output_Format,conf.Output_Directory,output_filename)
+        writer = MSDataOutput.start_writer(stored_args['Output_Format'],stored_args['Output_Directory'],output_filename)
         
-        if conf.Output_Options:
-            for column_name in conf.Output_Options:
+        if stored_args['Output_Options']:
+            for column_name in stored_args['Output_Options']:
                 if column_name == 'normArea by ISTD':
                     #Perform normalisation using ISTD
                     #Get Area Table
                     Area_df = RawData.get_table('Area',is_numeric=True)
                     #Get ISTD map df
-                    ISTD_map_df = ISTD_Operations.read_ISTD_map(conf.ISTD_Map,column_name,logger,ingui=True)
+                    ISTD_map_df = ISTD_Operations.read_ISTD_map(stored_args['ISTD_Map'],column_name,logger,ingui=True)
                     #Perform normalisation using ISTD
                     [norm_Area_df,ISTD_Area,ISTD_Report] = ISTD_Operations.normalise_by_ISTD(Area_df,ISTD_map_df,logger,ingui=True)
                     #Output the normalised area results
-                    if conf.Testing:
-                        MSDataOutput.df_to_file(writer,conf.Output_Format,"ISTD Area",ISTD_Area,logger,ingui=True,transpose=conf.Transpose_Results)
-                    MSDataOutput.df_to_file(writer,conf.Output_Format,"ISTD map",ISTD_map_df,logger,ingui=True)
-                    MSDataOutput.df_to_file(writer,conf.Output_Format,column_name,norm_Area_df,logger,ingui=True,transpose=conf.Transpose_Results)
+                    if stored_args['Testing']:
+                        MSDataOutput.df_to_file(writer,stored_args['Output_Format'],"ISTD Area",ISTD_Area,logger,ingui=True,transpose=stored_args['Transpose_Results'])
+                    MSDataOutput.df_to_file(writer,stored_args['Output_Format'],"ISTD map",ISTD_map_df,logger,ingui=True)
+                    MSDataOutput.df_to_file(writer,stored_args['Output_Format'],column_name,norm_Area_df,logger,ingui=True,transpose=stored_args['Transpose_Results'])
 
                     #Generate the ISTD normalisation report
                     PDFReport.create_ISTD_report(ISTD_Report)
@@ -135,7 +131,7 @@ if __name__ == '__main__':
                         #Get Area Table
                         Area_df = RawData.get_table('Area',is_numeric=True)
                         #Get ISTD map df
-                        ISTD_map_df = ISTD_Operations.read_ISTD_map(conf.ISTD_Map,column_name,logger,ingui=True)
+                        ISTD_map_df = ISTD_Operations.read_ISTD_map(stored_args['ISTD_Map'],column_name,logger,ingui=True)
                         #Perform normalisation using ISTD
                         [norm_Area_df,ISTD_Area,ISTD_Report] = ISTD_Operations.normalise_by_ISTD(Area_df,ISTD_map_df,logger,ingui=True)
 
@@ -144,21 +140,21 @@ if __name__ == '__main__':
 
                     #Perform concentration calculation
                     #Get Sample_Annot_df
-                    Sample_Annot_df = ISTD_Operations.read_Sample_Annot(conf.ISTD_Map,[os.path.basename(MS_FilePath)],column_name,logger,ingui=True)
+                    Sample_Annot_df = ISTD_Operations.read_Sample_Annot(stored_args['ISTD_Map'],[os.path.basename(MS_FilePath)],column_name,logger,ingui=True)
                     [norm_Conc_df,ISTD_Conc_df,ISTD_Samp_Ratio_df] = ISTD_Operations.getConc_by_ISTD(norm_Area_df,ISTD_map_df,Sample_Annot_df,logger,ingui=True)
-                    if conf.Testing:
-                        MSDataOutput.df_to_file(writer,conf.Output_Format,"ISTD Conc",ISTD_Conc_df,logger,ingui=True,transpose=conf.Transpose_Results)
-                        MSDataOutput.df_to_file(writer,conf.Output_Format,"ISTD to Samp Vol Ratio",ISTD_Samp_Ratio_df,logger,ingui=True,transpose=conf.Transpose_Results)
-                    MSDataOutput.df_to_file(writer,conf.Output_Format,"ISTD map",ISTD_map_df,logger,ingui=True)
-                    MSDataOutput.df_to_file(writer,conf.Output_Format,column_name,norm_Conc_df,logger,ingui=True,transpose=conf.Transpose_Results)
+                    if stored_args['Testing']:
+                        MSDataOutput.df_to_file(writer,stored_args['Output_Format'],"ISTD Conc",ISTD_Conc_df,logger,ingui=True,transpose=stored_args['Transpose_Results'])
+                        MSDataOutput.df_to_file(writer,stored_args['Output_Format'],"ISTD to Samp Vol Ratio",ISTD_Samp_Ratio_df,logger,ingui=True,transpose=stored_args['Transpose_Results'])
+                    MSDataOutput.df_to_file(writer,stored_args['Output_Format'],"ISTD map",ISTD_map_df,logger,ingui=True)
+                    MSDataOutput.df_to_file(writer,stored_args['Output_Format'],column_name,norm_Conc_df,logger,ingui=True,transpose=stored_args['Transpose_Results'])
 
                 else:
                     #We extract the data directly from the file and output accordingly
                     Output_df = RawData.get_table(column_name,is_numeric=True)
-                    MSDataOutput.df_to_file(writer,conf.Output_Format,column_name,Output_df,logger,ingui=True,transpose=conf.Transpose_Results)
+                    MSDataOutput.df_to_file(writer,stored_args['Output_Format'],column_name,Output_df,logger,ingui=True,transpose=stored_args['Transpose_Results'])
 
         #End the writing configuration for Excel, ...
-        MSDataOutput.end_writer(writer,conf.Output_Format,logger,ingui=True)
+        MSDataOutput.end_writer(writer,stored_args['Output_Format'],logger,ingui=True)
 
         #Output the report to a pdf file
         PDFReport.output_to_PDF()
