@@ -1,6 +1,5 @@
 import gooey
 import pyphen
-#from PyInstaller.utils.hooks import collect_data_files
 
 gooey_root = os.path.dirname(gooey.__file__)
 gooey_languages = Tree(os.path.join(gooey_root, 'languages'), prefix = 'gooey/languages')
@@ -8,7 +7,6 @@ gooey_images = Tree(os.path.join(gooey_root, 'images'), prefix = 'gooey/images')
 
 pyphen_root = os.path.dirname(pyphen.__file__)
 pyphen_dictionaries = Tree(os.path.join(pyphen_root, 'dictionaries'), prefix = 'pyphen/dictionaries')
-#print(pyphen_dictionaries)
 
 cairo_toc = Tree(os.path.join(os.getcwd(),'cairo_dll'), prefix = 'cairo_dll' )
 extras_toc = Tree(os.path.join(os.getcwd(),'msreport'), prefix = 'msreport' )

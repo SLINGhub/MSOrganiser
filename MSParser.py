@@ -91,23 +91,28 @@ def create_Gooey_Parser(stored_args):
         Transpose_Results = stored_args.get('Transpose_Results')
 
     required_args = parser.add_argument_group("Required Input", gooey_options={'columns': 1 } )
-
-    #search_group.add_argument(
-    #'--query', 
-    #help='Base search string') 
+    analysis_args = parser.add_argument_group("For Normalisation", gooey_options={'columns': 1 } )
+    output_args = parser.add_argument_group("Output Settings", gooey_options={ 'columns': 2 } )
+    optional_args = parser.add_argument_group(gooey_options={'show_border': True, 'columns': 2 } )
 
     #Required Arguments 
-    parser.add_argument('--MS_Files',action='store',nargs="+",help="Input the MS raw files.\nData File is a required column for MassHunter\nSample Name and Component Name are required columns for Sciex", 
-                        widget="MultiFileChooser",default=stored_args.get('MS_Files'))
-    #parser.add_argument('MS_Files_Type',action='store',nargs="+",help="Input the MS raw files.\nData File is a required column for MassHunter", widget="MultiFileChooser",default=stored_args.get('MS_Files'))
-    parser.add_argument('--Output_Directory',action='store', help="Output directory to save summary report.", widget="DirChooser",default=stored_args.get('Output_Directory'))
-    parser.add_argument('--Output_Format', choices=['Excel'], help='Select specific file type to output', default=Output_Format)
-    parser.add_argument('--Transpose_Results', choices=['True','False'], help='Set this option to True to let the samples be the columns instead of the Transition_Names',default=Transpose_Results)
+    required_args.add_argument('--MS_Files',action='store',nargs="+",help="Input the MS raw files.\nData File is a required column for MassHunter\nSample Name and Component Name are required columns for Sciex", 
+                               widget="MultiFileChooser", 
+                               default=stored_args.get('MS_Files'))
+    #required_args.add_argument('MS_Files_Type',action='store',nargs="+",help="Input the MS raw files.\nData File is a required column for MassHunter", widget="MultiFileChooser",default=stored_args.get('MS_Files'))
+    required_args.add_argument('--Output_Directory',action='store', help="Output directory to save summary report.", 
+                               widget="DirChooser", default=stored_args.get('Output_Directory'))
+    required_args.add_argument('--Output_Options', choices=['Area','normArea by ISTD','normConc by ISTD','RT','FWHM','S/N','Precursor Ion','Product Ion'], nargs="+", help='Select specific information to output', widget="Listbox", default=stored_args.get('Output_Options'))
 
+    #Analysis Arguments
+    analysis_args.add_argument('--ISTD_Map', action='store', help='Input the ISTD map file. Required for normalisation', widget="FileChooser",default=stored_args.get('ISTD_Map'))
+
+    #Output Arguments 
+    output_args.add_argument('--Output_Format', choices=['Excel'], help='Select specific file type to output', default=Output_Format)
+    output_args.add_argument('--Transpose_Results', choices=['True','False'], help='Set this option to True to let the samples be the columns instead of the Transition_Names',default=Transpose_Results)
+    #output_args.add_argument('--Transpose_Results', action='store_false', help='Select this option to let the samples be the columns',default=defaults.get('Transpose_Results'))
+    
     #Optional Arguments 
-    parser.add_argument('--ISTD_Map', action='store', help='Input the ISTD map file. Required for normalisation', widget="FileChooser",default=stored_args.get('ISTD_Map'))
-    parser.add_argument('--Output_Options', choices=['Area','normArea by ISTD','normConc by ISTD','RT','FWHM','S/N','Precursor Ion','Product Ion'], nargs="+", help='Select specific information to output', widget="Listbox", default=stored_args.get('Output_Options'))
-    parser.add_argument('--Testing', action='store_true', help='Testing mode will generate more output tables.')
-    #parser.add_argument('--Transpose_Results', action='store_false', help='Select this option to let the samples be the columns',default=defaults.get('Transpose_Results'))
+    optional_args.add_argument('--Testing', action='store_true', help='Testing mode will generate more output tables.')
 
     return parser
