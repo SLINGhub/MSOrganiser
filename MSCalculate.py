@@ -14,7 +14,7 @@ from openpyxl import load_workbook
 from Annotation import MS_Template
 
 class ISTD_Operations():
-    """A collection of functions to perform calculation"""
+    """A collection of functions to perform calculation relating to ISTD"""
 
     #def __init__( logger=None,ingui=True):
         #logger = logger

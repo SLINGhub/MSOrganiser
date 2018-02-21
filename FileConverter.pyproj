@@ -24,6 +24,9 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Annotation.py" />
+    <Compile Include="MSAnalysis.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="MSCalculate.py" />
     <Compile Include="MSDataReport.py">
       <SubType>Code</SubType>
