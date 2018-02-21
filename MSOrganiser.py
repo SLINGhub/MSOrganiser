@@ -106,24 +106,7 @@ if __name__ == '__main__':
         
         if stored_args['Output_Options']:
             for column_name in stored_args['Output_Options']:
-                if column_name == 'normArea by ISTD':
-                    #Perform normalisation using ISTD
-                    #Get Area Table
-                    Area_df = RawData.get_table('Area',is_numeric=True)
-                    #Get ISTD map df
-                    ISTD_map_df = ISTD_Operations.read_ISTD_map(stored_args['ISTD_Map'],column_name,logger,ingui=True)
-                    #Perform normalisation using ISTD
-                    [norm_Area_df,ISTD_Area,ISTD_Report] = ISTD_Operations.normalise_by_ISTD(Area_df,ISTD_map_df,logger,ingui=True)
-                    #Output the normalised area results
-                    if stored_args['Testing']:
-                        MSDataOutput.df_to_file(writer,stored_args['Output_Format'],"ISTD Area",ISTD_Area,logger,ingui=True,transpose=stored_args['Transpose_Results'])
-                    MSDataOutput.df_to_file(writer,stored_args['Output_Format'],"ISTD map",ISTD_map_df,logger,ingui=True)
-                    MSDataOutput.df_to_file(writer,stored_args['Output_Format'],column_name,norm_Area_df,logger,ingui=True,transpose=stored_args['Transpose_Results'])
-
-                    #Generate the ISTD normalisation report
-                    PDFReport.create_ISTD_report(ISTD_Report)
-
-                elif column_name == 'normConc by ISTD':
+                if column_name in ['normArea by ISTD','normConc by ISTD']:
                     try:
                         norm_Area_df
                     except NameError:
@@ -134,19 +117,26 @@ if __name__ == '__main__':
                         ISTD_map_df = ISTD_Operations.read_ISTD_map(stored_args['ISTD_Map'],column_name,logger,ingui=True)
                         #Perform normalisation using ISTD
                         [norm_Area_df,ISTD_Area,ISTD_Report] = ISTD_Operations.normalise_by_ISTD(Area_df,ISTD_map_df,logger,ingui=True)
+                        #Output the normalised area results
+                        if stored_args['Testing']:
+                            MSDataOutput.df_to_file(writer,stored_args['Output_Format'],"ISTD Area",ISTD_Area,logger,ingui=True,transpose=stored_args['Transpose_Results'])
+                        MSDataOutput.df_to_file(writer,stored_args['Output_Format'],"ISTD map",ISTD_map_df,logger,ingui=True)
+                        MSDataOutput.df_to_file(writer,stored_args['Output_Format'],"normArea by ISTD",norm_Area_df,logger,ingui=True,transpose=stored_args['Transpose_Results'])
 
                         #Generate the ISTD normalisation report
                         PDFReport.create_ISTD_report(ISTD_Report)
 
-                    #Perform concentration calculation
-                    #Get Sample_Annot_df
-                    Sample_Annot_df = ISTD_Operations.read_Sample_Annot(stored_args['ISTD_Map'],[os.path.basename(MS_FilePath)],column_name,logger,ingui=True)
-                    [norm_Conc_df,ISTD_Conc_df,ISTD_Samp_Ratio_df] = ISTD_Operations.getConc_by_ISTD(norm_Area_df,ISTD_map_df,Sample_Annot_df,logger,ingui=True)
-                    if stored_args['Testing']:
-                        MSDataOutput.df_to_file(writer,stored_args['Output_Format'],"ISTD Conc",ISTD_Conc_df,logger,ingui=True,transpose=stored_args['Transpose_Results'])
-                        MSDataOutput.df_to_file(writer,stored_args['Output_Format'],"ISTD to Samp Vol Ratio",ISTD_Samp_Ratio_df,logger,ingui=True,transpose=stored_args['Transpose_Results'])
-                    MSDataOutput.df_to_file(writer,stored_args['Output_Format'],"ISTD map",ISTD_map_df,logger,ingui=True)
-                    MSDataOutput.df_to_file(writer,stored_args['Output_Format'],column_name,norm_Conc_df,logger,ingui=True,transpose=stored_args['Transpose_Results'])
+                    #Perform concentration calculation, we need norm_Area_df
+                    if column_name == 'normConc by ISTD':
+                        #Perform concentration calculation
+                        Sample_Annot_df = ISTD_Operations.read_Sample_Annot(stored_args['ISTD_Map'],[os.path.basename(MS_FilePath)],column_name,logger,ingui=True)
+                        [norm_Conc_df,ISTD_Conc_df,ISTD_Samp_Ratio_df] = ISTD_Operations.getConc_by_ISTD(norm_Area_df,ISTD_map_df,Sample_Annot_df,logger,ingui=True)
+                        if stored_args['Testing']:
+                            MSDataOutput.df_to_file(writer,stored_args['Output_Format'],"ISTD Conc",ISTD_Conc_df,logger,ingui=True,transpose=stored_args['Transpose_Results'])
+                            MSDataOutput.df_to_file(writer,stored_args['Output_Format'],"ISTD to Samp Vol Ratio",ISTD_Samp_Ratio_df,logger,ingui=True,transpose=stored_args['Transpose_Results'])
+
+                        MSDataOutput.df_to_file(writer,stored_args['Output_Format'],"Sample Annot",Sample_Annot_df,logger,ingui=True)
+                        MSDataOutput.df_to_file(writer,stored_args['Output_Format'],"normConc by ISTD",norm_Conc_df,logger,ingui=True,transpose=stored_args['Transpose_Results'])
 
                 else:
                     #We extract the data directly from the file and output accordingly
