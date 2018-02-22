@@ -2,6 +2,7 @@ from openpyxl import Workbook
 from openpyxl.utils import get_column_letter
 from pandas import ExcelWriter
 import os
+import sys
 
 def start_writer(output_format,output_directory,output_filename):
     """Function to start a writer object"""

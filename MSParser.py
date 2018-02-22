@@ -40,14 +40,6 @@ def parse_MSOrganiser_args(args_json_file_path=""):
     __save_args_to_json(args_file,stored_args)
 
     #Convert the string in Transpose Results to boolean
-    #if args.Transpose_Results == 'True':
-    #    args.Transpose_Results = True
-    #else:
-    #    args.Transpose_Results = False
-
-    #return args
-
-    #Convert the string in Transpose Results to boolean
     if stored_args['Transpose_Results'] == 'True':
         stored_args['Transpose_Results'] = True
     else:

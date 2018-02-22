@@ -150,6 +150,7 @@ class ISTD_Operations():
         ISTD_list = Transition_Name_Annot_df.loc[Transition_Name_Annot_df['Transition_Name']==x.name,"Transition_Name_ISTD"].tolist()
 
         if not ISTD_list:
+            #ISTD_list None
             if logger:
                 logger.warning("%s is not found in the Transition_Name_Annot sheet. Please check ISTD map file",x.name)
             Transition_Name_dict[x.name] = None
@@ -160,12 +161,12 @@ class ISTD_Operations():
             #if ingui:
                 #print(x.name + " has duplicates or multiple internal standards. " + " ".join(ISTD_list) + " Please check ISTD map file")
             ISTD_report_list.append(("!Duplicate Transition_Name_ISTD in map file",x.name))
-        elif not ISTD_list[0]:
-            #Value may be none
+        elif ISTD_list[0] is None:
+            #ISTD_list may be [None]
             if logger:
                 logger.warning("%s has a blank internal standard. Please check ISTD map file",x.name)
-                Transition_Name_dict[x.name] = None
-                ISTD_report_list.append(("!Blank Transition_Name_ISTD in map file",x.name))
+            Transition_Name_dict[x.name] = None
+            ISTD_report_list.append(("!Blank Transition_Name_ISTD in map file",x.name))
         elif not isinstance(ISTD_list[0],float):
             Transition_Name_dict[x.name] = ISTD_list[0]
             ISTD_report_list.append((ISTD_list[0],x.name))
@@ -173,8 +174,8 @@ class ISTD_Operations():
             #Value may be nan
             if logger:
                 logger.warning("%s has a blank internal standard. Please check ISTD map file",x.name)
-                Transition_Name_dict[x.name] = None
-                ISTD_report_list.append(("!Blank Transition_Name_ISTD in map file",x.name))
+            Transition_Name_dict[x.name] = None
+            ISTD_report_list.append(("!Blank Transition_Name_ISTD in map file",x.name))
         else:
             if logger:
                 logger.warning("%s has an invalid Transition_Name_ISTD of %s. Please check ISTD map file",x.name,str(ISTD_list[0]))
