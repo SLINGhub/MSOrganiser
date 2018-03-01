@@ -4,83 +4,112 @@ from pandas import ExcelWriter
 import os
 import sys
 
-def start_writer(output_format,output_directory,output_filename):
-    """Function to start a writer object"""
-    if output_format=="Excel":
-        writer = os.path.join(output_directory, output_filename + '_Results.xlsx' )
-        writer = ExcelWriter(writer,engine='openpyxl')
-    elif output_format=="csv":
-        writer = os.path.join(output_directory, output_filename)
-    return writer
 
-def transpose_MSdata(MS_df):
-    #Transpose the data
-    MS_df = MS_df.T
-    #Now the first column is the index, we need to convert back to a first column
-    MS_df.reset_index(level=0, inplace=True)
-    #Assign the column names from first row
-    colnames = MS_df.iloc[0,:].astype('str').str.strip()
-    MS_df.columns = colnames
-    #We remove the first row because the column names are given
-    MS_df = MS_df.iloc[1:]
-    #Rename the first column to Compound Name
-    MS_df.rename(columns={'Sample_Name':'Transition_Name'}, inplace=True)
-    return MS_df
+class MSDataOutput:
+    """To describe the general setup for Data Output. Default to csv file"""
+    def __init__(self, output_directory, input_file_path, logger=None, ingui=True):
+        self.output_directory = output_directory
+        self.output_filename = os.path.splitext(os.path.basename(input_file_path))[0]
+        self.logger = logger
+        self.ingui = ingui
+        self.writer = None
 
-def df_to_file(writer,output_format,output_option,df,logger=None,ingui=False,transpose=False):
-    """Funtion to write a df to a file"""
+    def transpose_MSdata(MS_df):
+        """Function to transpose data"""
+        #Transpose the data
+        MS_df = MS_df.T
+        #Now the first column is the index, we need to convert back to a first column
+        MS_df.reset_index(level=0, inplace=True)
+        #Assign the column names from first row
+        colnames = MS_df.iloc[0,:].astype('str').str.strip()
+        MS_df.columns = colnames
+        #We remove the first row because the column names are given
+        MS_df = MS_df.iloc[1:]
+        #Rename the first column to Compound Name
+        MS_df.rename(columns={'Sample_Name':'Transition_Name'}, inplace=True)
+        return MS_df
 
-    #Replace '/' as excel cannot have this as sheet title
-    if output_option == 'S/N':
-        output_option = output_option.replace('/','_to_')
+    def start_writer(self):
+        self.writer = os.path.join(self.output_directory, self.__output_filename)
 
-    #If df is empty we send a warning and skip the df
-    if df.empty:
-        if logger:
-            logger.warning('%s has no data. Please check the input file',output_option)
-        if ingui:
-            print(output_option + ' has no data. Please check the input file',flush=True)
-        return
+    def df_to_file(self,output_option,df,transpose=False):
+        """Funtion to write a df to a file"""
 
-    if transpose:
-        df = transpose_MSdata(df)
+        if self.writer is None:
+            self.start_writer()
+
+        #Replace '/' as excel cannot have this as sheet title or file name
+        if output_option == 'S/N':
+            output_option = output_option.replace('/','_to_')
+
+        #If df is empty we send a warning and skip the df
+        if df.empty:
+            if self.logger:
+                self.logger.warning('%s has no data. Please check the input file',output_option)
+            if self.ingui:
+                print(output_option + ' has no data. Please check the input file',flush=True)
+            return
+
+        if transpose:
+            df = MSDataOutput.transpose_MSdata(df)
+
+        df.to_csv(self.writer + output_option + '_Results.csv',sep=',',index=False)
    
-    #Output file into Excel
-    if output_format=="Excel":
+
+class MSDataOutput_Excel(MSDataOutput):
+    """To describe the general setup for Data Output to Excel"""
+    def start_writer(self):
+        self.writer = os.path.join(self.output_directory, self.output_filename + '_Results.xlsx' )
+        self.writer = ExcelWriter(self.writer,engine='openpyxl')
+
+    def end_writer(self):
+        """Function to close a writer object"""
         try:
-            df.to_excel(excel_writer=writer,sheet_name=output_option, index=False)
-            worksheet = writer.sheets[output_option]
-            for i, width in enumerate(get_col_widths(df)):
-                #print(get_column_letter(i+1))
-                #print(width)
-                #worksheet.set_column(i-1, i-1, width)
-                #worksheet.column_dimensions[get_column_letter(i+1)].width = width
+            self.writer.save()
+        except Exception as e:
+            if self.ingui:
+                print('Unable to save Excel file due to:',flush=True)
+                print(e,flush=True)
+            if self.logger:
+                self.logger.error('Unable to save Excel file due to:')
+                self.logger.error(e)
+            sys.exit(-1)
+
+    def get_col_widths(dataframe):
+        """Function to get the correct width to output the excel file nicely"""
+        # First we find the maximum length of the index column   
+        idx_max = max([len(str(s)) for s in dataframe.index.values] + [len(str(dataframe.index.name))])
+        # Then, we concatenate this to the max of the lengths of column name and its values for each column, left to right
+        return [idx_max] + [max([len(str(s)) for s in dataframe[col].values] + [len(col)]) + 1 for col in dataframe.columns]
+
+    def df_to_file(self,output_option,df,transpose=False):
+        """Funtion to write a df to Excel"""
+
+        if self.writer is None:
+            self.start_writer()
+
+        #Replace '/' as excel cannot have this as sheet title or file name
+        if output_option == 'S/N':
+            output_option = output_option.replace('/','_to_')
+
+        #If df is empty we send a warning and skip the df
+        if df.empty:
+            if self.logger:
+                self.logger.warning('%s has no data. Please check the input file',output_option)
+            if self.ingui:
+                print(output_option + ' has no data. Please check the input file',flush=True)
+            return
+
+        if transpose:
+            df = MSDataOutput.transpose_MSdata(df)
+   
+        try:
+            df.to_excel(excel_writer=self.writer,sheet_name=output_option, index=False)
+            worksheet = self.writer.sheets[output_option]
+            for i, width in enumerate(MSDataOutput_Excel.get_col_widths(df)):
                 if i==0:
                     continue
                 worksheet.column_dimensions[get_column_letter(i)].width = width + 1
         except Exception as e:
             print("Unable to write df to excel file",flush=True)
             print(e,flush=True)
-    elif output_format=="csv":
-         df.to_csv(writer + output_option + '_Results.csv',sep=',',index=False)
-
-def get_col_widths(dataframe):
-    """Function to get the correct width to output the excel file nicely"""
-    # First we find the maximum length of the index column   
-    idx_max = max([len(str(s)) for s in dataframe.index.values] + [len(str(dataframe.index.name))])
-    # Then, we concatenate this to the max of the lengths of column name and its values for each column, left to right
-    return [idx_max] + [max([len(str(s)) for s in dataframe[col].values] + [len(col)]) + 1 for col in dataframe.columns]
-
-def end_writer(writer,output_format,logger=None,ingui=False):
-    """Function to close a writer object"""
-    if output_format=="Excel":
-        try:
-            writer.save()
-        except Exception as e:
-            if ingui:
-                print('Unable to save Excel file due to:',flush=True)
-                print(e,flush=True)
-            if logger:
-                logger.error('Unable to save Excel file due to:')
-                logger.error(e)
-            sys.exit(-1)

@@ -6,8 +6,9 @@ import os
 class MS_Analysis():
     """To describe the analysis being done"""
 
-    def __init__(self, MS_FilePath,logger=None, ingui=True, testing=False):
+    def __init__(self, MS_FilePath,OutputFormat,logger=None, ingui=True, testing=False):
         self.MS_FilePath = MS_FilePath
+        self.OutputFormat = OutputFormat
         self.logger = logger
         self.ingui = ingui
         self.testing = testing
@@ -39,9 +40,7 @@ class MS_Analysis():
 
         #Perform normalisation using ISTD
         [norm_Area_df,ISTD_Area,ISTD_Report] = ISTD_Operations.normalise_by_ISTD(Area_df,self.ISTD_map_df,self.logger,ingui=self.ingui)
-
         self.norm_Area_df = norm_Area_df
-        self.ISTD_map_df = ISTD_map_df
 
         if outputdata:
             return([norm_Area_df,ISTD_Area,ISTD_map_df,ISTD_Report])
