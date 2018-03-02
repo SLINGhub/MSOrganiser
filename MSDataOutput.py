@@ -32,15 +32,8 @@ class MSDataOutput:
     def start_writer(self):
         self.writer = os.path.join(self.output_directory, self.__output_filename)
 
-    def df_to_file(self,output_option,df,transpose=False):
-        """Funtion to write a df to a file"""
-
-        if self.writer is None:
-            self.start_writer()
-
-        #Replace '/' as excel cannot have this as sheet title or file name
-        if output_option == 'S/N':
-            output_option = output_option.replace('/','_to_')
+    def df_to_file_preparation(output_option,df,transpose=False):
+        """Function to check and set up the settings needed for printing to file"""
 
         #If df is empty we send a warning and skip the df
         if df.empty:
@@ -48,10 +41,28 @@ class MSDataOutput:
                 self.logger.warning('%s has no data. Please check the input file',output_option)
             if self.ingui:
                 print(output_option + ' has no data. Please check the input file',flush=True)
-            return
+            return([df,output_option])
+
+        #Replace '/' as excel cannot have this as sheet title or file name
+        if output_option == 'S/N':
+            output_option = output_option.replace('/','_to_')
 
         if transpose:
             df = MSDataOutput.transpose_MSdata(df)
+
+        return([df,output_option])
+
+
+    def df_to_file(self,output_option,df,transpose=False):
+        """Funtion to write a df to a csv file"""
+        if self.writer is None:
+            self.start_writer()
+
+        [df,output_option] = MSDataOutput.df_to_file_preparation(output_option,df,transpose)
+
+        #If df is empty, just leave the function, warning has been sent to df_to_file_preparation
+        if df.empty:
+            return
 
         df.to_csv(self.writer + output_option + '_Results.csv',sep=',',index=False)
    
@@ -83,26 +94,16 @@ class MSDataOutput_Excel(MSDataOutput):
         return [idx_max] + [max([len(str(s)) for s in dataframe[col].values] + [len(col)]) + 1 for col in dataframe.columns]
 
     def df_to_file(self,output_option,df,transpose=False):
-        """Funtion to write a df to Excel"""
-
+        """Funtion to write a df to a excel file"""
         if self.writer is None:
             self.start_writer()
 
-        #Replace '/' as excel cannot have this as sheet title or file name
-        if output_option == 'S/N':
-            output_option = output_option.replace('/','_to_')
+        [df,output_option] = MSDataOutput.df_to_file_preparation(output_option,df,transpose)
 
-        #If df is empty we send a warning and skip the df
+        #If df is empty, just leave the function, warning has been sent to df_to_file_preparation
         if df.empty:
-            if self.logger:
-                self.logger.warning('%s has no data. Please check the input file',output_option)
-            if self.ingui:
-                print(output_option + ' has no data. Please check the input file',flush=True)
             return
 
-        if transpose:
-            df = MSDataOutput.transpose_MSdata(df)
-   
         try:
             df.to_excel(excel_writer=self.writer,sheet_name=output_option, index=False)
             worksheet = self.writer.sheets[output_option]
