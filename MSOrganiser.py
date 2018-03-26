@@ -1,10 +1,5 @@
 # coding: utf-8
 
-#TODO
-#Do it for other machines
-#Plotting of graph
-#CoV calculation
-
 import MSParser
 from MSCalculate import ISTD_Operations
 from MSAnalysis import MS_Analysis
@@ -90,9 +85,8 @@ if __name__ == '__main__':
 
         MyData = MS_Analysis(MS_FilePath, stored_args['Output_Format'],logger, ingui=True, testing = stored_args['Testing'])
 
-        output_filename = os.path.splitext(os.path.basename(MS_FilePath))[0]
         #Initiate the pdf report file
-        PDFReport = MSDataReport_PDF(output_file_path = os.path.join(stored_args['Output_Directory'] , output_filename), logger=logger)
+        PDFReport = MSDataReport_PDF(stored_args['Output_Directory'], MS_FilePath, logger, ingui=True)
 
         #Set up the file writing configuration for Excel, ...
         DfOutput = MSDataOutput_Excel(stored_args['Output_Directory'], MS_FilePath, logger, ingui=True)

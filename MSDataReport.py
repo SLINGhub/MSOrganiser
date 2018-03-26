@@ -38,26 +38,25 @@ with warnings.catch_warnings():
 
 class MSDataReport:
     """To describe the general setup for Data Reporting"""
-    def __init__(self, output_file_path, logger=None, ingui=True):
-        self.__output_file_path = output_file_path 
-        self.__logger = logger
-        self.__ingui = ingui
+    def __init__(self, output_directory, input_file_path, logger=None, ingui=True):
+        output_filename = os.path.splitext(os.path.basename(input_file_path))[0]
+        self.output_file_path = os.path.join(output_directory , output_filename)
+        self.logger = logger
+        self.ingui = ingui
+
 
 class MSDataReport_PDF(MSDataReport):
     """To describe the general setup for Data Reporting in pdf"""
+    def __init__(self, output_directory, input_file_path, logger=None, ingui=True):
+        #Initialise the same way as MSDataReport
+        super().__init__(output_directory, input_file_path, logger, ingui)
+        #But change the output file path
+        self.output_file_path = self.output_file_path +  "_Report.pdf"
 
-    def __init__(self, output_file_path, logger=None, ingui=True):
-        MSDataReport.__init__(self, output_file_path = output_file_path, ingui = ingui,logger=logger)
-        self.__output_file_path = output_file_path
-        if not self.__output_file_path.endswith('.pdf'):
-            self.__output_file_path = self.__output_file_path +  "_Report.pdf"
-        self.__logger = logger
-        self.__ingui = ingui
+        #These variables are unique to MSDataReport_PDF
         self.__pdf_pages = []
-
         report_dir = get_report_dir('msreport')
         env = Environment(loader=FileSystemLoader(report_dir))
-        
         self.__ISTD_report_template = env.get_template("ISTD_Report.html")
         self.__Parameters_report_template = env.get_template("Parameters_Report.html")
         self.__stylesheet_file = os.path.join(report_dir,"typography.css")
@@ -72,6 +71,11 @@ class MSDataReport_PDF(MSDataReport):
             html_string = self.__Parameters_report_template.render(template_vars)
             html = HTML(string=html_string)
             self.__pdf_pages.append(html.render(stylesheets=[self.__stylesheet_file]))
+        else:
+            if self.logger:
+                self.logger.warning('Parameters_df is empty.')
+            if self.ingui:
+                print('Parameters_df is empty.',flush=True)
 
     def create_ISTD_report(self,ISTD_Report):
         #Generate the ISTD normalisation report
@@ -88,7 +92,7 @@ class MSDataReport_PDF(MSDataReport):
             for p in doc.pages:
                 val.append(p)
         #print(self.__pdf_pages[0].copy(val))
-        pdf_file = self.__pdf_pages[0].copy(val).write_pdf(self.__output_file_path) # use metadata of first pdf
+        pdf_file = self.__pdf_pages[0].copy(val).write_pdf(self.output_file_path) # use metadata of first pdf
 
 
 
