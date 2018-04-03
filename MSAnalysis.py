@@ -6,9 +6,8 @@ import os
 class MS_Analysis():
     """To describe the analysis being done"""
 
-    def __init__(self, MS_FilePath,OutputFormat,logger=None, ingui=True, testing=False):
+    def __init__(self, MS_FilePath,logger=None, ingui=True, testing=False):
         self.MS_FilePath = MS_FilePath
-        self.OutputFormat = OutputFormat
         self.logger = logger
         self.ingui = ingui
         self.testing = testing

@@ -3,6 +3,7 @@ from openpyxl.utils import get_column_letter
 from pandas import ExcelWriter
 import os
 import sys
+import pandas as pd
 
 
 class MSDataOutput:
@@ -23,10 +24,14 @@ class MSDataOutput:
         #Assign the column names from first row
         colnames = MS_df.iloc[0,:].astype('str').str.strip()
         MS_df.columns = colnames
+        MS_df.columns.name = None
         #We remove the first row because the column names are given
         MS_df = MS_df.iloc[1:]
         #Rename the first column to Compound Name
         MS_df.rename(columns={'Sample_Name':'Transition_Name'}, inplace=True)
+        #Reset the index since we remove first row and convert numeric columns from object to numeric
+        MS_df = MS_df.reset_index(drop=True)
+        MS_df = MS_df.apply(pd.to_numeric, errors='ignore')
         return MS_df
 
     def start_writer(self):

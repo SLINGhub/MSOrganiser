@@ -266,3 +266,4 @@ __pycache__/
 /dist
 /MSOrganiser-args.json
 /Required_folder
+/tests/testdata/ISTDTemplateDraft29.xlsm

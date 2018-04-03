@@ -83,12 +83,13 @@ if __name__ == '__main__':
         print("Working on " + MS_FilePath,flush=True)
         logger.info("Working on " + MS_FilePath)
 
-        MyData = MS_Analysis(MS_FilePath, stored_args['Output_Format'],logger, ingui=True, testing = stored_args['Testing'])
+        MyData = MS_Analysis(MS_FilePath,logger, ingui=True, testing = stored_args['Testing'])
 
         #Initiate the pdf report file
         PDFReport = MSDataReport_PDF(stored_args['Output_Directory'], MS_FilePath, logger, ingui=True)
 
         #Set up the file writing configuration for Excel, ...
+        #if stored_args['Output_Format'] == "Excel"
         DfOutput = MSDataOutput_Excel(stored_args['Output_Directory'], MS_FilePath, logger, ingui=True)
         DfOutput.start_writer()
 
