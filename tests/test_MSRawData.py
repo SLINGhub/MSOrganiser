@@ -39,56 +39,24 @@ class Agilent_Test(unittest.TestCase):
         self.assertEqual("CompoundTableForm",self.CompoundData.DataForm)
 
     def test_getAreaTable(self):
-        pd.util.testing.assert_frame_equal(self.WideData.get_table("Area"),self.sheet_to_table(self.WideDataResults,"Area"))
-        pd.util.testing.assert_frame_equal(MSDataOutput.transpose_MSdata(self.WideData.get_table("Area")),self.sheet_to_table(self.WideDataTransposeResults,"Area"))
-        
-        #Downcast both to the smallest numerical dtype possible
-        right = self.sheet_to_table(self.LargeWideDataResults,"Area").apply(pd.to_numeric, errors='ignore', downcast = 'float')
-        Area_df = self.LargeWideData.get_table("Area").apply(pd.to_numeric, errors='ignore', downcast = 'float')
-        pd.util.testing.assert_frame_equal(Area_df,right)
-
-        #Downcast both to the smallest numerical dtype possible
-        right = self.sheet_to_table(self.CompoundDataResults,"Area").apply(pd.to_numeric, errors='ignore', downcast = 'float')
-        Area_df = self.CompoundData.get_table("Area").apply(pd.to_numeric, errors='ignore', downcast = 'float')
-        pd.util.testing.assert_frame_equal(Area_df,right)
-
-        #Downcast both to the smallest numerical dtype possible
-        right = self.sheet_to_table(self.SciexDataResults,"Area").apply(pd.to_numeric, errors='ignore', downcast = 'float')
-        Area_df = self.SciexData.get_table("Area").apply(pd.to_numeric, errors='ignore', downcast = 'float')
-        pd.util.testing.assert_frame_equal(Area_df,right)
+        self.compare_tables("Area",self.WideData,self.WideDataResults)
+        self.compare_tables("Area",self.WideData,self.WideDataTransposeResults,transpose=True)
+        self.compare_tables("Area",self.LargeWideData,self.LargeWideDataResults)
+        self.compare_tables("Area",self.CompoundData,self.CompoundDataResults)
+        self.compare_tables("Area",self.SciexData,self.SciexDataResults)
 
     def test_getRTTable(self):
-        pd.util.testing.assert_frame_equal(self.WideData.get_table("RT"),self.sheet_to_table(self.WideDataResults,"RT"))
-        pd.util.testing.assert_frame_equal(MSDataOutput.transpose_MSdata(self.WideData.get_table("RT")),self.sheet_to_table(self.WideDataTransposeResults,"RT"))
-
-        #Downcast both to the smallest numerical dtype possible
-        right = self.sheet_to_table(self.LargeWideDataResults,"RT").apply(pd.to_numeric, errors='ignore', downcast = 'float')
-        RT_df = self.LargeWideData.get_table("RT").apply(pd.to_numeric, errors='ignore', downcast = 'float')
-        pd.util.testing.assert_frame_equal(RT_df,right)
-
-        #Downcast both to the smallest numerical dtype possible
-        right = self.sheet_to_table(self.CompoundDataResults,"RT").apply(pd.to_numeric, errors='ignore', downcast = 'float')
-        RT_df = self.CompoundData.get_table("RT").apply(pd.to_numeric, errors='ignore', downcast = 'float')
-        pd.util.testing.assert_frame_equal(RT_df,right)
-
-        #Downcast both to the smallest numerical dtype possible
-        right = self.sheet_to_table(self.SciexDataResults,"RT").apply(pd.to_numeric, errors='ignore', downcast = 'float')
-        RT_df = self.SciexData.get_table("RT").apply(pd.to_numeric, errors='ignore', downcast = 'float')
-        pd.util.testing.assert_frame_equal(RT_df,right)
+        self.compare_tables("RT",self.WideData,self.WideDataResults)
+        self.compare_tables("RT",self.WideData,self.WideDataTransposeResults,transpose=True)
+        self.compare_tables("RT",self.LargeWideData,self.LargeWideDataResults)
+        self.compare_tables("RT",self.CompoundData,self.CompoundDataResults)
+        self.compare_tables("RT",self.SciexData,self.SciexDataResults)
 
     def test_getFWHMTable(self):
-        pd.util.testing.assert_frame_equal(self.WideData.get_table("FWHM"),self.sheet_to_table(self.WideDataResults,"FWHM"))
-        pd.util.testing.assert_frame_equal(MSDataOutput.transpose_MSdata(self.WideData.get_table("FWHM")),self.sheet_to_table(self.WideDataTransposeResults,"FWHM"))
-
-        #Downcast both to the smallest numerical dtype possible
-        right = self.sheet_to_table(self.LargeWideDataResults,"FWHM").apply(pd.to_numeric, errors='ignore', downcast = 'float')
-        FWHM_df = self.LargeWideData.get_table("FWHM").apply(pd.to_numeric, errors='ignore', downcast = 'float')
-        pd.util.testing.assert_frame_equal(FWHM_df,right)
-
-        #Downcast both to the smallest numerical dtype possible
-        right = self.sheet_to_table(self.SciexDataResults,"FWHM").apply(pd.to_numeric, errors='ignore', downcast = 'float')
-        FWHM_df = self.SciexData.get_table("FWHM").apply(pd.to_numeric, errors='ignore', downcast = 'float')
-        pd.util.testing.assert_frame_equal(FWHM_df,right)
+        self.compare_tables("FWHM",self.WideData,self.WideDataResults)
+        self.compare_tables("FWHM",self.WideData,self.WideDataTransposeResults,transpose=True)
+        self.compare_tables("FWHM",self.LargeWideData,self.LargeWideDataResults)
+        self.compare_tables("FWHM",self.SciexData,self.SciexDataResults)
 
     def tearDown(self):
         self.WideDataResults.close()
@@ -96,6 +64,14 @@ class Agilent_Test(unittest.TestCase):
         self.LargeWideDataResults.close()
         self.CompoundDataResults.close()
         self.SciexDataResults.close()
+
+    def compare_tables(self,table_name,MSDataObject,ExcelWorkbook,transpose=False):
+        ExcelWorkbook = self.sheet_to_table(ExcelWorkbook,table_name).apply(pd.to_numeric, errors='ignore', downcast = 'float')
+        if transpose:
+            MSDataObject = MSDataOutput.transpose_MSdata(MSDataObject.get_table(table_name)).apply(pd.to_numeric, errors='ignore', downcast = 'float')
+        else:
+            MSDataObject = MSDataObject.get_table(table_name).apply(pd.to_numeric, errors='ignore', downcast = 'float')
+        pd.util.testing.assert_frame_equal(MSDataObject,ExcelWorkbook)
 
     def sheet_to_table(self,workbook,sheet_name):
         ws = workbook[sheet_name]
