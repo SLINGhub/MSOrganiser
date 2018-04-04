@@ -33,29 +33,29 @@ class Agilent_Test(unittest.TestCase):
         self.CompoundDataResults = openpyxl.load_workbook(COMPOUNDTABLEFORM_RESULTS_FILENAME)
         self.SciexDataResults = openpyxl.load_workbook(SCIEX_RESULTS_FILENAME)
 
-    def test_DataForm(self):
+    def test_WideData(self):
         self.assertEqual("WideTableForm",self.WideData.DataForm)
-        self.assertEqual("WideTableForm",self.LargeWideData.DataForm)
-        self.assertEqual("CompoundTableForm",self.CompoundData.DataForm)
-
-    def test_getAreaTable(self):
         self.compare_tables("Area",self.WideData,self.WideDataResults)
         self.compare_tables("Area",self.WideData,self.WideDataTransposeResults,transpose=True)
-        self.compare_tables("Area",self.LargeWideData,self.LargeWideDataResults)
-        self.compare_tables("Area",self.CompoundData,self.CompoundDataResults)
-        self.compare_tables("Area",self.SciexData,self.SciexDataResults)
-
-    def test_getRTTable(self):
         self.compare_tables("RT",self.WideData,self.WideDataResults)
         self.compare_tables("RT",self.WideData,self.WideDataTransposeResults,transpose=True)
-        self.compare_tables("RT",self.LargeWideData,self.LargeWideDataResults)
-        self.compare_tables("RT",self.CompoundData,self.CompoundDataResults)
-        self.compare_tables("RT",self.SciexData,self.SciexDataResults)
-
-    def test_getFWHMTable(self):
         self.compare_tables("FWHM",self.WideData,self.WideDataResults)
         self.compare_tables("FWHM",self.WideData,self.WideDataTransposeResults,transpose=True)
+
+    def test_WideDataLarge(self):
+        self.assertEqual("WideTableForm",self.LargeWideData.DataForm)
+        self.compare_tables("Area",self.LargeWideData,self.LargeWideDataResults)
+        self.compare_tables("RT",self.LargeWideData,self.LargeWideDataResults)
         self.compare_tables("FWHM",self.LargeWideData,self.LargeWideDataResults)
+
+    def test_CompoundData(self):
+        self.assertEqual("CompoundTableForm",self.CompoundData.DataForm)
+        self.compare_tables("Area",self.CompoundData,self.CompoundDataResults)
+        self.compare_tables("RT",self.CompoundData,self.CompoundDataResults)
+
+    def test_SciexData(self):
+        self.compare_tables("Area",self.SciexData,self.SciexDataResults)
+        self.compare_tables("RT",self.SciexData,self.SciexDataResults)
         self.compare_tables("FWHM",self.SciexData,self.SciexDataResults)
 
     def tearDown(self):

@@ -2,7 +2,6 @@ import unittest
 import os
 import pandas as pd
 import openpyxl
-from MSRawData import AgilentMSRawData
 from MSAnalysis import MS_Analysis
 
 WIDETABLEFORM_FILENAME = os.path.join(os.path.dirname(__file__),"testdata", 'WideTableForm.csv')
@@ -17,103 +16,52 @@ COMPOUNDTABLEFORM_FILENAME = os.path.join(os.path.dirname(__file__),"testdata", 
 COMPOUNDTABLEFORM_ANNOTATION = os.path.join(os.path.dirname(__file__),"testdata", 'CompoundTableForm_Annotation.xlsm')
 COMPOUNDTABLEFORM_RESULTS_FILENAME = os.path.join(os.path.dirname(__file__),"testdata", 'CompoundTableForm_Results.xlsx')
 
+SCIEX_FILENAME = os.path.join(os.path.dirname(__file__),"testdata", 'Mohammed_SciEx_data.txt')
+SCIEX_ANNOTATION = os.path.join(os.path.dirname(__file__),"testdata", 'Mohammed_SciEx_data_Annotation.xlsm')
+SCIEX_RESULTS_FILENAME = os.path.join(os.path.dirname(__file__),"testdata", 'Mohammed_SciEx_data_Results.xlsx')
+
 class Agilent_Test(unittest.TestCase):
 
     def setUp(self):
-        self.MyWideData = MS_Analysis(WIDETABLEFORM_FILENAME)
-        self.WideDataResults = openpyxl.load_workbook(WIDETABLEFORM_RESULTS_FILENAME)
+        MyWideData = MS_Analysis(WIDETABLEFORM_FILENAME,ingui=False)
+        WideDataResults = openpyxl.load_workbook(WIDETABLEFORM_RESULTS_FILENAME)
 
-        self.MyLargeWideData = MS_Analysis(LARGE_WIDETABLEFORM_FILENAME)
-        self.LargeWideDataResults = openpyxl.load_workbook(LARGE_WIDETABLEFORM_RESULTS_FILENAME)
+        MyLargeWideData = MS_Analysis(LARGE_WIDETABLEFORM_FILENAME,ingui=False)
+        LargeWideDataResults = openpyxl.load_workbook(LARGE_WIDETABLEFORM_RESULTS_FILENAME)
 
-        self.MyCompoundData = MS_Analysis(COMPOUNDTABLEFORM_FILENAME)
-        self.CompoundDataResults = openpyxl.load_workbook(COMPOUNDTABLEFORM_RESULTS_FILENAME)
+        MyCompoundData = MS_Analysis(COMPOUNDTABLEFORM_FILENAME,ingui=False)
+        CompoundDataResults = openpyxl.load_workbook(COMPOUNDTABLEFORM_RESULTS_FILENAME)
+
+        MySciexData = MS_Analysis(SCIEX_FILENAME,ingui=False)
+        SciexResults = openpyxl.load_workbook(SCIEX_RESULTS_FILENAME)
+
+        self.DataList = [MyWideData,MyLargeWideData,MyCompoundData,MySciexData]
+        self.DataAnnotationList = [WIDETABLEFORM_ANNOTATION,LARGE_WIDETABLEFORM_ANNOTATION,COMPOUNDTABLEFORM_ANNOTATION,SCIEX_ANNOTATION]
+        self.DataResultList = [WideDataResults,LargeWideDataResults,CompoundDataResults,SciexResults]
+
+    def compare_df(self,table_name,MSData_df,ExcelWorkbook):
+        MSData_df = MSData_df.apply(pd.to_numeric, errors='ignore', downcast = 'float')
+        ExcelWorkbook = self.sheet_to_table(ExcelWorkbook,table_name).apply(pd.to_numeric, errors='ignore', downcast = 'float')
+        pd.util.testing.assert_frame_equal(MSData_df,ExcelWorkbook)
 
     def test_getnormAreaTable(self):
         #Perform normalisation using ISTD
-        [norm_Area_df,ISTD_Area,ISTD_map_df,ISTD_Report] = self.MyWideData.get_Normalised_Area('normArea by ISTD',WIDETABLEFORM_ANNOTATION)
-        right = self.sheet_to_table(self.WideDataResults,'normArea by ISTD')
-        #Downcast both to the smallest numerical dtype possible
-        right = right.apply(pd.to_numeric, errors='ignore', downcast = 'float')
-        norm_Area_df = norm_Area_df.apply(pd.to_numeric, errors='ignore', downcast = 'float')
-        pd.util.testing.assert_frame_equal(norm_Area_df,right)
+        for i in range(len(self.DataList)):
+            [norm_Area_df,ISTD_Area,ISTD_map_df,ISTD_Report] = self.DataList[i].get_Normalised_Area('normArea by ISTD',self.DataAnnotationList[i])
+            self.compare_df('normArea by ISTD',norm_Area_df,self.DataResultList[i])
+            self.compare_df('ISTD map',ISTD_map_df,self.DataResultList[i])
 
-        right = self.sheet_to_table(self.WideDataResults,'ISTD map')
-        #Downcast both to the smallest numerical dtype possible
-        right = right.apply(pd.to_numeric, errors='ignore', downcast = 'float')
-        ISTD_map_df = ISTD_map_df.apply(pd.to_numeric, errors='ignore', downcast = 'float')
-        pd.util.testing.assert_frame_equal(ISTD_map_df,right)
-
-        [norm_Area_df,ISTD_Area,ISTD_map_df,ISTD_Report] = self.MyLargeWideData.get_Normalised_Area('normArea by ISTD',LARGE_WIDETABLEFORM_ANNOTATION)
-        right = self.sheet_to_table(self.LargeWideDataResults,'normArea by ISTD')
-        #Downcast both to the smallest numerical dtype possible
-        right = right.apply(pd.to_numeric, errors='ignore', downcast = 'float')
-        norm_Area_df = norm_Area_df.apply(pd.to_numeric, errors='ignore', downcast = 'float')
-        pd.util.testing.assert_frame_equal(norm_Area_df,right)
-
-        right = self.sheet_to_table(self.LargeWideDataResults,'ISTD map')
-        #Downcast both to the smallest numerical dtype possible
-        right = right.apply(pd.to_numeric, errors='ignore', downcast = 'float')
-        ISTD_map_df = ISTD_map_df.apply(pd.to_numeric, errors='ignore', downcast = 'float')
-        pd.util.testing.assert_frame_equal(ISTD_map_df,right)
-
-        [norm_Area_df,ISTD_Area,ISTD_map_df,ISTD_Report] = self.MyCompoundData.get_Normalised_Area('normArea by ISTD',COMPOUNDTABLEFORM_ANNOTATION)
-        right = self.sheet_to_table(self.CompoundDataResults,'normArea by ISTD')
-        #Downcast both to the smallest numerical dtype possible
-        right = right.apply(pd.to_numeric, errors='ignore', downcast = 'float')
-        norm_Area_df = norm_Area_df.apply(pd.to_numeric, errors='ignore', downcast = 'float')
-        pd.util.testing.assert_frame_equal(norm_Area_df,right)
-
-        right = self.sheet_to_table(self.CompoundDataResults,'ISTD map')
-        #Downcast both to the smallest numerical dtype possible
-        right = right.apply(pd.to_numeric, errors='ignore', downcast = 'float')
-        ISTD_map_df = ISTD_map_df.apply(pd.to_numeric, errors='ignore', downcast = 'float')
-        pd.util.testing.assert_frame_equal(ISTD_map_df,right)
 
     def test_getAnalyteConcTable(self):
         #Perform analyte concentration using ISTD
-        [norm_Conc_df,ISTD_Conc_df,ISTD_Samp_Ratio_df,Sample_Annot_df] = self.MyWideData.get_Analyte_Concentration('normConc by ISTD',WIDETABLEFORM_ANNOTATION)
-        right = self.sheet_to_table(self.WideDataResults,'normConc by ISTD')
-        #Downcast both to the smallest numerical dtype possible
-        right = right.apply(pd.to_numeric, errors='ignore', downcast = 'float')
-        norm_Conc_df = norm_Conc_df.apply(pd.to_numeric, errors='ignore', downcast = 'float')
-        pd.util.testing.assert_frame_equal(norm_Conc_df,right)
-
-        right = self.sheet_to_table(self.WideDataResults,'Sample Annot')
-        #Downcast both to the smallest numerical dtype possible
-        right = right.apply(pd.to_numeric, errors='ignore', downcast = 'float')
-        Sample_Annot_df = Sample_Annot_df.apply(pd.to_numeric, errors='ignore', downcast = 'float')
-        pd.util.testing.assert_frame_equal(Sample_Annot_df,right)
-
-        [norm_Conc_df,ISTD_Conc_df,ISTD_Samp_Ratio_df,Sample_Annot_df] = self.MyLargeWideData.get_Analyte_Concentration('normConc by ISTD',LARGE_WIDETABLEFORM_ANNOTATION)
-        right = self.sheet_to_table(self.LargeWideDataResults,'normConc by ISTD')
-        #Downcast both to the smallest numerical dtype possible
-        right = right.apply(pd.to_numeric, errors='ignore', downcast = 'float')
-        norm_Conc_df = norm_Conc_df.apply(pd.to_numeric, errors='ignore', downcast = 'float')
-        pd.util.testing.assert_frame_equal(norm_Conc_df,right)
-
-        right = self.sheet_to_table(self.LargeWideDataResults,'Sample Annot')
-        #Downcast both to the smallest numerical dtype possible
-        right = right.apply(pd.to_numeric, errors='ignore', downcast = 'float')
-        Sample_Annot_df = Sample_Annot_df.apply(pd.to_numeric, errors='ignore', downcast = 'float')
-        pd.util.testing.assert_frame_equal(Sample_Annot_df,right)
-
-        [norm_Conc_df,ISTD_Conc_df,ISTD_Samp_Ratio_df,Sample_Annot_df] = self.MyCompoundData.get_Analyte_Concentration('normConc by ISTD',COMPOUNDTABLEFORM_ANNOTATION)
-        right = self.sheet_to_table(self.CompoundDataResults,'normConc by ISTD')
-        #Downcast both to the smallest numerical dtype possible
-        right = right.apply(pd.to_numeric, errors='ignore', downcast = 'float')
-        norm_Conc_df = norm_Conc_df.apply(pd.to_numeric, errors='ignore', downcast = 'float')
-        pd.util.testing.assert_frame_equal(norm_Conc_df,right)
-
-        right = self.sheet_to_table(self.CompoundDataResults,'Sample Annot')
-        #Downcast both to the smallest numerical dtype possible
-        right = right.apply(pd.to_numeric, errors='ignore', downcast = 'float')
-        Sample_Annot_df = Sample_Annot_df.apply(pd.to_numeric, errors='ignore', downcast = 'float')
-        pd.util.testing.assert_frame_equal(Sample_Annot_df,right)
-
+        for i in range(len(self.DataList)):
+            [norm_Conc_df,ISTD_Conc_df,ISTD_Samp_Ratio_df,Sample_Annot_df] = self.DataList[i].get_Analyte_Concentration('normConc by ISTD',self.DataAnnotationList[i])
+            self.compare_df('normConc by ISTD',norm_Conc_df,self.DataResultList[i])
+            self.compare_df('Sample Annot',Sample_Annot_df,self.DataResultList[i])
+      
     def tearDown(self):
-        self.WideDataResults.close()
-        self.LargeWideDataResults.close()
+        for i in range(len(self.DataResultList)):
+            self.DataResultList[i].close()
 
     def sheet_to_table(self,workbook,sheet_name):
         ws = workbook[sheet_name]
