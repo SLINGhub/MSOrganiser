@@ -1,10 +1,8 @@
 # coding: utf-8
 
 import MSParser
-from MSCalculate import ISTD_Operations
 from MSAnalysis import MS_Analysis
 from MSDataOutput import MSDataOutput_Excel
-import MSDataOutput
 from MSDataReport import MSDataReport_PDF
 
 from logging.handlers import TimedRotatingFileHandler
