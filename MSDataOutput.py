@@ -37,14 +37,14 @@ class MSDataOutput:
     def start_writer(self):
         self.writer = os.path.join(self.output_directory, self.__output_filename)
 
-    def df_to_file_preparation(output_option,df,transpose=False):
+    def df_to_file_preparation(output_option,df,transpose=False,logger=None,ingui=False):
         """Function to check and set up the settings needed for printing to file"""
 
         #If df is empty we send a warning and skip the df
         if df.empty:
-            if self.logger:
-                self.logger.warning('%s has no data. Please check the input file',output_option)
-            if self.ingui:
+            if logger:
+                logger.warning('%s has no data. Please check the input file',output_option)
+            if ingui:
                 print(output_option + ' has no data. Please check the input file',flush=True)
             return([df,output_option])
 
@@ -63,7 +63,7 @@ class MSDataOutput:
         if self.writer is None:
             self.start_writer()
 
-        [df,output_option] = MSDataOutput.df_to_file_preparation(output_option,df,transpose)
+        [df,output_option] = MSDataOutput.df_to_file_preparation(output_option,df,transpose,self.logger,self.ingui)
 
         #If df is empty, just leave the function, warning has been sent to df_to_file_preparation
         if df.empty:
@@ -103,7 +103,7 @@ class MSDataOutput_Excel(MSDataOutput):
         if self.writer is None:
             self.start_writer()
 
-        [df,output_option] = MSDataOutput.df_to_file_preparation(output_option,df,transpose)
+        [df,output_option] = MSDataOutput.df_to_file_preparation(output_option,df,transpose,self.logger,self.ingui)
 
         #If df is empty, just leave the function, warning has been sent to df_to_file_preparation
         if df.empty:
