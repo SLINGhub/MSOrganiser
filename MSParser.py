@@ -31,6 +31,17 @@ def parse_MSOrganiser_args(args_json_file_path=""):
     stored_args = vars(args)
 
     #Verify that the arguments are valid before saving/using them
+
+    #Check if MS_Files option is not empty
+    if not stored_args['MS_Files']:
+        print("Please key in at least one input MS file",flush=True)
+        sys.exit(-1)
+
+    #Check if Output_Directory option is not empty
+    if not stored_args['Output_Directory']:
+        print("Please key in at least one output directory",flush=True)
+        sys.exit(-1)
+
     #Check if Output_Options is selected
     if not stored_args['Output_Options']:
         print("Please key in at least one result to output",flush=True)
