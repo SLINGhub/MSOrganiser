@@ -7,7 +7,7 @@ import pandas as pd
 
 
 class MSDataOutput:
-    """To describe the general setup for Data Output. Default to csv file"""
+    """To describe the general setup for Data Output. Default to excel file"""
     def __init__(self, output_directory, input_file_path, logger=None, ingui=True):
         self.output_directory = output_directory
         self.output_filename = os.path.splitext(os.path.basename(input_file_path))[0]

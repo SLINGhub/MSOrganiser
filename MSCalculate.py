@@ -242,7 +242,7 @@ class ISTD_Operations():
 
         return [norm_Transition_Name_df,ISTD_data,ISTD_report]
 
-    def create_ISTD_data_from_Transition_Name_Annot(Transition_Name_df,Transition_Name_Annot_df,ISTD_column,logger,ingui):
+    def create_ISTD_data_from_Transition_Name_Annot(Transition_Name_df,ISTD_Annot_df,ISTD_column,logger,ingui):
 
         #Create an empty data frame
         ISTD_data = pd.DataFrame(columns=Transition_Name_df.columns, index=Transition_Name_df.index)
@@ -254,15 +254,15 @@ class ISTD_Operations():
         #Compulsory columns Transition_Name and Transition_Name_ISTD and verified when reading the Transition_Name_Annot file
         #We do not need to check for these columns again
 
-        #Check if ISTD_column is a column in the Transition_Name_Annot_df when merged with ISTD_Annot
-        if ISTD_column not in Transition_Name_Annot_df.columns:
+        #Check if ISTD_column is a column in the ISTD_Annot_df
+        if ISTD_column not in ISTD_Annot_df.columns:
             if logger:
                 logger.warning("\"%s\" is not a column in the ISTD_Annot sheet. Returning an empty data frame",ISTD_column)
             if ingui:
                 print("\"" + ISTD_column + "\" is not a column in the ISTD_Annot file. Returning an empty data frame",flush=True)
             return [ISTD_data]
 
-        for index, row in Transition_Name_Annot_df.iterrows():
+        for index, row in ISTD_Annot_df.iterrows():
             if row['Transition_Name'] in ISTD_data.columns:
                 ISTD_data[row['Transition_Name']] = row[ISTD_column]
         
@@ -304,11 +304,6 @@ class ISTD_Operations():
         ISTD_Annot_Columns = list(ISTD_Annot_df.columns.values)
         if "ISTD_Conc_[nM]" in ISTD_Annot_Columns:
             #Some values may be missing because some transition names have no ISTD, logging it may be unnecessary 
-            #if ISTD_Annot_df["ISTD_Conc_[nM]"].isnull().any():
-                #if logger:
-                #    logger.warning("Some ISTD_Conc_nM input values are missing. Please check the ISTD_Annot sheet. Remember to save your file")
-                #if ingui:
-                #    print("Some ISTD_Conc_nM input values are missing. Please check the ISTD_Annot sheet. Remember to save your file",flush=True)
             ISTD_Conc_df = ISTD_Operations.create_ISTD_data_from_Transition_Name_Annot(Transition_Name_df,ISTD_Annot_df,"ISTD_Conc_[nM]",logger,ingui)
         else:
             #Return empty data set
