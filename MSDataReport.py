@@ -20,9 +20,7 @@ def get_report_dir(dir_name):
             raise IOError(
                 ("Cannot locate MSreport resources. It seems that the program was frozen, "
                  "but resource files were not copied into directory of the executable "
-                 "file. Please copy `msreport` folders from gooey module "
-                 "directory into `{}{}` directory. Using PyInstaller, a.datas in .spec "
-                 "file must be specified.".format(resource_dir, os.sep)))
+                 "file. Please copy `msreport` folders into `{}{}` directory.".format(resource_dir, os.sep)))
         return resource_dir
     else:
         resource_dir = os.path.dirname(__file__)

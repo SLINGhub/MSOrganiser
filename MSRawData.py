@@ -347,9 +347,9 @@ class SciexMSRawData(MSRawData):
 
         column_name = SciexMSRawData.AgilentColumnName_to_SciexColumnName(column_name)
 
-        Area_df = self.RawData.pivot(index='Sample Name' ,columns='Component Name',values=column_name)
-        Area_df = Area_df.reset_index()
-        Area_df.columns.name = None
-        Area_df.rename(columns={'Sample Name':'Sample_Name'}, inplace=True)
-        return(Area_df)
+        Table_df = self.RawData.pivot(index='Sample Name' ,columns='Component Name',values=column_name)
+        Table_df = Table_df.reset_index()
+        Table_df.columns.name = None
+        Table_df.rename(columns={'Sample Name':'Sample_Name'}, inplace=True)
+        return(Table_df)
 

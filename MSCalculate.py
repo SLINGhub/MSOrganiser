@@ -4,12 +4,6 @@ import sys
 import os
 import logging
 
-
-import psutil
-def usage():
-    process1 = psutil.Process(os.getpid())
-    print(process1.memory_info()[0] / float(2 ** 20),flush=True)
-
 from openpyxl import load_workbook
 from Annotation import MS_Template
 
