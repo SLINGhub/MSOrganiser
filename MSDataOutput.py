@@ -7,7 +7,16 @@ import pandas as pd
 
 
 class MSDataOutput:
-    """To describe the general setup for Data Output. Default to excel file"""
+    """
+    A class to describe the general setup for Data Output.
+
+    Args:
+        output_directory (str): directory path to output the data
+        input_file_path (str): file path of the input MRM transition name file. To be used for the output filename
+        logger (object): logger object created by start_logger in MSOrganiser
+        ingui (bool): if True, print analysis status to screen
+
+    """
     def __init__(self, output_directory, input_file_path, logger=None, ingui=True):
         self.output_directory = output_directory
         self.output_filename = os.path.splitext(os.path.basename(input_file_path))[0]
@@ -16,7 +25,15 @@ class MSDataOutput:
         self.writer = None
 
     def transpose_MSdata(MS_df):
-        """Function to transpose data"""
+        """Function to transpose data
+
+        Args:
+            MS_df (pandas DataFrame): A panda data frame
+
+        Returns:
+            MS_df (pandas DataFrame): A panda data frame with data transposed
+
+        """
         #Transpose the data
         MS_df = MS_df.T
         #Now the first column is the index, we need to convert back to a first column
@@ -35,10 +52,26 @@ class MSDataOutput:
         return MS_df
 
     def start_writer(self):
+        """Function to open a writer object"""
         self.writer = os.path.join(self.output_directory, self.__output_filename)
 
     def df_to_file_preparation(output_option,df,transpose=False,logger=None,ingui=False):
-        """Function to check and set up the settings needed for printing to file"""
+        """Function to check and set up the settings needed before writing to a file.
+
+        Args:
+            output_option (str): the Output_Options value given to MSOrganiser.
+            df (pandas DataFrame): A panda data frame to output
+            transpose (bool): if True, transpose the dataframe first before writing to the Excel sheet
+            logger (object): logger object created by start_logger in MSOrganiser
+            ingui (bool): if True, print analysis status to screen
+
+        Returns:
+            (list): list containing:
+
+                * df (pandas DataFrame): A panda data frame to output. Transposed if transpose is set to True
+                * output_option (str): Updated output options if changes are required E.g S/N to S_to_N
+        
+        """
 
         #If df is empty we send a warning and skip the df
         if df.empty:
@@ -59,7 +92,17 @@ class MSDataOutput:
 
 
     def df_to_file(self,output_option,df,transpose=False):
-        """Funtion to write a df to a csv file"""
+        """Funtion to write a df to a csv file named {input file name}_{output_option}_Results.csv .
+
+        Args:
+            output_option (str): the name of the result csv file. MSOrganiser puts it as the Output_Options value
+            df (pandas DataFrame): A panda data frame to output to csv
+            transpose (bool): if True, transpose the dataframe first before writing to the Excel sheet
+
+        Note:
+            For the output option S/N, it will be changed to S_to_N as filenames does not accept slashes. This is done in the function df_to_file_preparation
+        
+        """
         if self.writer is None:
             self.start_writer()
 
@@ -73,13 +116,23 @@ class MSDataOutput:
    
 
 class MSDataOutput_Excel(MSDataOutput):
-    """To describe the general setup for Data Output to Excel"""
+    """
+    A class to describe the general setup for Data Output to Excel.
+
+    Args:
+        output_directory (str): directory path to output the data
+        input_file_path (str): file path of the input MRM transition name file. To be used for the output filename
+        logger (object): logger object created by start_logger in MSOrganiser
+        ingui (bool): if True, print analysis status to screen
+
+    """
     def start_writer(self):
+        """Function to open an Excel writer object using openpyxl"""
         self.writer = os.path.join(self.output_directory, self.output_filename + '_Results.xlsx' )
         self.writer = ExcelWriter(self.writer,engine='openpyxl')
 
     def end_writer(self):
-        """Function to close a writer object"""
+        """Function to close an Excel writer object"""
         try:
             self.writer.save()
         except Exception as e:
@@ -91,7 +144,7 @@ class MSDataOutput_Excel(MSDataOutput):
                 self.logger.error(e)
             sys.exit(-1)
 
-    def get_col_widths(dataframe):
+    def __get_col_widths(dataframe):
         """Function to get the correct width to output the excel file nicely"""
         # First we find the maximum length of the index column   
         idx_max = max([len(str(s)) for s in dataframe.index.values] + [len(str(dataframe.index.name))])
@@ -99,7 +152,17 @@ class MSDataOutput_Excel(MSDataOutput):
         return [idx_max] + [max([len(str(s)) for s in dataframe[col].values] + [len(col)]) + 1 for col in dataframe.columns]
 
     def df_to_file(self,output_option,df,transpose=False):
-        """Funtion to write a df to a excel file"""
+        """Funtion to write a df to an excel file.
+
+        Args:
+            output_option (str): the name of the sheet
+            df (pandas DataFrame): A panda data frame to output to Excel
+            transpose (bool): if True, transpose the dataframe first before writing to the Excel sheet
+        
+        Note:
+            For the output option S/N, it will be changed to S_to_N as excel does not accept slashes. This is done in the function df_to_file_preparation
+        
+        """
         if self.writer is None:
             self.start_writer()
 
@@ -112,7 +175,7 @@ class MSDataOutput_Excel(MSDataOutput):
         try:
             df.to_excel(excel_writer=self.writer,sheet_name=output_option, index=False)
             worksheet = self.writer.sheets[output_option]
-            for i, width in enumerate(MSDataOutput_Excel.get_col_widths(df)):
+            for i, width in enumerate(MSDataOutput_Excel.__get_col_widths(df)):
                 if i==0:
                     continue
                 worksheet.column_dimensions[get_column_letter(i)].width = width + 1

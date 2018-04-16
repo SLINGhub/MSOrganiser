@@ -34,29 +34,50 @@ class Agilent_Test(unittest.TestCase):
         self.SciexDataResults = openpyxl.load_workbook(SCIEX_RESULTS_FILENAME)
 
     def test_WideData(self):
+        """Check if the software is able to do the following with WideTableForm.csv:
+
+        * Extract Area, RT and FWHM successfully using AgilentMSRawData.get_table
+        * Traspose the data correctly using MSDataOutput.transpose_MSdata
+        """
+
         self.assertEqual("WideTableForm",self.WideData.DataForm)
-        self.compare_tables("Area",self.WideData,self.WideDataResults)
-        self.compare_tables("Area",self.WideData,self.WideDataTransposeResults,transpose=True)
-        self.compare_tables("RT",self.WideData,self.WideDataResults)
-        self.compare_tables("RT",self.WideData,self.WideDataTransposeResults,transpose=True)
-        self.compare_tables("FWHM",self.WideData,self.WideDataResults)
-        self.compare_tables("FWHM",self.WideData,self.WideDataTransposeResults,transpose=True)
+        self.__compare_tables("Area",self.WideData,self.WideDataResults)
+        self.__compare_tables("Area",self.WideData,self.WideDataTransposeResults,transpose=True)
+        self.__compare_tables("RT",self.WideData,self.WideDataResults)
+        self.__compare_tables("RT",self.WideData,self.WideDataTransposeResults,transpose=True)
+        self.__compare_tables("FWHM",self.WideData,self.WideDataResults)
+        self.__compare_tables("FWHM",self.WideData,self.WideDataTransposeResults,transpose=True)
 
     def test_WideDataLarge(self):
+        """Check if the software is able to do the following with large dataset sPerfect_Index_AllLipids_raw.csv:
+
+        * Extract Area, RT and FWHM successfully using AgilentMSRawData.get_table
+        """
+
         self.assertEqual("WideTableForm",self.LargeWideData.DataForm)
-        self.compare_tables("Area",self.LargeWideData,self.LargeWideDataResults)
-        self.compare_tables("RT",self.LargeWideData,self.LargeWideDataResults)
-        self.compare_tables("FWHM",self.LargeWideData,self.LargeWideDataResults)
+        self.__compare_tables("Area",self.LargeWideData,self.LargeWideDataResults)
+        self.__compare_tables("RT",self.LargeWideData,self.LargeWideDataResults)
+        self.__compare_tables("FWHM",self.LargeWideData,self.LargeWideDataResults)
 
     def test_CompoundData(self):
+        """Check if the software is able to do the following with large dataset CompoundTableForm.csv:
+
+        * Extract Area and RT successfully using AgilentMSRawData.get_table
+        """
+
         self.assertEqual("CompoundTableForm",self.CompoundData.DataForm)
-        self.compare_tables("Area",self.CompoundData,self.CompoundDataResults)
-        self.compare_tables("RT",self.CompoundData,self.CompoundDataResults)
+        self.__compare_tables("Area",self.CompoundData,self.CompoundDataResults)
+        self.__compare_tables("RT",self.CompoundData,self.CompoundDataResults)
 
     def test_SciexData(self):
-        self.compare_tables("Area",self.SciexData,self.SciexDataResults)
-        self.compare_tables("RT",self.SciexData,self.SciexDataResults)
-        self.compare_tables("FWHM",self.SciexData,self.SciexDataResults)
+        """Check if the software is able to do the following with large dataset Mohammed_SciEx_data.txt:
+
+        * Extract Area and RT successfully using SciexMSRawData.get_table
+        """
+
+        self.__compare_tables("Area",self.SciexData,self.SciexDataResults)
+        self.__compare_tables("RT",self.SciexData,self.SciexDataResults)
+        self.__compare_tables("FWHM",self.SciexData,self.SciexDataResults)
 
     def tearDown(self):
         self.WideDataResults.close()
@@ -65,15 +86,17 @@ class Agilent_Test(unittest.TestCase):
         self.CompoundDataResults.close()
         self.SciexDataResults.close()
 
-    def compare_tables(self,table_name,MSDataObject,ExcelWorkbook,transpose=False):
-        ExcelWorkbook = self.sheet_to_table(ExcelWorkbook,table_name).apply(pd.to_numeric, errors='ignore', downcast = 'float')
+    def __compare_tables(self,table_name,MSDataObject,ExcelWorkbook,transpose=False):
+        '''Check if the pandas data frame (MSDataObject) has the same values as the table in ExcelWorkbook'''
+        ExcelWorkbook = self.__sheet_to_table(ExcelWorkbook,table_name).apply(pd.to_numeric, errors='ignore', downcast = 'float')
         if transpose:
             MSDataObject = MSDataOutput.transpose_MSdata(MSDataObject.get_table(table_name)).apply(pd.to_numeric, errors='ignore', downcast = 'float')
         else:
             MSDataObject = MSDataObject.get_table(table_name).apply(pd.to_numeric, errors='ignore', downcast = 'float')
         pd.util.testing.assert_frame_equal(MSDataObject,ExcelWorkbook)
 
-    def sheet_to_table(self,workbook,sheet_name):
+    def __sheet_to_table(self,workbook,sheet_name):
+        '''Convert an Excel sheet table into a pandas data frame.'''
         ws = workbook[sheet_name]
         data = ws.values
         cols = next(data)

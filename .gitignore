@@ -265,6 +265,5 @@ __pycache__/
 /build
 /dist
 /MSOrganiser-args.json
-/Required_folder
-/tests/testdata/ISTDTemplateDraft29.xlsm
 /RequiredFolders
+/Sphinx

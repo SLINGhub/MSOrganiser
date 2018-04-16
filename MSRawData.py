@@ -6,7 +6,14 @@ import os
 from pathlib import Path
 
 class MSRawData:
-    """To describe raw data obtained from the MS machine"""
+    """
+    A class to describe raw data obtained from the MS machine
+
+    Args:
+        filePath (str): file path of the input MRM transition name file
+        logger (object): logger object created by start_logger in MSOrganiser
+        ingui (bool): if True, print analysis status to screen
+    """
 
     def __init__(self, filepath, logger=None, ingui=True):
         self.__logger = logger
@@ -29,17 +36,28 @@ class MSRawData:
                 sys.exit(-1)
 
     def remove_whiteSpaces(self,df):
-        #Strip the whitespaces for each string columns of a df
+        """Strip the whitespaces for each string columns of a df
+
+        Args:
+            df (pandas DataFrame): A panda data frame
+
+        Returns:
+            df (pandas DataFrame): A panda data frame with white space removed
+
+        """
         df[df.select_dtypes(['object']).columns] = df.select_dtypes(['object']).apply(lambda x: x.str.strip())
         return df
 
 
 class AgilentMSRawData(MSRawData):
-    
-    """To describe raw data obtained from the Agilent MS machine"""
+    """
+    To describe raw data obtained from the Agilent MS machine
 
-    VALID_COMPOUND_RESULTS = ('Area','RT','FWHM','S/N')
-    VALID_COMPOUND_METHODS = ('Precursor Ion','Product Ion')
+    Args:
+        filePath (str): file path of the input MRM transition name file
+        logger (object): logger object created by start_logger in MSOrganiser
+        ingui (bool): if True, print analysis status to screen
+    """
 
     def __init__(self, filepath, logger=None, ingui=True):
         MSRawData.__init__(self,filepath, ingui = ingui,logger=logger)
@@ -48,24 +66,46 @@ class AgilentMSRawData(MSRawData):
         self.__readfile(filepath)
         self.__getdataform(filepath)
         self.__filename = os.path.basename(filepath)
+        self.VALID_COMPOUND_RESULTS = ('Area','RT','FWHM','S/N')
+        self.VALID_COMPOUND_METHODS = ('Precursor Ion','Product Ion')
 
     def get_table(self,column_name,is_numeric=True):
-        """Function to get the table from MassHunter Raw Data"""
-        if self.DataForm == "WideTableForm":
-            return self.get_table_wide(column_name,is_numeric)
-        elif self.DataForm == "CompoundTableForm":
-            return self.get_table_compound(column_name,is_numeric)
+        """Function to get the table from MassHunter Raw Data
 
-    def get_table_wide(self,column_name,is_numeric=True):
+        Args:
+            column_name (str): The name of the column given in the Output_Options.
+
+        Returns:
+            A data frame of sample as rows and transition names as columns with values from the chosen column name
+
+        """
+        if self.DataForm == "WideTableForm":
+            return self.__get_table_wide(column_name,is_numeric)
+        elif self.DataForm == "CompoundTableForm":
+            return self.__get_table_compound(column_name,is_numeric)
+
+    def get_data_file_name(self):
+        """Function to get the list of sample names in a form of a dataframe
+
+        Returns:
+            A data frame of sample as rows and transition names as columns with values from the chosen column name
+
+        """
+        if self.DataForm == "WideTableForm":
+            return self.__get_data_file_name_wide()
+        elif self.DataForm == "CompoundTableForm":
+            return self.__get_data_file_name_compound()
+
+    def __get_table_wide(self,column_name,is_numeric=True):
         """Function to get the table from MassHunter Raw Data in Wide Table form"""
 
         #Get the data file name and give error when it cannot be found
-        DataFileName_df = self.get_data_file_name_wide()
+        DataFileName_df = self.__get_data_file_name_wide()
 
         #Check if Column name comes from Results or Methods group
-        if column_name in AgilentMSRawData.VALID_COMPOUND_RESULTS:
+        if column_name in self.VALID_COMPOUND_RESULTS:
             column_group = "Results"
-        elif column_name in AgilentMSRawData.VALID_COMPOUND_METHODS:
+        elif column_name in self.VALID_COMPOUND_METHODS:
             column_group = "Method"
         else:
             self.__logger.error('%s is not a valid column in MassHunter or not available as a valid output for this program.',column_name)
@@ -104,14 +144,14 @@ class AgilentMSRawData(MSRawData):
 
         return table_df
 
-    def get_table_compound(self,column_name,is_numeric=True):
+    def __get_table_compound(self,column_name,is_numeric=True):
         """Function to get the table from MassHunter Raw Data in Compound Table form"""
 
         #Get the data file name and give error when it cannot be found
-        DataFileName_df = self.get_data_file_name_compound()
+        DataFileName_df = self.__get_data_file_name_compound()
 
         #Get the compound name df and give error when it cannot be found
-        CompoundName_df = self.get_compound_name_compound()
+        CompoundName_df = self.__get_compound_name_compound()
 
         #Get the data with the given column name at the seond row 
         table_index = self.RawData.iloc[1,:].str.contains(column_name)
@@ -135,7 +175,7 @@ class AgilentMSRawData(MSRawData):
         table_df = table_df.iloc[1:]
 
         #If column name is a compound method, only the first row has data, we need to replicate data for all the rows
-        if column_name in AgilentMSRawData.VALID_COMPOUND_METHODS:
+        if column_name in self.VALID_COMPOUND_METHODS:
             table_df = pd.concat([table_df]*DataFileName_df.shape[0], ignore_index=True)
         
         #Reset the row index
@@ -145,7 +185,7 @@ class AgilentMSRawData(MSRawData):
 
         return table_df
 
-    def get_compound_name_compound(self):
+    def __get_compound_name_compound(self):
         """Function to get the list of compound in a form of a df"""
 
         Compound_Col = self.RawData.iloc[0,:].str.contains("Compound Method") & self.RawData.iloc[1,:].str.contains("Name")
@@ -167,14 +207,7 @@ class AgilentMSRawData(MSRawData):
 
         return CompoundName_df
 
-    def get_data_file_name(self):
-        """Function to get the list of sample names in a form of a df"""
-        if self.DataForm == "WideTableForm":
-            return self.get_data_file_name_wide()
-        elif self.DataForm == "CompoundTableForm":
-            return self.get_data_file_name_compound()
-    
-    def get_data_file_name_wide(self):
+    def __get_data_file_name_wide(self):
         """Function to get the list of sample names from MassHunter Raw Data in Wide Table form"""
 
         DataFileName_Col = self.RawData.iloc[0,:].str.contains("Sample") & self.RawData.iloc[1,:].str.contains("Data File")
@@ -204,7 +237,7 @@ class AgilentMSRawData(MSRawData):
 
         return DataFileName_df
 
-    def get_data_file_name_compound(self):
+    def __get_data_file_name_compound(self):
         """Function to get the list of sample names from MassHunter Raw Data in Compound Table form"""
 
         DataFileName_Col = self.RawData.iloc[1,:].str.contains("Data File")
@@ -278,9 +311,14 @@ class AgilentMSRawData(MSRawData):
             sys.exit(-1)
 
 class SciexMSRawData(MSRawData):
-    """To describe raw data obtained from the Sciex MS machine"""
+    """
+    To describe raw data obtained from the Sciex MS machine
 
-    VALID_COMPOUND_RESULTS = ('Area','RT','FWHM','S/N')
+    Args:
+        filePath (str): file path of the input MRM transition name file
+        logger (object): logger object created by start_logger in MSOrganiser
+        ingui (bool): if True, print analysis status to screen
+    """
 
     def __init__(self, filepath, logger=None, ingui=True):
         MSRawData.__init__(self,filepath, ingui = ingui,logger=logger)
@@ -288,6 +326,54 @@ class SciexMSRawData(MSRawData):
         self.__ingui = ingui
         self.__readfile(filepath)
         self.__filename = os.path.basename(filepath)
+        self.VALID_COMPOUND_RESULTS = ('Area','RT','FWHM','S/N')
+
+    def get_table(self,column_name,is_numeric=True):
+        """Function to get the table from Sciex MultiQuant Raw Data
+
+        Args:
+            column_name (str): The name of the column given in the Output_Options.
+
+        Returns:
+            A data frame of sample as rows and transition names as columns with values from the chosen column name
+
+        """
+        column_name = self.AgilentColumnName_to_SciexColumnName(column_name)
+
+        Table_df = self.RawData.pivot(index='Sample Name' ,columns='Component Name',values=column_name)
+        Table_df = Table_df.reset_index()
+        Table_df.columns.name = None
+        Table_df.rename(columns={'Sample Name':'Sample_Name'}, inplace=True)
+        return(Table_df)
+
+    def AgilentColumnName_to_SciexColumnName(self,column_name):
+        """Function to convert the column_name (Output Option) from Agilent to Sciex form
+
+        Note:
+            By default the Output Option name follows Agilent.
+
+        Args:
+            column_name (str): The name of the column given in the Output_Options.
+
+        Returns:
+            column_name (str): Name converted to Sciex form
+
+        """
+
+        if column_name not in self.VALID_COMPOUND_RESULTS:
+            self.__logger.error('%s is not a valid column in Sciex or not available as a valid output for this program.',column_name)
+            if self.__ingui:
+                print(column_name + ' is not a valid column in Sciex or not available as a valid output for this program.',flush=True)
+            sys.exit(-1)
+
+        if column_name == 'RT':
+            return('Retention Time')
+        elif column_name == 'FWHM':
+            return('Width at 50%')
+        elif column_name == 'S/N':
+            return('Signal / Noise')
+        else:
+            return(column_name)
 
     def __readfile(self,filepath):
         """Function to read the input file"""
@@ -324,32 +410,4 @@ class SciexMSRawData(MSRawData):
             if self.__ingui:
                 print(str(filepath) + ' must have Sample Name and Component Name present in the Sciex file.',flush=True)
             sys.exit(-1)
-
-    def AgilentColumnName_to_SciexColumnName(column_name):
-        '''By default the Output Option name follows Agilent, we need to convert it to Sciex form'''
-
-        if column_name not in SciexMSRawData.VALID_COMPOUND_RESULTS:
-            self.__logger.error('%s is not a valid column in Sciex or not available as a valid output for this program.',column_name)
-            if self.__ingui:
-                print(column_name + ' is not a valid column in Sciex or not available as a valid output for this program.',flush=True)
-            sys.exit(-1)
-
-        if column_name == 'RT':
-            return('Retention Time')
-        elif column_name == 'FWHM':
-            return('Width at 50%')
-        elif column_name == 'S/N':
-            return('Signal / Noise')
-        else:
-            return(column_name)
-
-    def get_table(self,column_name,is_numeric=True):
-
-        column_name = SciexMSRawData.AgilentColumnName_to_SciexColumnName(column_name)
-
-        Table_df = self.RawData.pivot(index='Sample Name' ,columns='Component Name',values=column_name)
-        Table_df = Table_df.reset_index()
-        Table_df.columns.name = None
-        Table_df.rename(columns={'Sample Name':'Sample_Name'}, inplace=True)
-        return(Table_df)
 

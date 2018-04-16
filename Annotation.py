@@ -7,19 +7,35 @@ import logging
 from openpyxl import load_workbook
 
 class MS_Template():
-    """A class to define the excel macro sheet"""
+    """A class to describe the excel macro sheet MS Template Creator
+
+    Args:
+        filePath (str): file path of the input MS Template Creator file
+        logger (object): logger object created by start_logger in MSOrganiser
+        ingui (bool): if True, print analysis status to screen
+    """
+
     def __init__(self,filepath,column_name, logger=None,ingui=True):
         self.__logger = logger
         self.__ingui = ingui
         self.filepath = filepath
-        self.filecheck(column_name)
+        self.__filecheck(column_name)
 
     def remove_whiteSpaces(df):
-        #Strip the whitespaces for each string columns of a df
+        """Strip the whitespaces for each string columns of a df
+
+        Args:
+            df (pandas DataFrame): A panda data frame
+
+        Returns:
+            df (pandas DataFrame): A panda data frame with white space removed
+
+        """
+
         df[df.select_dtypes(['object']).columns] = df.select_dtypes(['object']).apply(lambda x: x.str.strip())
         return df
 
-    def filecheck(self,column_name):
+    def __filecheck(self,column_name):
         #Check if input is blank/None
         if not self.filepath:
             if self.__logger:
@@ -43,7 +59,7 @@ class MS_Template():
                 print('This program no longer accept csv file as input for the ISTD map file. Please use the excel template file given',flush=True)
             sys.exit(-1)
 
-    def readExcelWorkbook(self):
+    def __readExcelWorkbook(self):
         #Read the excel file
         try:
             wb = load_workbook(filename=self.filepath,data_only=True)
@@ -57,8 +73,8 @@ class MS_Template():
             sys.exit(-1)
         return wb
 
-    def checkExcelWorksheet_in_Workbook(self,sheetname,wb):
-        #Check if the excel file has the sheet "Transition_Name_Annot"
+    def __checkExcelWorksheet_in_Workbook(self,sheetname,wb):
+        #Check if the excel file has the sheet sheetname
         if sheetname not in wb.sheetnames:
             if self.__logger:
                 self.__logger.error('Sheet name ' + sheetname + ' does not exists. Please check the input excel file')
@@ -66,7 +82,7 @@ class MS_Template():
                 print('Sheet name ' + sheetname + ' does not exists. Please check the input excel file',flush=True)
             sys.exit(-1)
 
-    def check_if_df_is_empty(self,sheetname,df):
+    def __check_if_df_is_empty(self,sheetname,df):
         #Validate the Transition_Name_Annot sheet has data
         if df.empty:
             if self.__logger:
@@ -75,7 +91,7 @@ class MS_Template():
                 print('The input ' + sheetname + ' data frame has no data.',flush=True)
             sys.exit(-1)
 
-    def checkColumns_in_df(self,colname,sheetname,df):
+    def __checkColumns_in_df(self,colname,sheetname,df):
         #Check if the column name exists as a header in the df
         if colname not in df:
             if self.__logger:
@@ -84,7 +100,7 @@ class MS_Template():
                 print('The ' + sheetname  + ' sheet is missing the column ' + colname + '.',flush=True)
             sys.exit(-1)
 
-    def checkDuplicates_in_cols(self,colname,sheetname,df):
+    def __checkDuplicates_in_cols(self,colname,sheetname,df):
         #Check if Transition_Name column has duplicate Transition_Names
         duplicateValues = df[colname].duplicated()
         if duplicateValues.any():
@@ -96,11 +112,17 @@ class MS_Template():
             sys.exit(-1)
 
     def Read_Transition_Name_Annot_Sheet(self):
+        """Read the excel sheet Transition_Name_Annot as a pandas data frame
+
+        Returns:
+            Transition_Name_Annot_df (pandas DataFrame): A panda data frame containing the contents of Transition_Name_Annot
+        """
+
         #Open the excel file
-        wb = self.readExcelWorkbook()
+        wb = self.__readExcelWorkbook()
 
         #Check if the excel file has the sheet "Transition_Name_Annot"
-        self.checkExcelWorksheet_in_Workbook("Transition_Name_Annot",wb)
+        self.__checkExcelWorksheet_in_Workbook("Transition_Name_Annot",wb)
         
         #Convert worksheet to a dataframe
         worksheet = wb["Transition_Name_Annot"]
@@ -118,7 +140,7 @@ class MS_Template():
         Transition_Name_Annot_df = Transition_Name_Annot_df.dropna(axis=1, how='all')
 
         #Validate the Transition_Name_Annot sheet is valid (Has the Transition_Name and Transition_Name_ISTD columns are not empty)
-        self.validate_Transition_Name_Annot_sheet("Transition_Name_Annot",Transition_Name_Annot_df)
+        self.__validate_Transition_Name_Annot_sheet("Transition_Name_Annot",Transition_Name_Annot_df)
 
         #Remove whitespaces in column names
         Transition_Name_Annot_df.columns = Transition_Name_Annot_df.columns.str.strip()
@@ -131,31 +153,39 @@ class MS_Template():
 
         return Transition_Name_Annot_df
 
-    def validate_Transition_Name_Annot_sheet(self,sheetname,Transition_Name_Annot_df):
+    def __validate_Transition_Name_Annot_sheet(self,sheetname,Transition_Name_Annot_df):
         #Validate the Transition_Name_Annot sheet has data
-        self.check_if_df_is_empty(sheetname,Transition_Name_Annot_df)
+        self.__check_if_df_is_empty(sheetname,Transition_Name_Annot_df)
 
         #Check if the column Transition_Name exists as a header in Transition_Name_Annot_df
-        self.checkColumns_in_df('Transition_Name',sheetname,Transition_Name_Annot_df)
+        self.__checkColumns_in_df('Transition_Name',sheetname,Transition_Name_Annot_df)
 
         #Check if Transition_Name column has duplicate Transition_Names
-        self.checkDuplicates_in_cols('Transition_Name',sheetname,Transition_Name_Annot_df)
+        self.__checkDuplicates_in_cols('Transition_Name',sheetname,Transition_Name_Annot_df)
 
         #Check if the column Transition_Name exists as a header in Transition_Name_Annot_df
-        self.checkColumns_in_df('Transition_Name_ISTD',sheetname,Transition_Name_Annot_df)
+        self.__checkColumns_in_df('Transition_Name_ISTD',sheetname,Transition_Name_Annot_df)
 
     def Read_ISTD_Annot_Sheet(self):
+        """Read the excel sheet ISTD_Annot as a pandas data frame
+
+        Returns:
+            ISTD_Annot_df (pandas DataFrame): A panda data frame containing the contents of ISTD_Annot
+        Note:
+            Transition_Name_ISTD and ISTD_Conc_[nM] are the only columns taken
+        """
+
         #Open the excel file
-        wb = self.readExcelWorkbook()
+        wb = self.__readExcelWorkbook()
 
         #Check if the excel file has the sheet "Transition_Name_Annot"
-        self.checkExcelWorksheet_in_Workbook("ISTD_Annot",wb)
+        self.__checkExcelWorksheet_in_Workbook("ISTD_Annot",wb)
         
         #Convert worksheet to a dataframe
         worksheet = wb["ISTD_Annot"]
 
         #Check that sheet is valid
-        self.validate_ISTD_Annot_Sheet(worksheet)
+        self.__validate_ISTD_Annot_Sheet(worksheet)
 
         #Get the column names
         cols = [worksheet["A2"].value,worksheet["E3"].value]
@@ -178,7 +208,7 @@ class MS_Template():
         #ISTD_Annot_df = ISTD_Annot_df.dropna(axis=0, how='all')
 
         #Check if Transition_Name_ISTD column has duplicate Transition_Name_ISTD
-        self.checkDuplicates_in_cols('Transition_Name_ISTD','ISTD_Annot',ISTD_Annot_df)
+        self.__checkDuplicates_in_cols('Transition_Name_ISTD','ISTD_Annot',ISTD_Annot_df)
 
         #Remove whitespaces in column names
         ISTD_Annot_df.columns = ISTD_Annot_df.columns.str.strip()
@@ -196,7 +226,7 @@ class MS_Template():
         
         return(ISTD_Annot_df)
 
-    def validate_ISTD_Annot_Sheet(self,worksheet):
+    def __validate_ISTD_Annot_Sheet(self,worksheet):
         #Check if the sheet has been tampled
         if worksheet["A2"].value != "Transition_Name_ISTD":
             if self.__logger:
@@ -213,11 +243,25 @@ class MS_Template():
             sys.exit(-1)
 
     def Read_Sample_Annot_Sheet(self,MS_FilePathList=[]):
+        """Read the excel sheet Sample_Annot as a pandas data frame
+
+        Args:
+            MS_FilePathList (list): A list of MRM transition name file names. 
+           
+        Note:
+            The list of MRM transition name file names names is to help the program properly filter 
+            the Sample annotation such that we only pick rows whose Raw_Data_File_Name values is in the list. 
+            Currently, our input is set as [os.path.basename(self.MS_FilePath)] from MSAnalysis.
+
+        Returns:
+            Sample_Annot_df (pandas DataFrame): A panda data frame containing the contents of Sample_Annot
+        """
+
         #Open the excel file
-        wb = self.readExcelWorkbook()
+        wb = self.__readExcelWorkbook()
 
         #Check if the excel file has the sheet "Transition_Name_Annot"
-        self.checkExcelWorksheet_in_Workbook("Sample_Annot",wb)
+        self.__checkExcelWorksheet_in_Workbook("Sample_Annot",wb)
         
         #Convert worksheet to a dataframe
         worksheet = wb["Sample_Annot"]
@@ -235,7 +279,7 @@ class MS_Template():
         Sample_Annot_df = Sample_Annot_df.dropna(axis=1, how='all')
 
         #Validate the Transition_Name_Annot sheet is valid (Has the Transition_Name and Transition_Name_ISTD columns are not empty)
-        self.validate_Sample_Annot_sheet("Sample_Annot",Sample_Annot_df)
+        self.__validate_Sample_Annot_sheet("Sample_Annot",Sample_Annot_df)
 
         #We take the Sample Annotation data that can be found in the MS_FilePathList
         #Else we just take all of them
@@ -258,28 +302,28 @@ class MS_Template():
 
         return Sample_Annot_df
 
-    def validate_Sample_Annot_sheet(self,sheetname,Sample_Annot_df):
+    def __validate_Sample_Annot_sheet(self,sheetname,Sample_Annot_df):
         #Validate the Sample_Annot sheet has data
-        self.check_if_df_is_empty(sheetname,Sample_Annot_df)
+        self.__check_if_df_is_empty(sheetname,Sample_Annot_df)
 
         #Check if the column Raw_Data_File_Name exists as a header in Sample_Annot_df
-        self.checkColumns_in_df('Raw_Data_File_Name',sheetname,Sample_Annot_df)
+        self.__checkColumns_in_df('Raw_Data_File_Name',sheetname,Sample_Annot_df)
 
         #Check if the column Merge_Status exists as a header in Sample_Annot_df
-        #self.checkColumns_in_df('Merge_Status',sheetname,Sample_Annot_df)
+        #self.__checkColumns_in_df('Merge_Status',sheetname,Sample_Annot_df)
 
         #Check if the column Sample_Name exists as a header in Sample_Annot_df
-        self.checkColumns_in_df('Sample_Name',sheetname,Sample_Annot_df)
+        self.__checkColumns_in_df('Sample_Name',sheetname,Sample_Annot_df)
 
         #Check if the column Sample_Type exists as a header in Sample_Annot_df
-        self.checkColumns_in_df('Sample_Type',sheetname,Sample_Annot_df)
+        self.__checkColumns_in_df('Sample_Type',sheetname,Sample_Annot_df)
 
         #Check if the column Sample_Amount exists as a header in Sample_Annot_df
-        self.checkColumns_in_df('Sample_Amount',sheetname,Sample_Annot_df)
+        self.__checkColumns_in_df('Sample_Amount',sheetname,Sample_Annot_df)
 
         #Check if the column Sample_Amount_Unit exists as a header in Sample_Annot_df
-        self.checkColumns_in_df('Sample_Amount_Unit',sheetname,Sample_Annot_df)
+        self.__checkColumns_in_df('Sample_Amount_Unit',sheetname,Sample_Annot_df)
 
         #Check if the column ISTD_Mixture_Volume_[uL] exists as a header in Sample_Annot_df
-        self.checkColumns_in_df('ISTD_Mixture_Volume_[uL]',sheetname,Sample_Annot_df)
+        self.__checkColumns_in_df('ISTD_Mixture_Volume_[uL]',sheetname,Sample_Annot_df)
 

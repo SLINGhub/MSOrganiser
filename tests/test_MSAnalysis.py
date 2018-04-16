@@ -39,31 +39,47 @@ class Agilent_Test(unittest.TestCase):
         self.DataAnnotationList = [WIDETABLEFORM_ANNOTATION,LARGE_WIDETABLEFORM_ANNOTATION,COMPOUNDTABLEFORM_ANNOTATION,SCIEX_ANNOTATION]
         self.DataResultList = [WideDataResults,LargeWideDataResults,CompoundDataResults,SciexResults]
 
-    def compare_df(self,table_name,MSData_df,ExcelWorkbook):
-        MSData_df = MSData_df.apply(pd.to_numeric, errors='ignore', downcast = 'float')
-        ExcelWorkbook = self.sheet_to_table(ExcelWorkbook,table_name).apply(pd.to_numeric, errors='ignore', downcast = 'float')
-        pd.util.testing.assert_frame_equal(MSData_df,ExcelWorkbook)
-
     def test_getnormAreaTable(self):
+        """Check if the software is able to calculate the normalise area using MS_Analysis.get_Normalised_Area from these datasets 
+
+        * WideTableForm.csv
+        * sPerfect_Index_AllLipids_raw.csv
+        * CompoundTableForm.csv
+        * Mohammed_SciEx_data.txt
+        """
+
         #Perform normalisation using ISTD
         for i in range(len(self.DataList)):
             [norm_Area_df,ISTD_Area,ISTD_map_df,ISTD_Report] = self.DataList[i].get_Normalised_Area('normArea by ISTD',self.DataAnnotationList[i])
-            self.compare_df('normArea by ISTD',norm_Area_df,self.DataResultList[i])
-            self.compare_df('ISTD map',ISTD_map_df,self.DataResultList[i])
+            self.__compare_df('normArea by ISTD',norm_Area_df,self.DataResultList[i])
+            self.__compare_df('ISTD map',ISTD_map_df,self.DataResultList[i])
 
 
     def test_getAnalyteConcTable(self):
+        """Check if the software is able to calculate the transition names concentration using MS_Analysis.get_Analyte_Concentration from these datasets
+
+        * WideTableForm.csv
+        * sPerfect_Index_AllLipids_raw.csv
+        * CompoundTableForm.csv
+        * Mohammed_SciEx_data.txt
+        """
+
         #Perform analyte concentration using ISTD
         for i in range(len(self.DataList)):
             [norm_Conc_df,ISTD_Conc_df,ISTD_Samp_Ratio_df,Sample_Annot_df] = self.DataList[i].get_Analyte_Concentration('normConc by ISTD',self.DataAnnotationList[i])
-            self.compare_df('normConc by ISTD',norm_Conc_df,self.DataResultList[i])
-            self.compare_df('Sample Annot',Sample_Annot_df,self.DataResultList[i])
+            self.__compare_df('normConc by ISTD',norm_Conc_df,self.DataResultList[i])
+            self.__compare_df('Sample Annot',Sample_Annot_df,self.DataResultList[i])
       
     def tearDown(self):
         for i in range(len(self.DataResultList)):
             self.DataResultList[i].close()
 
-    def sheet_to_table(self,workbook,sheet_name):
+    def __compare_df(self,table_name,MSData_df,ExcelWorkbook):
+        MSData_df = MSData_df.apply(pd.to_numeric, errors='ignore', downcast = 'float')
+        ExcelWorkbook = self.__sheet_to_table(ExcelWorkbook,table_name).apply(pd.to_numeric, errors='ignore', downcast = 'float')
+        pd.util.testing.assert_frame_equal(MSData_df,ExcelWorkbook)
+
+    def __sheet_to_table(self,workbook,sheet_name):
         ws = workbook[sheet_name]
         data = ws.values
         cols = next(data)

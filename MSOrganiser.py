@@ -16,6 +16,15 @@ from datetime import datetime
 import time
 
 def start_logger(log_directory_path):
+    """To set up the log file folder and default configuration give a log directory path
+
+    Args:
+        log_directory_path (str): The directory path to create a folder containing the log files.
+        
+    Returns:
+        logger (object): A logger object used for the MSOrganiser software.
+
+    """
 
     logdirectory = os.path.join(log_directory_path,"logfiles")
 
@@ -45,6 +54,17 @@ def start_logger(log_directory_path):
     return logger
 
 def get_Parameters_df(stored_args,MS_FilePath):
+    """To set up a pandas dataframe storing the input parameters, This data frame will be converted to a PDF page
+
+    Args:
+        stored_args (dict): A dictionary storing the input parameters. The dictionary is created in MSParser
+        MS_FilePath (str): The file path to the MRM transition name file.
+        
+    Returns:
+        Parameters_df (pandas DataFrame): A dataframe storing the input parameters
+
+    """
+
     Parameter_list = []
 
     #Get specific keys into the parameters list
@@ -81,7 +101,7 @@ if __name__ == '__main__':
         print("Working on " + MS_FilePath,flush=True)
         logger.info("Working on " + MS_FilePath)
 
-        MyData = MS_Analysis(MS_FilePath,logger, ingui=True, testing = stored_args['Testing'])
+        MyData = MS_Analysis(MS_FilePath,logger, ingui=True)
 
         #Initiate the pdf report file
         PDFReport = MSDataReport_PDF(stored_args['Output_Directory'], MS_FilePath, logger, ingui=True)

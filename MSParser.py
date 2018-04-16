@@ -10,54 +10,6 @@ import sys
        advanced=True,
        default_size=(610,710))
 
-def parse_MSOrganiser_args(args_json_file_path=""):
-    """ Use ArgParser to build up the arguments we will use in our script"""
-
-    """ Save the arguments in a default json file so that we can retrieve them every time we run the script."""
-    #Create default json file is located in the same directory as the executable file
-    if not args_json_file_path:
-        args_file = os.path.join(os.path.abspath(os.path.dirname(sys.argv[0])),"MSOrganiser-args.json")
-    else:
-        args_file =  args_json_file_path
-
-    #Load the parameters from json file or create an empty dictionary
-    stored_args = __load_args_from_json(args_file)
-
-    #Create a Gooey Parser from the stored args
-    parser = create_Gooey_Parser(stored_args)
-
-    #Update the args with the most recent parameter settings
-    args = parser.parse_args()
-    stored_args = vars(args)
-
-    #Verify that the arguments are valid before saving/using them
-
-    #Check if MS_Files option is not empty
-    if not stored_args['MS_Files']:
-        print("Please key in at least one input MS file",flush=True)
-        sys.exit(-1)
-
-    #Check if Output_Directory option is not empty
-    if not stored_args['Output_Directory']:
-        print("Please key in at least one output directory",flush=True)
-        sys.exit(-1)
-
-    #Check if Output_Options is selected
-    if not stored_args['Output_Options']:
-        print("Please key in at least one result to output",flush=True)
-        sys.exit(-1)
-
-    #Store the values of the arguments so we have them next time we run
-    __save_args_to_json(args_file,stored_args)
-
-    #Convert the string in Transpose Results to boolean
-    if stored_args['Transpose_Results'] == 'True':
-        stored_args['Transpose_Results'] = True
-    else:
-        stored_args['Transpose_Results'] = False
-
-    return stored_args
-
 def __load_args_from_json(args_file):
 
     #Declare an empty dictionary
@@ -81,8 +33,17 @@ def __save_args_to_json(args_file,stored_args):
         print("Warning: Unable to save input settings in " + args_file + " due to this error message",flush=True)
         print(e,flush=True)
 
+def __create_Gooey_Parser(stored_args):
+    """Function to create the Gooey Interface, record the stored arguments into the gui interface
+    
+    Args:
+        stored_args (dict): A dictionary storing the input parameters.
 
-def create_Gooey_Parser(stored_args):
+    Returns:
+        parser (object): A dictionary storing the input parameters.
+
+    """
+
     parser = GooeyParser()
 
     if not stored_args.get('Output_Format'):
@@ -124,3 +85,58 @@ def create_Gooey_Parser(stored_args):
     optional_args.add_argument('--Testing', action='store_true', help='Testing mode will generate more output tables.')
 
     return parser
+
+
+def parse_MSOrganiser_args(args_json_file_path=""):
+    """Function to start the Gooey Interface, record the stored arguments and write them to a json file
+    
+    Args:
+        args_json_file_path (str): The file path to where the json file be created. Default is where the MSOrganiser.exe file is
+
+    Returns:
+        stored_args (dict): A dictionary storing the input parameters.
+
+    """
+    #Create default json file is located in the same directory as the executable file
+    if not args_json_file_path:
+        args_file = os.path.join(os.path.abspath(os.path.dirname(sys.argv[0])),"MSOrganiser-args.json")
+    else:
+        args_file =  args_json_file_path
+
+    #Load the parameters from json file or create an empty dictionary
+    stored_args = __load_args_from_json(args_file)
+
+    #Create a Gooey Parser from the stored args
+    parser = __create_Gooey_Parser(stored_args)
+
+    #Update the args with the most recent parameter settings
+    args = parser.parse_args()
+    stored_args = vars(args)
+
+    #Verify that the arguments are valid before saving/using them
+
+    #Check if MS_Files option is not empty
+    if not stored_args['MS_Files']:
+        print("Please key in at least one input MS file",flush=True)
+        sys.exit(-1)
+
+    #Check if Output_Directory option is not empty
+    if not stored_args['Output_Directory']:
+        print("Please key in at least one output directory",flush=True)
+        sys.exit(-1)
+
+    #Check if Output_Options is selected
+    if not stored_args['Output_Options']:
+        print("Please key in at least one result to output",flush=True)
+        sys.exit(-1)
+
+    #Store the values of the arguments so we have them next time we run
+    __save_args_to_json(args_file,stored_args)
+
+    #Convert the string in Transpose Results to boolean
+    if stored_args['Transpose_Results'] == 'True':
+        stored_args['Transpose_Results'] = True
+    else:
+        stored_args['Transpose_Results'] = False
+
+    return stored_args
