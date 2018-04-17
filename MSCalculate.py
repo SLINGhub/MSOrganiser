@@ -16,12 +16,24 @@ class ISTD_Operations():
         #Transition_Name_dict = {}
         #ISTD_report = []
 
-    def remove_whiteSpaces(df):
-        #Strip the whitespaces for each string columns of a df
-        df[df.select_dtypes(['object']).columns] = df.select_dtypes(['object']).apply(lambda x: x.str.strip())
-        return df
+    #def remove_whiteSpaces(df):
+        ##Strip the whitespaces for each string columns of a df
+        #df[df.select_dtypes(['object']).columns] = df.select_dtypes(['object']).apply(lambda x: x.str.strip())
+        #return df
 
     def read_ISTD_map(filepath,column_name,logger=None,ingui=False):
+        """Function to get the transition names annotation dataframe from the MS Template Creator annotation file.
+
+        Args:
+            filepath (str): The file path to the MS Template Creator annotation file
+            column_name (str): The name of the column given in the Output_Options.
+            logger (object): logger object created by start_logger in MSOrganiser
+            ingui (bool): if True, print analysis status to screen
+
+        Returns:
+            Transition_Name_Annot_df (pandas DataFrame): A data frame of showing the transition names annotation
+
+        """
 
         AnnotationList = MS_Template(filepath=filepath,column_name=column_name, logger=logger,ingui=ingui)
         Transition_Name_Annot_df = AnnotationList.Read_Transition_Name_Annot_Sheet()
@@ -52,11 +64,29 @@ class ISTD_Operations():
         return Transition_Name_Annot_df
 
     def read_Sample_Annot(filepath,MS_FilePathList,column_name,logger=None,ingui=False):
+        """Function to get the sample names annotation dataframe from the MS Template Creator annotation file.
+
+        Args:
+            filepath (str): The file path to the MS Template Creator annotation file
+            MS_FilePathList (list): A list of MRM transition name file names.
+            column_name (str): The name of the column given in the Output_Options.
+            logger (object): logger object created by start_logger in MSOrganiser
+            ingui (bool): if True, print analysis status to screen
+
+        Note:
+            The list of MRM transition name file names names is to help the program properly filter 
+            the Sample annotation such that we only pick rows whose Raw_Data_File_Name values is in the list. 
+            Currently, our input is set as [os.path.basename(self.MS_FilePath)] from MSAnalysis.
+
+        Returns:
+            Sample_Annot_df (pandas DataFrame): A data frame of showing the sample names annotation
+
+        """
         AnnotationList = MS_Template(filepath=filepath,column_name=column_name, logger=logger,ingui=ingui)
         Sample_Annot_df = AnnotationList.Read_Sample_Annot_Sheet(MS_FilePathList)
         return Sample_Annot_df
 
-    def validate_Transition_Name_df(Transition_Name_df,logger=None,ingui=False):
+    def _validate_Transition_Name_df(Transition_Name_df,logger=None,ingui=False):
         if "Sample_Name" not in Transition_Name_df:
             if logger:
                 logger.error("The input data frame does not contain the column Sample_Name")
@@ -68,7 +98,7 @@ class ISTD_Operations():
                 print("If input raw file is from Sciex, make sure the column Sample Name is present")
             sys.exit(-1)
 
-    def validate_Sample_Annot_df(Sample_Annot_df,logger=None,ingui=False):
+    def _validate_Sample_Annot_df(Sample_Annot_df,logger=None,ingui=False):
         if "Sample_Name" not in Sample_Annot_df:
             if logger:
                 logger.error("The sample annotation file does not contain the column Sample_Name")
@@ -76,7 +106,22 @@ class ISTD_Operations():
                 print("The sample annotation file does not contain the Sample_Name",flush=True)
             sys.exit(-1)
 
-    def create_ISTD_data_from_Transition_Name_df(Transition_Name_df,Transition_Name_Annot_df,logger=None,ingui=False):
+    def _create_ISTD_data_from_Transition_Name_df(Transition_Name_df,Transition_Name_Annot_df,logger=None,ingui=False):
+        """
+        Create the ISTD data from Transition_Name df and ISTD map file
+
+        Args:
+            Transition_Name_df (pandas DataFrame): A data frame of sample as rows and transition names as columns
+            Transition_Name_Annot_df (pandas DataFrame): A data frame of showing the transition names annotation
+            logger (object): logger object created by start_logger in MSOrganiser
+            ingui (bool): if True, print analysis status to screen
+
+        Returns:
+            (list): list containing:
+
+                * ISTD_report (pandas DataFrame): A data frame of with transition names, its corresponding ISTD as columns. This will be converted to a pdf file page
+                * ISTD_data (pandas DataFrame): A data frame of sample as rows and transition names as columns with the ISTD area as values. Output as excel only at testing mode
+        """
 
         #Create a dictionary to map the Transition_Name to the Transition_Name_ISTD and an ISTD report to map Transition_Name_ISTD to Transition_Name
         #We start a new Transition_Name_dict and ISTD_report
@@ -84,17 +129,17 @@ class ISTD_Operations():
         ISTD_report = []
 
         #Create the Transition_Name_dict and ISTD_report
-        Transition_Name_df.iloc[:,1:].apply(lambda x: ISTD_Operations.update_Transition_Name_dict(x=x,Transition_Name_Annot_df=Transition_Name_Annot_df,Transition_Name_dict=Transition_Name_dict,ISTD_report_list = ISTD_report,logger=logger,ingui=ingui),axis=0)
+        Transition_Name_df.iloc[:,1:].apply(lambda x: ISTD_Operations._update_Transition_Name_dict(x=x,Transition_Name_Annot_df=Transition_Name_Annot_df,Transition_Name_dict=Transition_Name_dict,ISTD_report_list = ISTD_report,logger=logger,ingui=ingui),axis=0)
 
         #Create empty dataframe with a preset column name and index
         ISTD_data = pd.DataFrame(columns=Transition_Name_df.columns, index=Transition_Name_df.index)
 
         #Sample_Name must be present
-        ISTD_Operations.validate_Transition_Name_df(Transition_Name_df,logger,ingui)
+        ISTD_Operations._validate_Transition_Name_df(Transition_Name_df,logger,ingui)
         ISTD_data["Sample_Name"] = Transition_Name_df["Sample_Name"]
 
         #Create a ISTD table from the Transition_Name df
-        ISTD_data.iloc[:,1:].apply(lambda x: ISTD_Operations.update_ISTD_data_from_Transition_Name_df(x=x,Transition_Name_dict=Transition_Name_dict,Transition_Name_df=Transition_Name_df,ISTD_report_list = ISTD_report,logger=logger,ingui=ingui),axis=0)
+        ISTD_data.iloc[:,1:].apply(lambda x: ISTD_Operations._update_ISTD_data_from_Transition_Name_df(x=x,Transition_Name_dict=Transition_Name_dict,Transition_Name_df=Transition_Name_df,ISTD_report_list = ISTD_report,logger=logger,ingui=ingui),axis=0)
 
         #Convert ISTD report from list to dataframe and report any warnings if any
         ISTD_report = pd.DataFrame(ISTD_report)
@@ -137,8 +182,18 @@ class ISTD_Operations():
 
         return [ISTD_report,ISTD_data]
 
-    def update_Transition_Name_dict(x,Transition_Name_Annot_df,Transition_Name_dict,ISTD_report_list,logger=None,ingui=False):
-        '''Updating the Transition_Name dict to map Transition_Name to their Transition_Name_ISTD'''
+    def _update_Transition_Name_dict(x,Transition_Name_Annot_df,Transition_Name_dict,ISTD_report_list,logger=None,ingui=False):
+        """Updating the Transition_Name dict to map Transition_Name to their Transition_Name_ISTD
+
+        Args:
+            x (pandas Series): A column from the ISTD_data to obtain the transition name
+            Transition_Name_Annot_df (pandas DataFrame): A data frame of showing the transition names annotation
+            Transition_Name_dict (dict): A dictionary to map each transition name to its ISTD. To be updated by each x
+            ISTD_report_list (list): A list of tuples showing (ISTD name or reason why there is no ISTD,Transition name)
+            logger (object): logger object created by start_logger in MSOrganiser
+            ingui (bool): if True, print analysis status to screen
+
+        """
 
         #Get the mapping of one Transition_Name to exactly one ISTD
         ISTD_list = Transition_Name_Annot_df.loc[Transition_Name_Annot_df['Transition_Name']==x.name,"Transition_Name_ISTD"].tolist()
@@ -177,9 +232,18 @@ class ISTD_Operations():
                 print(x.name + " has an invalid Transition_Name_ISTD of " + str(ISTD_list[0]) + ". Please check ISTD map file",flush=True)
             sys.exit(-1)
 
-    def update_ISTD_data_from_Transition_Name_df(x,Transition_Name_dict,Transition_Name_df,ISTD_report_list,logger=None,ingui=False):
-        '''Update the ISTD data for each Transition_Name'''
-        '''Value remains as NAN when there is an issue'''
+    def _update_ISTD_data_from_Transition_Name_df(x,Transition_Name_dict,Transition_Name_df,ISTD_report_list,logger=None,ingui=False):
+        """Update the ISTD data for each Transition_Name. Value remains as NAN when there is an issue
+
+        Args:
+            x (pandas Series): A column from the ISTD_data to be updated with its corresponding ISTD values
+            Transition_Name_dict (dict): A dictionary to map each transition name to its ISTD
+            Transition_Name_df (pandas DataFrame): A data frame of sample as rows and transition names as columns
+            ISTD_report_list (list): A list of tuples showing (ISTD name or reason why there is no ISTD,Transition name)
+            logger (object): logger object created by start_logger in MSOrganiser
+            ingui (bool): if True, print analysis status to screen
+        
+        """
 
         #When a Transition_Name name has no/duplicate Transition_Name_ISTD or not found in the map file, just leave the funtion
         #A warning is already given in update_Transition_Name_dict so we do not need to write this again
@@ -206,7 +270,21 @@ class ISTD_Operations():
             ISTD_report_list.append(("!Missing Transition_Name_ISTD in data", x.name + " -> " + Transition_Name_dict[x.name] ))
 
     def normalise_by_ISTD(Transition_Name_df,Transition_Name_Annot_df,logger=None,ingui=False):
-        '''Perform normalisation using the values from the Transition_Name_ISTD'''
+        """Perform normalisation using the values from the Transition_Name_ISTD
+
+        Args:
+            Transition_Name_df (pandas DataFrame): A data frame of sample as rows and transition names as columns
+            Transition_Name_Annot_df (pandas DataFrame): A data frame of showing the transition names annotation
+            logger (object): logger object created by start_logger in MSOrganiser
+            ingui (bool): if True, print analysis status to screen
+
+        Returns:
+            (list): list containing:
+                * norm_Transition_Name_df (pandas DataFrame): A data frame of sample as rows and transition names as columns with the normalised values
+                * ISTD_data (pandas DataFrame): A data frame of sample as rows and transition names as columns with the ISTD area as values. Output as excel only at testing mode
+                * ISTD_Report (pandas DataFrame): A data frame of with transition names, its corresponding ISTD as columns. This will be converted to a pdf file page
+
+        """
         #If the Transition_Name table or Transition_Name_Annot df is empty, return an empty data frame
         if Transition_Name_df.empty:
             if logger:
@@ -220,11 +298,11 @@ class ISTD_Operations():
         norm_Transition_Name_df = pd.DataFrame(columns=Transition_Name_df.columns, index=Transition_Name_df.index)
 
         #Sample_Name must be present
-        ISTD_Operations.validate_Transition_Name_df(Transition_Name_df,logger,ingui)
+        ISTD_Operations._validate_Transition_Name_df(Transition_Name_df,logger,ingui)
         norm_Transition_Name_df["Sample_Name"] = Transition_Name_df["Sample_Name"]
 
         #Create the ISTD data from Transition_Name df and ISTD map file
-        [ISTD_report,ISTD_data] = ISTD_Operations.create_ISTD_data_from_Transition_Name_df(Transition_Name_df,Transition_Name_Annot_df,logger,ingui)
+        [ISTD_report,ISTD_data] = ISTD_Operations._create_ISTD_data_from_Transition_Name_df(Transition_Name_df,Transition_Name_Annot_df,logger,ingui)
 
         #Perform an elementwise normalisation so that it is easy to debug.
         #To prevent Division by zero error, use astype
@@ -236,13 +314,26 @@ class ISTD_Operations():
 
         return [norm_Transition_Name_df,ISTD_data,ISTD_report]
 
-    def create_ISTD_data_from_Transition_Name_Annot(Transition_Name_df,ISTD_Annot_df,ISTD_column,logger,ingui):
+    def _create_ISTD_data_from_Transition_Name_Annot(Transition_Name_df,ISTD_Annot_df,ISTD_column,logger,ingui):
+        """Perform normalisation using the values from the Transition_Name_ISTD
+
+        Args:
+            Transition_Name_df (pandas DataFrame): A data frame of sample as rows and transition names as columns
+            ISTD_Annot_df (pandas DataFrame): A panda data frame containing the ISTD Annotation
+            ISTD_column (str): The column from ISTD Annotation that needs to be map to ISTD_data
+            logger (object): logger object created by start_logger in MSOrganiser
+            ingui (bool): if True, print analysis status to screen
+
+        Returns:
+            ISTD_data (pandas DataFrame): A data frame of sample as rows and transition names as columns with the corresponding ISTD_column values. Output as excel only at testing mode
+
+        """
 
         #Create an empty data frame
         ISTD_data = pd.DataFrame(columns=Transition_Name_df.columns, index=Transition_Name_df.index)
 
         #Sample_Name must be present
-        ISTD_Operations.validate_Transition_Name_df(Transition_Name_df,logger,ingui)
+        ISTD_Operations._validate_Transition_Name_df(Transition_Name_df,logger,ingui)
         ISTD_data["Sample_Name"] = Transition_Name_df["Sample_Name"]
 
         #Compulsory columns Transition_Name and Transition_Name_ISTD and verified when reading the Transition_Name_Annot file
@@ -263,7 +354,23 @@ class ISTD_Operations():
         return(ISTD_data)
 
     def getConc_by_ISTD(Transition_Name_df,ISTD_Annot_df,Sample_Annot_df,logger=None,ingui=False):
-        '''Perform calculation of conc using values from Transition_Name_Annot_ISTD'''
+        """Perform calculation of analyte concentration using values from Transition_Name_Annot_ISTD
+        
+        Args:
+            Transition_Name_df (pandas DataFrame): A data frame of sample as rows and transition names as columns
+            ISTD_Annot_df (pandas DataFrame): A data frame showing the ISTD annotation
+            Sample_Annot_df (pandas DataFrame): A data frame showing the sample name annotation
+            logger (object): logger object created by start_logger in MSOrganiser
+            ingui (bool): if True, print analysis status to screen
+
+        Returns:
+            (list): list containing:
+
+                * Conc_df (pandas DataFrame): A data frame of sample as rows and transition names as columns with the transition name concentration as values
+                * ISTD_Conc_df (pandas DataFrame): A data frame of sample as rows and transition names as columns with the ISTD concentration as values
+                * ISTD_Samp_Ratio_df (pandas DataFrame): A data frame of with transition names, its corresponding ISTD and ISTD to Sample ratio as columns
+ 
+        """
         #If the Transition_Name_df or Sample_Annot_df is empty, return an empty data frame
         if Transition_Name_df.empty:
             if logger:
@@ -287,8 +394,8 @@ class ISTD_Operations():
             return [pd.DataFrame(),pd.DataFrame(),pd.DataFrame()]
 
         #Sample_Name must be present
-        ISTD_Operations.validate_Transition_Name_df(Transition_Name_df,logger,ingui)
-        ISTD_Operations.validate_Sample_Annot_df(Sample_Annot_df,logger,ingui)
+        ISTD_Operations._validate_Transition_Name_df(Transition_Name_df,logger,ingui)
+        ISTD_Operations._validate_Sample_Annot_df(Sample_Annot_df,logger,ingui)
 
         #Creating the normConc dataframe
         Conc_df = pd.DataFrame(columns=Transition_Name_df.columns, index=Transition_Name_df.index)
@@ -298,7 +405,7 @@ class ISTD_Operations():
         ISTD_Annot_Columns = list(ISTD_Annot_df.columns.values)
         if "ISTD_Conc_[nM]" in ISTD_Annot_Columns:
             #Some values may be missing because some transition names have no ISTD, logging it may be unnecessary 
-            ISTD_Conc_df = ISTD_Operations.create_ISTD_data_from_Transition_Name_Annot(Transition_Name_df,ISTD_Annot_df,"ISTD_Conc_[nM]",logger,ingui)
+            ISTD_Conc_df = ISTD_Operations._create_ISTD_data_from_Transition_Name_Annot(Transition_Name_df,ISTD_Annot_df,"ISTD_Conc_[nM]",logger,ingui)
         else:
             #Return empty data set
             if logger:
