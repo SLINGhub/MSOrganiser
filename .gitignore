@@ -266,4 +266,4 @@ __pycache__/
 /dist
 /MSOrganiser-args.json
 /RequiredFolders
-/Sphinx
+/docs/build/
