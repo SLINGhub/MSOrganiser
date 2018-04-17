@@ -4,12 +4,11 @@ from gooey import GooeyParser
 import os
 import sys
 
-#This needs to be be right at the top
+#This needs to be be right at the top with parse_MSOrganiser_args
 @Gooey(program_name='MS Data Organiser',
        program_description='Create summary tables from MassHunter csv files',
-       advanced=True,
+       advanced=True, 
        default_size=(610,710))
-
 def parse_MSOrganiser_args(args_json_file_path=""):
     """Function to start the Gooey Interface, record the stored arguments and write them to a json file
     
@@ -27,10 +26,10 @@ def parse_MSOrganiser_args(args_json_file_path=""):
         args_file =  args_json_file_path
 
     #Load the parameters from json file or create an empty dictionary
-    stored_args = __load_args_from_json(args_file=args_file)
+    stored_args = _load_args_from_json(args_file=args_file)
 
     #Create a Gooey Parser from the stored args
-    parser = __create_Gooey_Parser(stored_args)
+    parser = _create_Gooey_Parser(stored_args)
 
     #Update the args with the most recent parameter settings
     args = parser.parse_args()
@@ -54,7 +53,7 @@ def parse_MSOrganiser_args(args_json_file_path=""):
         sys.exit(-1)
 
     #Store the values of the arguments so we have them next time we run
-    __save_args_to_json(args_file,stored_args)
+    _save_args_to_json(args_file,stored_args)
 
     #Convert the string in Transpose Results to boolean
     if stored_args['Transpose_Results'] == 'True':
@@ -64,8 +63,7 @@ def parse_MSOrganiser_args(args_json_file_path=""):
 
     return stored_args
 
-
-def __load_args_from_json(args_file):
+def _load_args_from_json(args_file):
     #Declare an empty dictionary
     stored_args = {}
 
@@ -76,7 +74,7 @@ def __load_args_from_json(args_file):
 
     return stored_args
 
-def __save_args_to_json(args_file,stored_args):
+def _save_args_to_json(args_file,stored_args):
     #Store the values of the arguments so we have them next time we run
 
     #By default json file will be the same directory as the exe file
@@ -87,7 +85,7 @@ def __save_args_to_json(args_file,stored_args):
         print("Warning: Unable to save input settings in " + args_file + " due to this error message",flush=True)
         print(e,flush=True)
 
-def __create_Gooey_Parser(stored_args):
+def _create_Gooey_Parser(stored_args):
     """Function to create the Gooey Interface, record the stored arguments into the gui interface
     
     Args:
