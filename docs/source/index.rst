@@ -27,8 +27,3 @@ Code Structure Outline
    analysis/index
    fileoutput/index
    testunits/index
-
-Indices and tables
-==================
-
-* :ref:`modindex`
