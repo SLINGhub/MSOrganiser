@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.27004.2006
+VisualStudioVersion = 15.0.27130.2036
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "FileConverter", "FileConverter.pyproj", "{71EE6A96-D651-4EC9-A3CE-CFCAA8BC3E56}"
 EndProject
@@ -18,6 +18,6 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {454825D2-8769-4644-8B25-2073D60E4B9C}
+		SolutionGuid = {9AB10A53-AAAE-475E-BE59-FDB54C4FBFD5}
 	EndGlobalSection
 EndGlobal
