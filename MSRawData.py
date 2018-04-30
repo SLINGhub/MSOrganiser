@@ -284,7 +284,22 @@ class AgilentMSRawData(MSRawData):
                 print(str(filepath) + ' does not exists. Please check the input file',flush=True)
                 sys.exit(-1)
 
-        self.RawData = pd.read_csv(filepath, header=None,low_memory=False)
+        #self.RawData = pd.read_csv(filepath, header=None,low_memory=False,encoding = "ISO-8859-1")
+        all_encoders_fail = True
+        for encoder in ["ANSI","ISO-8859-1","utf-8"]:
+            try:
+                self.RawData = pd.read_csv(filepath, header=None,low_memory=False, encoding = encoder)
+                all_encoders_fail = False
+            except UnicodeDecodeError:
+                if self.__logger:
+                    self.__logger.warning('Warning: Unable to read csv file using the %s encoder',encoder)
+                continue
+        if all_encoders_fail:
+            if self.__logger:
+                self.__logger.error('Unable to read csv file with the available encoders')
+            if self.__ingui:
+                print('Unable to read csv file with the available encoders',flush=True)
+            sys.exit(-1)
 
         #Check if the file has content
         if self.RawData.empty:

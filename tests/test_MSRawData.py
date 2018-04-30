@@ -10,6 +10,9 @@ WIDETABLEFORM_FILENAME = os.path.join(os.path.dirname(__file__),"testdata", 'Wid
 WIDETABLEFORM_RESULTS_FILENAME = os.path.join(os.path.dirname(__file__),"testdata", 'WideTableForm_Results.xlsx')
 WIDETABLEFORM_TRANSPOSE_RESULTS_FILENAME = os.path.join(os.path.dirname(__file__),"testdata", 'WideTableForm_TransposeResults.xlsx')
 
+WIDETABLEFORM_ISO_8859_1_ENCODE_FILENAME = os.path.join(os.path.dirname(__file__),"testdata", 'ISO_8859_1_Encoding.csv')
+WIDETABLEFORM_ISO_8859_1_ENCODE_RESULTS_FILENAME = os.path.join(os.path.dirname(__file__),"testdata", 'ISO_8859_1_Encoding_Results.xlsx')
+
 LARGE_WIDETABLEFORM_FILENAME = os.path.join(os.path.dirname(__file__),"testdata", 'sPerfect_Index_AllLipids_raw.csv')
 LARGE_WIDETABLEFORM_RESULTS_FILENAME = os.path.join(os.path.dirname(__file__),"testdata", 'sPerfect_Index_AllLipids_raw_Results.xlsx')
 
@@ -23,12 +26,14 @@ class Agilent_Test(unittest.TestCase):
 
     def setUp(self):
         self.WideData = AgilentMSRawData(WIDETABLEFORM_FILENAME,ingui=True)
+        self.ISO_EncodedData = AgilentMSRawData(WIDETABLEFORM_ISO_8859_1_ENCODE_FILENAME,ingui=True)
         self.LargeWideData = AgilentMSRawData(LARGE_WIDETABLEFORM_FILENAME,ingui=True)
         self.CompoundData = AgilentMSRawData(COMPOUNDTABLEFORM_FILENAME,ingui=True)
         self.SciexData = SciexMSRawData(SCIEX_FILENAME,ingui=True)
 
         self.WideDataResults = openpyxl.load_workbook(WIDETABLEFORM_RESULTS_FILENAME)
         self.WideDataTransposeResults = openpyxl.load_workbook(WIDETABLEFORM_TRANSPOSE_RESULTS_FILENAME)
+        self.ISO_EncodedDataResults = openpyxl.load_workbook(WIDETABLEFORM_ISO_8859_1_ENCODE_RESULTS_FILENAME)
         self.LargeWideDataResults = openpyxl.load_workbook(LARGE_WIDETABLEFORM_RESULTS_FILENAME)
         self.CompoundDataResults = openpyxl.load_workbook(COMPOUNDTABLEFORM_RESULTS_FILENAME)
         self.SciexDataResults = openpyxl.load_workbook(SCIEX_RESULTS_FILENAME)
@@ -47,6 +52,16 @@ class Agilent_Test(unittest.TestCase):
         self.__compare_tables("RT",self.WideData,self.WideDataTransposeResults,transpose=True)
         self.__compare_tables("FWHM",self.WideData,self.WideDataResults)
         self.__compare_tables("FWHM",self.WideData,self.WideDataTransposeResults,transpose=True)
+
+    def test_ISOEncodedData(self):
+        """Check if the software is able to do the following with ISO_8859_1_Encoding.csv:
+
+        * Extract Area successfully using AgilentMSRawData.get_table
+        """
+
+        self.assertEqual("WideTableForm",self.WideData.DataForm)
+        self.__compare_tables("Area",self.ISO_EncodedData,self.ISO_EncodedDataResults)
+
 
     def test_WideDataLarge(self):
         """Check if the software is able to do the following with large dataset sPerfect_Index_AllLipids_raw.csv:
