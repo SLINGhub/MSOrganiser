@@ -66,7 +66,7 @@ class AgilentMSRawData(MSRawData):
         self.__readfile(filepath)
         self.__getdataform(filepath)
         self.__filename = os.path.basename(filepath)
-        self.VALID_COMPOUND_RESULTS = ('Area','RT','FWHM','S/N')
+        self.VALID_COMPOUND_RESULTS = ('Area','RT','FWHM','S/N','Symmetry')
         self.VALID_COMPOUND_METHODS = ('Precursor Ion','Product Ion')
 
     def get_table(self,column_name,is_numeric=True):
