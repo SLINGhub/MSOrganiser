@@ -36,13 +36,14 @@ Pygments==2.2.0
 PyInstaller==3.3.1
 pyparsing==2.2.0
 Pyphen==0.9.4
-pypiwin32==220
+pypiwin32==223
 Pypubsub==4.0.0
 PyQt5==5.11.2
 PyQt5-sip==4.19.11
 python-dateutil==2.7.3
 pytz==2018.5
 pywin32==223
+pywin32-ctypes==0.1.2
 requests==2.19.1
 setuptools==39.2.0
 sip==4.19.8
