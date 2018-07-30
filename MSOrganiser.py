@@ -3,6 +3,7 @@
 import MSParser
 from MSAnalysis import MS_Analysis
 from MSDataOutput import MSDataOutput_Excel
+from MSDataOutput import MSDataOutput_csv
 from MSDataReport import MSDataReport_PDF
 
 from logging.handlers import TimedRotatingFileHandler
@@ -106,9 +107,11 @@ if __name__ == '__main__':
         #Initiate the pdf report file
         PDFReport = MSDataReport_PDF(stored_args['Output_Directory'], MS_FilePath, logger, ingui=True)
 
-        #Set up the file writing configuration for Excel, ...
-        #if stored_args['Output_Format'] == "Excel"
-        DfOutput = MSDataOutput_Excel(stored_args['Output_Directory'], MS_FilePath, logger, ingui=True)
+        #Set up the file writing configuration for Excel, or csv ...
+        if stored_args['Output_Format'] == "Excel" :
+            DfOutput = MSDataOutput_Excel(stored_args['Output_Directory'], MS_FilePath, logger, ingui=True)
+        elif stored_args['Output_Format'] == "csv" :
+            DfOutput = MSDataOutput_csv(stored_args['Output_Directory'], MS_FilePath, logger, ingui=True)
         DfOutput.start_writer()
 
         #Generate the parameters report
@@ -122,9 +125,9 @@ if __name__ == '__main__':
 
                 #Output the normalised area results
                 if stored_args['Testing']:
-                    DfOutput.df_to_file("ISTD Area",ISTD_Area,transpose=stored_args['Transpose_Results'])
-                DfOutput.df_to_file("ISTD map",ISTD_map_df)
-                DfOutput.df_to_file("normArea by ISTD",norm_Area_df,transpose=stored_args['Transpose_Results'])
+                    DfOutput.df_to_file("ISTD_Area",ISTD_Area,transpose=stored_args['Transpose_Results'])
+                DfOutput.df_to_file("Transition_Name_Annot",ISTD_map_df)
+                DfOutput.df_to_file("normArea_by_ISTD",norm_Area_df,transpose=stored_args['Transpose_Results'])
                     
                 #Generate the ISTD normalisation report
                 PDFReport.create_ISTD_report(ISTD_Report)
@@ -134,10 +137,10 @@ if __name__ == '__main__':
                 [norm_Conc_df,ISTD_Conc_df,ISTD_Samp_Ratio_df,Sample_Annot_df] = MyData.get_Analyte_Concentration(column_name,stored_args['ISTD_Map'])
 
                 if stored_args['Testing']:
-                    DfOutput.df_to_file("ISTD Conc",ISTD_Conc_df,transpose=stored_args['Transpose_Results'])
-                    DfOutput.df_to_file("ISTD to Samp Vol Ratio",ISTD_Samp_Ratio_df,transpose=stored_args['Transpose_Results'])
-                DfOutput.df_to_file("Sample Annot",Sample_Annot_df)
-                DfOutput.df_to_file("normConc by ISTD",norm_Conc_df,transpose=stored_args['Transpose_Results'])
+                    DfOutput.df_to_file("ISTD_Conc",ISTD_Conc_df,transpose=stored_args['Transpose_Results'])
+                    DfOutput.df_to_file("ISTD_to_Samp_Vol_Ratio",ISTD_Samp_Ratio_df,transpose=stored_args['Transpose_Results'])
+                DfOutput.df_to_file("Sample_Annot",Sample_Annot_df)
+                DfOutput.df_to_file("normConc_by_ISTD",norm_Conc_df,transpose=stored_args['Transpose_Results'])
 
             else:
                 #We extract the data directly from the file and output accordingly
@@ -145,7 +148,8 @@ if __name__ == '__main__':
                 DfOutput.df_to_file(column_name,Output_df,transpose=stored_args['Transpose_Results'])
                     
         #End the writing configuration for Excel, ...
-        DfOutput.end_writer()
+        if stored_args['Output_Format'] == "Excel" :
+            DfOutput.end_writer()
 
         #Output the report to a pdf file
         PDFReport.output_to_PDF()

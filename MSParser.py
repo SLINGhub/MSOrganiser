@@ -129,7 +129,7 @@ def _create_Gooey_Parser(stored_args):
     analysis_args.add_argument('--ISTD_Map', action='store', help='Input the ISTD map file. Required for normalisation', widget="FileChooser",default=stored_args.get('ISTD_Map'))
 
     #Output Arguments 
-    output_args.add_argument('--Output_Format', choices=['Excel'], help='Select specific file type to output', default=Output_Format)
+    output_args.add_argument('--Output_Format', choices=['Excel','csv'], help='Select specific file type to output', default=Output_Format)
     output_args.add_argument('--Transpose_Results', choices=['True','False'], help='Set this option to True to let the samples be the columns instead of the Transition_Names',default=Transpose_Results)
     #output_args.add_argument('--Transpose_Results', action='store_false', help='Select this option to let the samples be the columns',default=defaults.get('Transpose_Results'))
     

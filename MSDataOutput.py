@@ -53,7 +53,7 @@ class MSDataOutput:
 
     def start_writer(self):
         """Function to open a writer object"""
-        self.writer = os.path.join(self.output_directory, self.__output_filename)
+        self.writer = os.path.join(self.output_directory, self.output_filename)
 
     def df_to_file_preparation(output_option,df,transpose=False,logger=None,ingui=False):
         """Function to check and set up the settings needed before writing to a file.
@@ -112,8 +112,50 @@ class MSDataOutput:
         if df.empty:
             return
 
-        df.to_csv(self.writer + output_option + '_Results.csv',sep=',',index=False)
-   
+        df.to_csv(self.writer + '_Results_' + output_option + '.csv',sep=',',index=False)
+
+class MSDataOutput_csv(MSDataOutput):
+    """
+    A class to describe the general setup for Data Output to csv.
+
+    Args:
+        output_directory (str): directory path to output the data
+        input_file_path (str): file path of the input MRM transition name file. To be used for the output filename
+        logger (object): logger object created by start_logger in MSOrganiser
+        ingui (bool): if True, print analysis status to screen
+
+    """
+    def df_to_file(self,output_option,df,transpose=False):
+        """Funtion to write a df to an excel file.
+
+        Args:
+            output_option (str): the name of the sheet
+            df (pandas DataFrame): A panda data frame to output to Excel
+            transpose (bool): if True, transpose the dataframe first before writing to the Excel sheet
+        
+        Note:
+            For the output option S/N, it will be changed to S_to_N as excel does not accept slashes. This is done in the function df_to_file_preparation
+        
+        """
+        if self.writer is None:
+            self.start_writer()
+
+        [df,output_option] = MSDataOutput.df_to_file_preparation(output_option,df,transpose,self.logger,self.ingui)
+
+        #If df is empty, just leave the function, warning has been sent to df_to_file_preparation
+        if df.empty:
+            return
+
+        if(output_option in ['Sample_Annot', 'Transition_Name_Annot']) :
+            csv_filename = output_option + '.csv'
+        else:
+            csv_filename = self.writer + '_Results_' + output_option + '.csv'
+
+        try:
+            df.to_csv(csv_filename,sep=',',index=False)
+        except Exception as e:
+            print("Unable to write df to csv file name" + csv_filename,flush=True)
+            print(e,flush=True)
 
 class MSDataOutput_Excel(MSDataOutput):
     """
