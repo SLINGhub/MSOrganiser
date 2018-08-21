@@ -355,7 +355,20 @@ class SciexMSRawData(MSRawData):
         """
         column_name = self.AgilentColumnName_to_SciexColumnName(column_name)
 
-        Table_df = self.RawData.pivot(index='Sample Name' ,columns='Component Name',values=column_name)
+        #Catch any duplicated data that prevent us from pivoting.
+        self.RawData.index = np.arange(2,len(self.RawData)+2)
+        duplicate_df = [g for _, g in self.RawData.groupby(['Sample Name','Component Name']) if len(g) > 1]
+        if(len(duplicate_df)>0):
+            duplicate_df = pd.concat(duplicate_df)
+            duplicate_df_filename = os.path.splitext(os.path.basename(self.__filename))[0] + "_" + column_name + "_Duplicate.csv"
+            self.__logger.error('There are duplicate %s for a given sample name and component name. See %s for more info',column_name,duplicate_df_filename)
+            if self.__ingui:
+                print('There are duplicate ' + column_name + ' for a given sample name and component name. See ' + duplicate_df_filename + ' for more info.' ,flush=True)
+            print(duplicate_df.loc[:,['Sample Name','Component Name',column_name]].head())
+            duplicate_df.to_csv(duplicate_df_filename,sep=',',index=True)
+            sys.exit(-1)
+
+        Table_df = self.RawData.pivot(index='Sample Name' ,columns='Component Name',values=column_name).reset_index()
         Table_df = Table_df.reset_index()
         Table_df.columns.name = None
         Table_df.rename(columns={'Sample Name':'Sample_Name'}, inplace=True)
