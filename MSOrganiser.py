@@ -74,8 +74,8 @@ def get_Parameters_df(stored_args,MS_FilePath):
     if stored_args['Output_Format']:
         Parameter_list.append(("Output_Format",stored_args['Output_Format']))
 
-    if stored_args['ISTD_Map']:
-        Parameter_list.append(("ISTD_Map_File",os.path.basename(stored_args['ISTD_Map'])))
+    if stored_args['Annot_File']:
+        Parameter_list.append(("Annot_File",os.path.basename(stored_args['Annot_File'])))
 
     if stored_args['Output_Options']:
         for things in stored_args['Output_Options']:
@@ -121,7 +121,7 @@ if __name__ == '__main__':
         for column_name in stored_args['Output_Options']:
             if column_name == 'normArea by ISTD':
                 #Perform normalisation using ISTD
-                [norm_Area_df,ISTD_Area,ISTD_map_df,ISTD_Report] = MyData.get_Normalised_Area(column_name,stored_args['ISTD_Map'])
+                [norm_Area_df,ISTD_Area,ISTD_map_df,ISTD_Report] = MyData.get_Normalised_Area(column_name,stored_args['Annot_File'])
 
                 #Output the normalised area results
                 if stored_args['Testing']:
@@ -134,7 +134,7 @@ if __name__ == '__main__':
 
             elif column_name == 'normConc by ISTD':
                 #Perform concentration calculation
-                [norm_Conc_df,ISTD_Conc_df,ISTD_Samp_Ratio_df,Sample_Annot_df] = MyData.get_Analyte_Concentration(column_name,stored_args['ISTD_Map'])
+                [norm_Conc_df,ISTD_Conc_df,ISTD_Samp_Ratio_df,Sample_Annot_df] = MyData.get_Analyte_Concentration(column_name,stored_args['Annot_File'])
 
                 if stored_args['Testing']:
                     DfOutput.df_to_file("ISTD_Conc",ISTD_Conc_df,transpose=stored_args['Transpose_Results'])
