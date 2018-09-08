@@ -403,15 +403,26 @@ class ISTD_Operations():
         
         #Creating the ISTD_Conc_df
         ISTD_Annot_Columns = list(ISTD_Annot_df.columns.values)
-        if "ISTD_Conc_[nM]" in ISTD_Annot_Columns:
+        ISTD_Conc_Column = [col for col in ISTD_Annot_df if col.startswith("ISTD_Conc")]
+
+        #if "ISTD_Conc_[nM]" in ISTD_Annot_Columns:
+        if len(ISTD_Conc_Column) == 1:
             #Some values may be missing because some transition names have no ISTD, logging it may be unnecessary 
-            ISTD_Conc_df = ISTD_Operations._create_ISTD_data_from_Transition_Name_Annot(Transition_Name_df,ISTD_Annot_df,"ISTD_Conc_[nM]",logger,ingui)
+            ISTD_Conc_Column = ISTD_Conc_Column[0]
+            #ISTD_Conc_df = ISTD_Operations._create_ISTD_data_from_Transition_Name_Annot(Transition_Name_df,ISTD_Annot_df,"ISTD_Conc_[nM]",logger,ingui)
+            ISTD_Conc_df = ISTD_Operations._create_ISTD_data_from_Transition_Name_Annot(Transition_Name_df,ISTD_Annot_df,ISTD_Conc_Column,logger,ingui)
         else:
             #Return empty data set
-            if logger:
-                logger.warning("Skipping step to get normConc. ISTD_Annot sheet does not have column ISTD_Conc_[nM].")
-            if ingui:
-                print("Skipping step to get normConc. ISTD_Annot sheet does not have column name ISTD_Conc_[nM].",flush=True)
+            if len(ISTD_Conc_Column) == 0:
+                if logger:
+                    logger.warning("Skipping step to get normConc. ISTD_Annot sheet does not have a column that contains ISTD_Conc")
+                if ingui:
+                    print("Skipping step to get normConc. ISTD_Annot sheet does not have a column that contains ISTD_Conc",flush=True)
+            elif len(ISTD_Conc_Column) > 1:
+                if logger:
+                    logger.warning("Skipping step to get normConc. ISTD_Annot sheet has more than one column that contains ISTD_Conc")
+                if ingui:
+                    print("Skipping step to get normConc. ISTD_Annot sheet has more than one column that contains ISTD_Conc",flush=True)
             return [Conc_df,Conc_df,Conc_df]
 
         #Creating the ISTD_Samp_Ratio_df

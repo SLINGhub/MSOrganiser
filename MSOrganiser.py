@@ -102,7 +102,7 @@ if __name__ == '__main__':
         print("Working on " + MS_FilePath,flush=True)
         logger.info("Working on " + MS_FilePath)
 
-        MyData = MS_Analysis(MS_FilePath,logger, ingui=True)
+        MyData = MS_Analysis(MS_FilePath,logger, ingui=True, longform = stored_args['Long_Form'])
 
         #Initiate the pdf report file
         PDFReport = MSDataReport_PDF(stored_args['Output_Directory'], MS_FilePath, logger, ingui=True)
@@ -117,7 +117,7 @@ if __name__ == '__main__':
         #Generate the parameters report
         Parameters_df = get_Parameters_df(stored_args,MS_FilePath)
         PDFReport.create_parameters_report(Parameters_df)
-        
+
         for column_name in stored_args['Output_Options']:
             if column_name == 'normArea by ISTD':
                 #Perform normalisation using ISTD
@@ -147,6 +147,10 @@ if __name__ == '__main__':
                 Output_df = MyData.get_from_Input_Data(column_name)
                 DfOutput.df_to_file(column_name,Output_df,transpose=stored_args['Transpose_Results'])
                     
+        if stored_args['Long_Form']:
+            DfOutput.df_to_file("Long_Form",MyData.get_Long_Form())
+
+                
         #End the writing configuration for Excel, ...
         if stored_args['Output_Format'] == "Excel" :
             DfOutput.end_writer()

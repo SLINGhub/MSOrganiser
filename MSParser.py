@@ -61,6 +61,12 @@ def parse_MSOrganiser_args(args_json_file_path=""):
     else:
         stored_args['Transpose_Results'] = False
 
+    #Convert the string in Long Form to boolean
+    if stored_args['Long_Form'] == 'True':
+        stored_args['Long_Form'] = True
+    else:
+        stored_args['Long_Form'] = False
+
     return stored_args
 
 def _load_args_from_json(args_file):
@@ -108,6 +114,11 @@ def _create_Gooey_Parser(stored_args):
     else:
         Transpose_Results = stored_args.get('Transpose_Results')
 
+    if not stored_args.get('Long_Form'):
+        Long_Form = 'False'
+    else:
+        Long_Form = stored_args.get('Long_Form')
+
     required_args = parser.add_argument_group("Required Input", gooey_options={'columns': 1 } )
     analysis_args = parser.add_argument_group("For Normalisation", gooey_options={'columns': 1 } )
     output_args = parser.add_argument_group("Output Settings", gooey_options={ 'columns': 2 } )
@@ -131,6 +142,7 @@ def _create_Gooey_Parser(stored_args):
     #Output Arguments 
     output_args.add_argument('--Output_Format', choices=['Excel','csv'], help='Select specific file type to output', default=Output_Format)
     output_args.add_argument('--Transpose_Results', choices=['True','False'], help='Set this option to True to let the samples be the columns instead of the Transition_Names',default=Transpose_Results)
+    output_args.add_argument('--Long_Form', choices=['True','False'], help='Set this option to True to output an adiitional sheet containing the results in Long Form',default=Long_Form)
     #output_args.add_argument('--Transpose_Results', action='store_false', help='Select this option to let the samples be the columns',default=defaults.get('Transpose_Results'))
     
     #Optional Arguments 

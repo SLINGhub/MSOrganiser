@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 import sys
+import re
 import os
 import logging
 
@@ -188,7 +189,8 @@ class MS_Template():
         self.__validate_ISTD_Annot_Sheet(worksheet)
 
         #Get the column names
-        cols = [worksheet["A2"].value,worksheet["E3"].value]
+        istd_conc_name = re.sub("\[.*?\]",worksheet["F3"].value,worksheet["E3"].value)
+        cols = [worksheet["A2"].value, istd_conc_name]
 
         #Get the ISTD Table and clean it up
         ISTD_Annot_df = worksheet.values
@@ -199,8 +201,8 @@ class MS_Template():
         #Reset the row index
         ISTD_Annot_df = ISTD_Annot_df.reset_index(drop=True)
         
-        #Take specific columns (A and E only)
-        ISTD_Annot_df = ISTD_Annot_df.iloc[:,[0,4]]
+        #Take specific columns (A and F only)
+        ISTD_Annot_df = ISTD_Annot_df.iloc[:,[0,5]]
         ISTD_Annot_df.columns = cols
 
         #Remove rows with no Transition_Name_ISTD
@@ -214,9 +216,8 @@ class MS_Template():
         ISTD_Annot_df.columns = ISTD_Annot_df.columns.str.strip()
 
         #Convert all but first column to numeric
-        #ISTD_Annot_df = ISTD_Annot_df.apply(pd.to_numeric, errors='ignore')
-        ISTD_Annot_df['ISTD_Conc_[nM]'] = pd.to_numeric(ISTD_Annot_df['ISTD_Conc_[nM]'], errors='coerce')
-        #print(ISTD_Annot_df.info())
+        #ISTD_Annot_df['ISTD_Conc_[nM]'] = pd.to_numeric(ISTD_Annot_df['ISTD_Conc_[nM]'], errors='coerce')
+        ISTD_Annot_df[istd_conc_name] = pd.to_numeric(ISTD_Annot_df[istd_conc_name], errors='coerce')
 
         #Remove whitespace for each string column
         ISTD_Annot_df = MS_Template.remove_whiteSpaces(ISTD_Annot_df)
@@ -240,6 +241,20 @@ class MS_Template():
                 self.__logger.error('Sheet ISTD_Annot is missing the column ISTD_Conc_nM at position E3')
             if self.__ingui:
                 print('Sheet ISTD_Annot is missing the column ISTD_Conc_nM at position E3',flush=True)
+            sys.exit(-1)
+
+        if worksheet["F2"].value != "Custom_Unit":
+            if self.__logger:
+                self.__logger.error('Sheet ISTD_Annot is missing the column Custom_Unit at position F2')
+            if self.__ingui:
+                print('Sheet ISTD_Annot is missing the column ISTD_Conc_nM at position E3',flush=True)
+            sys.exit(-1)
+
+        if worksheet["F3"].value not in ["[M]","[mM]","[uM]","[nM]","[pM]"]:
+            if self.__logger:
+                self.__logger.error('Sheet ISTD_Annot Custom_Unit options %s is invalid', worksheet["F3"].value)
+            if self.__ingui:
+                print('Sheet ISTD_Annot Custom_Unit options ' + worksheet["F3"].value + ' is invalid', flush=True)
             sys.exit(-1)
 
     def Read_Sample_Annot_Sheet(self,MS_FilePathList=[]):
