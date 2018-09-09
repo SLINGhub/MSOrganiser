@@ -102,7 +102,7 @@ if __name__ == '__main__':
         print("Working on " + MS_FilePath,flush=True)
         logger.info("Working on " + MS_FilePath)
 
-        MyData = MS_Analysis(MS_FilePath,logger, ingui=True, longform = stored_args['Long_Form'])
+        MyData = MS_Analysis(MS_FilePath, stored_args['Annot_File'],logger, ingui=True, longform = stored_args['Long_Form'], longform_annot = stored_args['Long_Form_Annot'])
 
         #Initiate the pdf report file
         PDFReport = MSDataReport_PDF(stored_args['Output_Directory'], MS_FilePath, logger, ingui=True)

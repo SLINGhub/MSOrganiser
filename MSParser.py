@@ -119,6 +119,11 @@ def _create_Gooey_Parser(stored_args):
     else:
         Long_Form = stored_args.get('Long_Form')
 
+    if not stored_args.get('Long_Form_Annot'):
+        Long_Form_Annot = 'False'
+    else:
+        Long_Form_Annot = stored_args.get('Long_Form_Annot')
+
     required_args = parser.add_argument_group("Required Input", gooey_options={'columns': 1 } )
     analysis_args = parser.add_argument_group("For Normalisation", gooey_options={'columns': 1 } )
     output_args = parser.add_argument_group("Output Settings", gooey_options={ 'columns': 2 } )
@@ -140,10 +145,10 @@ def _create_Gooey_Parser(stored_args):
     analysis_args.add_argument('--Annot_File', action='store', help='Input the annotation excel macro file required for normalisation and concentration calculation', widget="FileChooser",default=stored_args.get('Annot_File'))
 
     #Output Arguments 
-    output_args.add_argument('--Output_Format', choices=['Excel','csv'], help='Select specific file type to output', default=Output_Format)
-    output_args.add_argument('--Transpose_Results', choices=['True','False'], help='Set this option to True to let the samples be the columns instead of the Transition_Names',default=Transpose_Results)
-    output_args.add_argument('--Long_Form', choices=['True','False'], help='Set this option to True to output an adiitional sheet containing the results in Long Form',default=Long_Form)
-    #output_args.add_argument('--Transpose_Results', action='store_false', help='Select this option to let the samples be the columns',default=defaults.get('Transpose_Results'))
+    output_args.add_argument('--Output_Format', choices=['Excel','csv'], help='Select specific file type to output\ncsv form will give multiple sheets', default=Output_Format)
+    output_args.add_argument('--Transpose_Results', choices=['True','False'], help='Set this option to True to let the samples\nto be the columns instead of the Transition_Name',default=Transpose_Results)
+    output_args.add_argument('--Long_Form', choices=['True','False'], help='Set this option to True to output the data in\nLong Form as well',default=Long_Form)
+    output_args.add_argument('--Long_Form_Annot', choices=['True','False'], help='Set this option to True to add ISTD and Sample Type\nfrom Annot_File to the Long Form output',default=Long_Form_Annot)
     
     #Optional Arguments 
     optional_args.add_argument('--Testing', action='store_true', help='Testing mode will generate more output tables.')
