@@ -61,11 +61,11 @@ def parse_MSOrganiser_args(args_json_file_path=""):
     else:
         stored_args['Transpose_Results'] = False
 
-    #Convert the string in Long Form to boolean
-    if stored_args['Long_Form'] == 'True':
-        stored_args['Long_Form'] = True
+    #Convert the string in Long Table to boolean
+    if stored_args['Long_Table'] == 'True':
+        stored_args['Long_Table'] = True
     else:
-        stored_args['Long_Form'] = False
+        stored_args['Long_Table'] = False
 
     return stored_args
 
@@ -104,6 +104,11 @@ def _create_Gooey_Parser(stored_args):
 
     parser = GooeyParser()
 
+    if not stored_args.get('MS_FileType'):
+        MS_FileType = 'Agilent Wide Table in csv'
+    else:
+        MS_FileType = stored_args.get('MS_FileType')
+
     if not stored_args.get('Output_Format'):
         Output_Format = 'Excel'
     else:
@@ -114,15 +119,15 @@ def _create_Gooey_Parser(stored_args):
     else:
         Transpose_Results = stored_args.get('Transpose_Results')
 
-    if not stored_args.get('Long_Form'):
-        Long_Form = 'False'
+    if not stored_args.get('Long_Table'):
+        Long_Table = 'False'
     else:
-        Long_Form = stored_args.get('Long_Form')
+        Long_Table = stored_args.get('Long_Table')
 
-    if not stored_args.get('Long_Form_Annot'):
-        Long_Form_Annot = 'False'
+    if not stored_args.get('Long_Table_Annot'):
+        Long_Table_Annot = 'False'
     else:
-        Long_Form_Annot = stored_args.get('Long_Form_Annot')
+        Long_Table_Annot = stored_args.get('Long_Table_Annot')
 
     required_args = parser.add_argument_group("Required Input", gooey_options={'columns': 1 } )
     analysis_args = parser.add_argument_group("For Normalisation", gooey_options={'columns': 1 } )
@@ -136,7 +141,11 @@ def _create_Gooey_Parser(stored_args):
     required_args.add_argument('--MS_Files',help="Input the MS raw files.\nData File is a required column for MassHunter\nSample Name and Component Name are required columns for Sciex", 
                                widget='MultiFileChooser', 
                                default=stored_args.get('MS_Files'))
-    #required_args.add_argument('MS_Files_Type',action='store',nargs="+",help="Input the MS raw files.\nData File is a required column for MassHunter", widget="MultiFileChooser",default=stored_args.get('MS_Files'))
+    required_args.add_argument('--MS_FileType', 
+                               choices=['Agilent Wide Table in csv',
+                                        'Agilent Compound Table in csv',
+                                        'Multiquant Long Table in txt'], 
+                               help='Input the MS raw file type', default=MS_FileType)
     required_args.add_argument('--Output_Directory',action='store', help="Output directory to save summary report.", 
                                widget="DirChooser", default=stored_args.get('Output_Directory'))
     required_args.add_argument('--Output_Options', choices=['Area','normArea by ISTD','normConc by ISTD','RT','FWHM','S/N','Symmetry','Precursor Ion','Product Ion'], nargs="+", help='Select specific information to output', widget="Listbox", default=stored_args.get('Output_Options'))
@@ -147,8 +156,8 @@ def _create_Gooey_Parser(stored_args):
     #Output Arguments 
     output_args.add_argument('--Output_Format', choices=['Excel','csv'], help='Select specific file type to output\ncsv form will give multiple sheets', default=Output_Format)
     output_args.add_argument('--Transpose_Results', choices=['True','False'], help='Set this option to True to let the samples\nto be the columns instead of the Transition_Name',default=Transpose_Results)
-    output_args.add_argument('--Long_Form', choices=['True','False'], help='Set this option to True to output the data in\nLong Form as well',default=Long_Form)
-    output_args.add_argument('--Long_Form_Annot', choices=['True','False'], help='Set this option to True to add ISTD and Sample Type\nfrom Annot_File to the Long Form output',default=Long_Form_Annot)
+    output_args.add_argument('--Long_Table', choices=['True','False'], help='Set this option to True to output the data in\nLong Table as well',default=Long_Table)
+    output_args.add_argument('--Long_Table_Annot', choices=['True','False'], help='Set this option to True to add ISTD and Sample Type\nfrom Annot_File to the Long Table output',default=Long_Table_Annot)
     
     #Optional Arguments 
     optional_args.add_argument('--Testing', action='store_true', help='Testing mode will generate more output tables.')

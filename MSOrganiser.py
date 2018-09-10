@@ -102,7 +102,7 @@ if __name__ == '__main__':
         print("Working on " + MS_FilePath,flush=True)
         logger.info("Working on " + MS_FilePath)
 
-        MyData = MS_Analysis(MS_FilePath, stored_args['Annot_File'],logger, ingui=True, longform = stored_args['Long_Form'], longform_annot = stored_args['Long_Form_Annot'])
+        MyData = MS_Analysis(MS_FilePath, stored_args['MS_FileType'], stored_args['Annot_File'],logger, ingui=True, longtable = stored_args['Long_Table'], longtable_annot = stored_args['Long_Table_Annot'])
 
         #Initiate the pdf report file
         PDFReport = MSDataReport_PDF(stored_args['Output_Directory'], MS_FilePath, logger, ingui=True)
@@ -147,8 +147,8 @@ if __name__ == '__main__':
                 Output_df = MyData.get_from_Input_Data(column_name)
                 DfOutput.df_to_file(column_name,Output_df,transpose=stored_args['Transpose_Results'])
                     
-        if stored_args['Long_Form']:
-            DfOutput.df_to_file("Long_Form",MyData.get_Long_Form())
+        if stored_args['Long_Table']:
+            DfOutput.df_to_file("Long_Table",MyData.get_Long_Table())
 
                 
         #End the writing configuration for Excel, ...

@@ -14,31 +14,45 @@ class MS_Analysis():
         Annotation_FilePath (str): The file path to the MS Template Creator annotation file if provided
         logger (object): logger object created by start_logger in MSOrganiser
         ingui (bool): if True, print analysis status to screen
-        longform (bool): if True, prepare a dataframe to store results in long form
+        longtable (bool): if True, prepare a dataframe to store results in long table
     """
 
-    def __init__(self, MS_FilePath , Annotation_FilePath=None, logger=None, ingui=True,  longform = False, longform_annot = False):
+    def __init__(self, MS_FilePath , MS_FileType ,Annotation_FilePath=None, logger=None, ingui=True,  longtable = False, longtable_annot = False):
         self.MS_FilePath = MS_FilePath
         self.logger = logger
         self.ingui = ingui
 
         #Check if file is from Agilent or Sciex
-        if MS_FilePath.endswith('.csv'):
-            self.RawData = AgilentMSRawData(filepath=MS_FilePath,logger=logger)
-        elif MS_FilePath.endswith('.txt'):
-            self.RawData = SciexMSRawData(filepath=MS_FilePath,logger=logger)
+        if MS_FileType in ['Agilent Wide Table in csv', 'Agilent Compound Table in csv']:
+            if MS_FilePath.endswith('.csv'):
+                self.RawData = AgilentMSRawData(filepath=MS_FilePath,logger=logger)
+            else:
+                if self.ingui:
+                    print('Filepath ' + str(MS_FilePath) + ' must have a .csv extention',flush=True)
+                if self.logger:
+                    self.logger.error('Filepath %s must have a .csv extention',MS_FilePath)
+                sys.exit(-1)
+        elif MS_FileType in ['Multiquant Long Table in txt']:
+            if MS_FilePath.endswith('.txt'):
+                self.RawData = SciexMSRawData(filepath=MS_FilePath,logger=logger)
+            else:
+                if self.ingui:
+                    print('Filepath ' + str(MS_FilePath) + ' must have a .txt extention',flush=True)
+                if self.logger:
+                    self.logger.error('Filepath %s must have a .txt extention',MS_FilePath)
+                sys.exit(-1)
 
         #Annotation File Path
         self.Annotation_FilePath = Annotation_FilePath
 
-        #Initialise the data in long form starting with an empty dataframe
-        self.LongForm_df = pd.DataFrame()
-        self.LongForm = False
-        if longform:
-            self.LongForm = True
-        self.LongForm_Annot = False
-        if longform_annot:
-            self.LongForm_Annot = True
+        #Initialise the data in long table starting with an empty dataframe
+        self.LongTable_df = pd.DataFrame()
+        self.LongTable = False
+        if longtable:
+            self.LongTable = True
+        self.LongTable_Annot = False
+        if longtable_annot:
+            self.LongTable_Annot = True
 
         #For analysis that depends on other analysis
 
@@ -46,38 +60,38 @@ class MS_Analysis():
         self.ISTD_map_df = pd.DataFrame()
         self.Sample_Annot_df = pd.DataFrame()
 
-    def _add_to_LongForm_df(self,wide_df,column_name):
+    def _add_to_LongTable_df(self,wide_df,column_name):
         wide_df = pd.melt(wide_df,id_vars=["Sample_Name"],var_name="Transition_Name", value_name=column_name)
-        if self.LongForm_df.empty:
-            self.LongForm_df = wide_df
+        if self.LongTable_df.empty:
+            self.LongTable_df = wide_df
         else:
-            self.LongForm_df = pd.merge(self.LongForm_df, wide_df , on=["Sample_Name","Transition_Name"], how='left')
+            self.LongTable_df = pd.merge(self.LongTable_df, wide_df , on=["Sample_Name","Transition_Name"], how='left')
 
-    def get_Long_Form(self):
-        """Function to get the long form of the extracted or calculated MRM transition name data.
+    def get_Long_Table(self):
+        """Function to get the long table of the extracted or calculated MRM transition name data.
 
         Returns:
             Output_df (pandas DataFrame): A long data frame of with column name Sample_Name, Transition_Name and other relevant data
 
         """
 
-        #If we ask for the Sample Type and Transition Name ISTD to be present in the Long Form and an annotation file is given
-        if self.LongForm_Annot and self.Annotation_FilePath:
+        #If we ask for the Sample Type and Transition Name ISTD to be present in the Long Table and an annotation file is given
+        if self.LongTable_Annot and self.Annotation_FilePath:
             if self.ISTD_map_df.empty:
-                self.ISTD_map_df = ISTD_Operations.read_ISTD_map(self.Annotation_FilePath,"LongForm",logger=self.logger,ingui=self.ingui)
+                self.ISTD_map_df = ISTD_Operations.read_ISTD_map(self.Annotation_FilePath,"LongTable",logger=self.logger,ingui=self.ingui)
             if self.Sample_Annot_df.empty:
-                self.Sample_Annot_df = ISTD_Operations.read_Sample_Annot(self.Annotation_FilePath,[os.path.basename(self.MS_FilePath)],"LongForm",self.logger,ingui=self.ingui)
+                self.Sample_Annot_df = ISTD_Operations.read_Sample_Annot(self.Annotation_FilePath,[os.path.basename(self.MS_FilePath)],"LongTable",self.logger,ingui=self.ingui)
 
-            #self.LongForm can never be empty as it must have at least one output option e.g "Area" 
-            self.LongForm_df = pd.merge(self.LongForm_df, self.ISTD_map_df[["Transition_Name","Transition_Name_ISTD"]] , on=["Transition_Name"], how='left')
-            self.LongForm_df = pd.merge(self.LongForm_df, self.Sample_Annot_df[["Sample_Name","Sample_Type"]] , on=["Sample_Name"], how='left')
+            #self.LongTable can never be empty as it must have at least one output option e.g "Area" 
+            self.LongTable_df = pd.merge(self.LongTable_df, self.ISTD_map_df[["Transition_Name","Transition_Name_ISTD"]] , on=["Transition_Name"], how='left')
+            self.LongTable_df = pd.merge(self.LongTable_df, self.Sample_Annot_df[["Sample_Name","Sample_Type"]] , on=["Sample_Name"], how='left')
 
         #Reorder the columns
-        col_order = self.LongForm_df.columns.tolist()
-        col_order = ["Sample_Name","Sample_Type","Transition_Name","Transition_Name_ISTD"] + [item for item in col_order if item not in ["Sample_Name","Sample_Type","Transition_Name","Transition_Name_ISTD"]]
-        self.LongForm_df = self.LongForm_df[col_order] 
+        col_order = self.LongTable_df.columns.tolist()
+        col_order = ["Transition_Name","Transition_Name_ISTD","Sample_Name","Sample_Type"] + [item for item in col_order if item not in ["Sample_Name","Sample_Type","Transition_Name","Transition_Name_ISTD"]]
+        self.LongTable_df = self.LongTable_df[col_order] 
 
-        return self.LongForm_df
+        return self.LongTable_df
 
     def get_from_Input_Data(self,column_name):
         """Function to get a specific column from the input MRM transition name data.
@@ -93,8 +107,8 @@ class MS_Analysis():
         #We extract the data directly from the file and output accordingly
         Output_df = self.RawData.get_table(column_name,is_numeric=True)
 
-        if self.LongForm:
-            MS_Analysis._add_to_LongForm_df(self,Output_df,column_name)
+        if self.LongTable:
+            MS_Analysis._add_to_LongTable_df(self,Output_df,column_name)
 
         return Output_df
 
@@ -129,13 +143,9 @@ class MS_Analysis():
         [norm_Area_df,ISTD_Area,ISTD_Report] = ISTD_Operations.normalise_by_ISTD(Area_df,self.ISTD_map_df,self.logger,ingui=self.ingui)
         self.norm_Area_df = norm_Area_df
 
-        #Create the Long Form dataframe
-        if self.LongForm:
-            #if self.LongForm_df.empty:
-            #    self.LongForm_df = ISTD_map_df[["Transition_Name","Transition_Name_ISTD"]]
-            #else:
-            #    self.LongForm_df = pd.merge(self.LongForm_df, ISTD_map_df[["Transition_Name","Transition_Name_ISTD"]] , on=["Transition_Name"], how='left')
-            MS_Analysis._add_to_LongForm_df(self,norm_Area_df,"normArea")
+        #Create the Long Table dataframe
+        if self.LongTable:
+            MS_Analysis._add_to_LongTable_df(self,norm_Area_df,"normArea")
 
         if outputdata:
             return([norm_Area_df,ISTD_Area,ISTD_map_df,ISTD_Report])
@@ -170,12 +180,8 @@ class MS_Analysis():
         [norm_Conc_df,ISTD_Conc_df,ISTD_Samp_Ratio_df] = ISTD_Operations.getConc_by_ISTD(self.norm_Area_df,self.ISTD_map_df,self.Sample_Annot_df,self.logger,ingui=self.ingui)
 
         #Create the Long Form dataframe
-        if self.LongForm:
-            #if self.LongForm_df.empty:
-            #    self.LongForm_df = Sample_Annot_df[["Sample_Name","Sample_Type"]]
-            #else:
-            #    self.LongForm_df = pd.merge(self.LongForm_df, Sample_Annot_df[["Sample_Name","Sample_Type"]] , on=["Sample_Name"], how='left')
-            MS_Analysis._add_to_LongForm_df(self,norm_Conc_df,"normConc")
+        if self.LongTable:
+            MS_Analysis._add_to_LongTable_df(self,norm_Conc_df,"normConc")
 
         if outputdata:
             return([norm_Conc_df,ISTD_Conc_df,ISTD_Samp_Ratio_df,Sample_Annot_df])

@@ -369,9 +369,9 @@ class SciexMSRawData(MSRawData):
             sys.exit(-1)
 
         Table_df = self.RawData.pivot(index='Sample Name' ,columns='Component Name',values=column_name).reset_index()
-        Table_df = Table_df.reset_index()
         Table_df.columns.name = None
         Table_df.rename(columns={'Sample Name':'Sample_Name'}, inplace=True)
+
         return(Table_df)
 
     def AgilentColumnName_to_SciexColumnName(self,column_name):
