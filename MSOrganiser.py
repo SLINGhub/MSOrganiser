@@ -71,6 +71,8 @@ def get_Parameters_df(stored_args,MS_FilePath):
     #Get specific keys into the parameters list
     Parameter_list.append(("Input_File",os.path.basename(MS_FilePath)))
 
+    Parameter_list.append(("Input_File_Type",stored_args['MS_FileType']))
+
     if stored_args['Output_Format']:
         Parameter_list.append(("Output_Format",stored_args['Output_Format']))
 
@@ -109,9 +111,9 @@ if __name__ == '__main__':
 
         #Set up the file writing configuration for Excel, or csv ...
         if stored_args['Output_Format'] == "Excel" :
-            DfOutput = MSDataOutput_Excel(stored_args['Output_Directory'], MS_FilePath, logger, ingui=True)
+            DfOutput = MSDataOutput_Excel(stored_args['Output_Directory'], MS_FilePath, result_name = "Results" ,logger=logger, ingui=True)
         elif stored_args['Output_Format'] == "csv" :
-            DfOutput = MSDataOutput_csv(stored_args['Output_Directory'], MS_FilePath, logger, ingui=True)
+            DfOutput = MSDataOutput_csv(stored_args['Output_Directory'], MS_FilePath, result_name = "Results" ,logger=logger, ingui=True)
         DfOutput.start_writer()
 
         #Generate the parameters report
@@ -146,14 +148,25 @@ if __name__ == '__main__':
                 #We extract the data directly from the file and output accordingly
                 Output_df = MyData.get_from_Input_Data(column_name)
                 DfOutput.df_to_file(column_name,Output_df,transpose=stored_args['Transpose_Results'])
-                    
-        if stored_args['Long_Table']:
-            DfOutput.df_to_file("Long_Table",MyData.get_Long_Table())
 
-                
         #End the writing configuration for Excel, ...
         if stored_args['Output_Format'] == "Excel" :
             DfOutput.end_writer()
+
+        #Output the report to a pdf file
+        PDFReport.output_to_PDF()
+                 
+        #Output the LongTable Data Table in another csv or excel sheet
+        if stored_args['Long_Table']:
+            #Set up the file writing configuration for Excel, or csv ...
+            if stored_args['Output_Format'] == "Excel" :
+                DfLongOutput = MSDataOutput_Excel(stored_args['Output_Directory'], MS_FilePath, result_name = "LongTable" ,logger=logger, ingui=True)
+            elif stored_args['Output_Format'] == "csv" :
+                DfLongOutput = MSDataOutput_csv(stored_args['Output_Directory'], MS_FilePath, result_name = "LongTable" ,logger=logger, ingui=True)
+            DfLongOutput.start_writer()
+            DfLongOutput.df_to_file("Long_Table",MyData.get_Long_Table())
+            if stored_args['Output_Format'] == "Excel" :
+                DfLongOutput.end_writer()
 
         #Output the report to a pdf file
         PDFReport.output_to_PDF()

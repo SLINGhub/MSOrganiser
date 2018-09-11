@@ -17,9 +17,10 @@ class MSDataOutput:
         ingui (bool): if True, print analysis status to screen
 
     """
-    def __init__(self, output_directory, input_file_path, logger=None, ingui=True):
+    def __init__(self, output_directory, input_file_path, result_name = "Results" ,logger=None, ingui=True):
         self.output_directory = output_directory
         self.output_filename = os.path.splitext(os.path.basename(input_file_path))[0]
+        self.result_name = result_name
         self.logger = logger
         self.ingui = ingui
         self.writer = None
@@ -92,7 +93,7 @@ class MSDataOutput:
 
 
     def df_to_file(self,output_option,df,transpose=False):
-        """Funtion to write a df to a csv file named {input file name}_{output_option}_Results.csv .
+        """Funtion to write a df to a csv file named {input file name}_{output_option}_{result filename}.csv .
 
         Args:
             output_option (str): the name of the result csv file. MSOrganiser puts it as the Output_Options value
@@ -112,7 +113,7 @@ class MSDataOutput:
         if df.empty:
             return
 
-        df.to_csv(self.writer + '_Results_' + output_option + '.csv',sep=',',index=False)
+        df.to_csv(self.writer + '_' + self.result_name + '_' + output_option + '.csv',sep=',',index=False)
 
 class MSDataOutput_csv(MSDataOutput):
     """
@@ -149,7 +150,7 @@ class MSDataOutput_csv(MSDataOutput):
         if(output_option in ['Sample_Annot', 'Transition_Name_Annot']) :
             csv_filename = output_option + '.csv'
         else:
-            csv_filename = self.writer + '_Results_' + output_option + '.csv'
+            csv_filename = self.writer + '_' + self.result_name + '_' + output_option + '.csv'
 
         try:
             df.to_csv(csv_filename,sep=',',index=False)
@@ -170,7 +171,7 @@ class MSDataOutput_Excel(MSDataOutput):
     """
     def start_writer(self):
         """Function to open an Excel writer object using openpyxl"""
-        self.writer = os.path.join(self.output_directory, self.output_filename + '_Results.xlsx' )
+        self.writer = os.path.join(self.output_directory, self.output_filename + '_' +  self.result_name + '.xlsx' )
         self.writer = ExcelWriter(self.writer,engine='openpyxl')
 
     def end_writer(self):
