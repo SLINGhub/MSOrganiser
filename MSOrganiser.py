@@ -109,11 +109,16 @@ if __name__ == '__main__':
         #Initiate the pdf report file
         PDFReport = MSDataReport_PDF(stored_args['Output_Directory'], MS_FilePath, logger, ingui=True)
 
+        if stored_args['Transpose_Results']:
+            result_name = "TransposeResults"
+        else:
+            result_name = "Results"
+
         #Set up the file writing configuration for Excel, or csv ...
         if stored_args['Output_Format'] == "Excel" :
-            DfOutput = MSDataOutput_Excel(stored_args['Output_Directory'], MS_FilePath, result_name = "Results" ,logger=logger, ingui=True)
+            DfOutput = MSDataOutput_Excel(stored_args['Output_Directory'], MS_FilePath, result_name = result_name ,logger=logger, ingui=True)
         elif stored_args['Output_Format'] == "csv" :
-            DfOutput = MSDataOutput_csv(stored_args['Output_Directory'], MS_FilePath, result_name = "Results" ,logger=logger, ingui=True)
+            DfOutput = MSDataOutput_csv(stored_args['Output_Directory'], MS_FilePath, result_name = result_name ,logger=logger, ingui=True)
         DfOutput.start_writer()
 
         #Generate the parameters report
