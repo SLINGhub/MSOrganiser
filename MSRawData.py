@@ -206,15 +206,20 @@ class AgilentMSRawData(MSRawData):
         CompoundName_df = pd.DataFrame(Compound_list)
         CompoundName_df = self.remove_whiteSpaces(CompoundName_df)
 
-        #Column Name (e.g Area) and Transition index
+        #All Column Name (e.g Area) and Transition index
         ColName_Col = self.RawData.iloc[1,:].str.contains(column_name) | self.RawData.iloc[1,:].str.contains("Transition")
         ColName_Col_Index = ColName_Col.index[ColName_Col == True].tolist()
+
+        #Transition from Compound Method
+        CpdMethod_Transition_Col = self.RawData.iloc[0,:].str.contains("Compound Method") & self.RawData.iloc[1,:].str.contains("Transition")
+        CpdMethod_Transition_Col_Index = CpdMethod_Transition_Col.index[CpdMethod_Transition_Col == True].tolist()
 
         #Column Name (e.g Area) found only at the Qualifier
         ColName_Qualifier_Col = self.RawData.iloc[0,:].str.contains("Qualifier \d Results", regex=True) & self.RawData.iloc[1,:].str.contains(column_name)
         ColName_Qualifier_Col_Index = ColName_Qualifier_Col.index[ColName_Qualifier_Col == True].tolist()
 
-        ColName_Compound_Col_Index = [x for x in ColName_Col_Index if x not in sorted(Qualifier_Method_Col_Index + ColName_Qualifier_Col_Index, key = int)]
+        #The Column Name (e.g Area), no transitons and not from Qualifier
+        ColName_Compound_Col_Index = [x for x in ColName_Col_Index if x not in sorted(CpdMethod_Transition_Col_Index + Qualifier_Method_Col_Index + ColName_Qualifier_Col_Index, key = int)]
 
         table_list = []
 
