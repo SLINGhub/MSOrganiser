@@ -150,21 +150,13 @@ class AgilentMSRawData(MSRawData):
         #Get the data file name and give error when it cannot be found
         DataFileName_df = self.__get_data_file_name_compound()
 
-        #Get the compound name df and give error when it cannot be found
-        CompoundName_df = self.__get_compound_name_compound()
-
-        #Get the data with the given column name at the seond row 
-        table_index = self.RawData.iloc[1,:].str.contains(column_name)
-        table_df = self.RawData.loc[2:,table_index].copy()
+        #Get the compound table df and give error when it cannot be found
+        #CompoundName_df = self.__get_compound_name_compound(column_name)
+        table_df = self.__get_compound_name_compound(column_name)
 
         if table_df.empty:
             return table_df
 
-        #Reset the row index
-        table_df = table_df.reset_index(drop=True)
-        
-        #Get the CompoundName and transpose the matrix
-        table_df = pd.concat([CompoundName_df, table_df ], axis=1)
         table_df = table_df.transpose()
 
         #Assign column name
@@ -185,27 +177,103 @@ class AgilentMSRawData(MSRawData):
 
         return table_df
 
-    def __get_compound_name_compound(self):
-        """Function to get the list of compound in a form of a df"""
+    def __get_compound_name_compound(self,column_name):
+        """Function to get the df Transition Name as Rows, Sample Name as Columns with values from the chosen column_name. E.g Area """
 
+        #Find cols with Transition in Qualifier Method in the first row
+        Qualifier_Method_Col = self.RawData.iloc[0,:].str.contains("Qualifier \d Method", regex=True) & self.RawData.iloc[1,:].str.contains("Transition")
+        #Find cols with Data File in the second row
+        DataFileName_Col = self.RawData.iloc[1,:].str.contains("Data File")
+
+        #Find the number of Qualifiers each Transition is entitled to have
+        No_of_Qual_per_Transition = int((Qualifier_Method_Col.values==True).sum() / (DataFileName_Col.values==True).sum() )
+
+        #Get the column index where the group of Qualifier Method first appeared.
+        Qualifier_Method_Col_Index = Qualifier_Method_Col.index[Qualifier_Method_Col == True].tolist()
+
+        #Get the only column index of where the Transition Names are. We know for sure that it is on the third row
         Compound_Col = self.RawData.iloc[0,:].str.contains("Compound Method") & self.RawData.iloc[1,:].str.contains("Name")
-        CompoundName_df = self.RawData.loc[:,Compound_Col].copy()
+        Compound_Col_Index = Compound_Col.index[Compound_Col == True].tolist()
 
-        if CompoundName_df.empty:
-            self.__logger.error('%s has no column containing \"Name\" in Compound Method. Please check the input file',self.__filename)
-            if self.__ingui:
-                print(self.__filename + ' has no column containing \"Name\" in Compound Method. Please check the input file',flush=True)
-            sys.exit(-1)
+        #We start a new Compound_list
+        Compound_list = []
 
-        #We remove the first and second row because the column names are given
-        CompoundName_df = CompoundName_df.iloc[2:]
-        #Reset the row index
-        CompoundName_df = CompoundName_df.reset_index(drop=True)
+        #We start on row three
+        self.RawData.iloc[2:,sorted(Compound_Col_Index + Qualifier_Method_Col_Index[0:No_of_Qual_per_Transition] )].apply(lambda x: AgilentMSRawData._get_Compound_List(x=x,
+                                                                                                                                                                        Compound_list=Compound_list),
+                                                                                                                          axis=1)
 
-        #Strip the whitespaces for each string columns
+        CompoundName_df = pd.DataFrame(Compound_list)
         CompoundName_df = self.remove_whiteSpaces(CompoundName_df)
 
-        return CompoundName_df
+        #Column Name (e.g Area) and Transition index
+        ColName_Col = self.RawData.iloc[1,:].str.contains(column_name) | self.RawData.iloc[1,:].str.contains("Transition")
+        ColName_Col_Index = ColName_Col.index[ColName_Col == True].tolist()
+
+        #Column Name (e.g Area) found only at the Qualifier
+        ColName_Qualifier_Col = self.RawData.iloc[0,:].str.contains("Qualifier \d Results", regex=True) & self.RawData.iloc[1,:].str.contains(column_name)
+        ColName_Qualifier_Col_Index = ColName_Qualifier_Col.index[ColName_Qualifier_Col == True].tolist()
+
+        ColName_Compound_Col_Index = [x for x in ColName_Col_Index if x not in sorted(Qualifier_Method_Col_Index + ColName_Qualifier_Col_Index, key = int)]
+
+        table_list = []
+
+        #We start on row three, update the table list with the column_name
+        self.RawData.iloc[2:,sorted(ColName_Col_Index, key=int)].apply(lambda x: AgilentMSRawData._get_Compound_Data(x=x,
+                                                                                                                     table_list=table_list, 
+                                                                                                                     ColName_Compound_Col_Index = ColName_Compound_Col_Index,
+                                                                                                                     Qualifier_Method_Col_Index = Qualifier_Method_Col_Index,
+                                                                                                                     ColName_Qualifier_Col_Index = ColName_Qualifier_Col_Index,
+                                                                                                                     No_of_Qual_per_Transition = No_of_Qual_per_Transition)
+                                                                       ,axis=1)
+
+        if pd.DataFrame(table_list).empty:
+            return(pd.DataFrame(table_list))
+        else:
+            return(pd.concat([CompoundName_df, pd.DataFrame(table_list) ], axis=1))
+        return(pd.DataFrame()) 
+
+    def _get_Compound_Data(x,table_list,ColName_Compound_Col_Index,Qualifier_Method_Col_Index,ColName_Qualifier_Col_Index,No_of_Qual_per_Transition):
+        """Function to get the values from the chosen column_name. E.g(Area) from a given row from the raw MRM data from Agilent in Compound Table form. table_list will be updated"""
+
+        #Get Compound row
+        Compound_df = pd.DataFrame(x[x.index.isin(ColName_Compound_Col_Index)])
+        Compound_df = Compound_df.T.values.tolist()
+        #Append to table_list
+        table_list.extend(Compound_df)
+
+        #Get Qualifier row
+        for i in range(0,No_of_Qual_per_Transition):
+            #Check if there is a transition 
+            #print([Qualifier_Method_Col_Index[i]])
+            #print(x[ x.index.isin([Qualifier_Method_Col_Index[i]])].values.tolist()[0])
+            #sys.exit(0)
+            Transition = x[ x.index.isin([Qualifier_Method_Col_Index[i]])].values.tolist()[0]
+            if(pd.isna(Transition)):
+                break
+            else:
+                #When there is a transition, we need to collect a subset of ColName_Qualifier_Col_Index that correspond to this transition
+                ColName_Qualifier_Col_Index_subset = [ColName_Qualifier_Col_Index[index] for index in range(0+i,int(len(ColName_Qualifier_Col_Index)/No_of_Qual_per_Transition),No_of_Qual_per_Transition)]
+                Qualifier_df = pd.DataFrame(x[x.index.isin(ColName_Qualifier_Col_Index_subset)])
+                Qualifier_df = Qualifier_df.T.values.tolist()
+
+                #Append to table_list
+                table_list.extend(Qualifier_df)
+
+                #if i == 0:
+                #    print(Transition)
+                #    print(Qualifier_df)
+                #    sys.exit(0)
+
+    def _get_Compound_List(x,Compound_list):
+        """Function to get the Transition Names and Qualifiers from a given row from the raw MRM data from Agilent in Compound Table form. Compound_list will be updated"""
+        #x is a series
+        #Remove NA if any
+        s = x.dropna().copy()
+        #Update the Qualifer name if there is any
+        s[s.str.contains("->")] = "Qualifier (" + s[s.str.contains("->")].values + ")"
+        Compound_list.extend(s.values.tolist())
+
 
     def __get_data_file_name_wide(self):
         """Function to get the list of sample names from MassHunter Raw Data in Wide Table form"""
