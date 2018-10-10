@@ -23,20 +23,20 @@ SCIEX_RESULTS_FILENAME = os.path.join(os.path.dirname(__file__),"testdata", 'Moh
 class Agilent_Test(unittest.TestCase):
 
     def setUp(self):
-        MyWideData = MS_Analysis(WIDETABLEFORM_FILENAME,ingui=False)
+        MyWideData = MS_Analysis(WIDETABLEFORM_FILENAME,'Agilent Wide Table in csv',WIDETABLEFORM_ANNOTATION,ingui=True)
         WideDataResults = openpyxl.load_workbook(WIDETABLEFORM_RESULTS_FILENAME)
 
-        MyLargeWideData = MS_Analysis(LARGE_WIDETABLEFORM_FILENAME,ingui=False)
+        MyLargeWideData = MS_Analysis(LARGE_WIDETABLEFORM_FILENAME,'Agilent Wide Table in csv',LARGE_WIDETABLEFORM_ANNOTATION,ingui=True)
         LargeWideDataResults = openpyxl.load_workbook(LARGE_WIDETABLEFORM_RESULTS_FILENAME)
 
-        MyCompoundData = MS_Analysis(COMPOUNDTABLEFORM_FILENAME,ingui=False)
+        MyCompoundData = MS_Analysis(COMPOUNDTABLEFORM_FILENAME,'Agilent Compound Table in csv',COMPOUNDTABLEFORM_ANNOTATION,ingui=True)
         CompoundDataResults = openpyxl.load_workbook(COMPOUNDTABLEFORM_RESULTS_FILENAME)
 
-        MySciexData = MS_Analysis(SCIEX_FILENAME,ingui=False)
+        MySciexData = MS_Analysis(SCIEX_FILENAME,'Multiquant Long Table in txt',SCIEX_ANNOTATION,ingui=True)
         SciexResults = openpyxl.load_workbook(SCIEX_RESULTS_FILENAME)
 
         self.DataList = [MyWideData,MyLargeWideData,MyCompoundData,MySciexData]
-        self.DataAnnotationList = [WIDETABLEFORM_ANNOTATION,LARGE_WIDETABLEFORM_ANNOTATION,COMPOUNDTABLEFORM_ANNOTATION,SCIEX_ANNOTATION]
+        #self.DataAnnotationList = [WIDETABLEFORM_ANNOTATION,LARGE_WIDETABLEFORM_ANNOTATION,COMPOUNDTABLEFORM_ANNOTATION,SCIEX_ANNOTATION]
         self.DataResultList = [WideDataResults,LargeWideDataResults,CompoundDataResults,SciexResults]
 
     def test_getnormAreaTable(self):
@@ -50,9 +50,9 @@ class Agilent_Test(unittest.TestCase):
 
         #Perform normalisation using ISTD
         for i in range(len(self.DataList)):
-            [norm_Area_df,ISTD_Area,ISTD_map_df,ISTD_Report] = self.DataList[i].get_Normalised_Area('normArea by ISTD',self.DataAnnotationList[i])
-            self.__compare_df('normArea by ISTD',norm_Area_df,self.DataResultList[i])
-            self.__compare_df('ISTD map',ISTD_map_df,self.DataResultList[i])
+            [norm_Area_df,ISTD_Area,Transition_Name_Annot,ISTD_Report] = self.DataList[i].get_Normalised_Area('normArea by ISTD')
+            self.__compare_df('normArea_by_ISTD',norm_Area_df,self.DataResultList[i])
+            self.__compare_df('Transition_Name_Annot',Transition_Name_Annot,self.DataResultList[i])
 
 
     def test_getAnalyteConcTable(self):
@@ -66,9 +66,9 @@ class Agilent_Test(unittest.TestCase):
 
         #Perform analyte concentration using ISTD
         for i in range(len(self.DataList)):
-            [norm_Conc_df,ISTD_Conc_df,ISTD_Samp_Ratio_df,Sample_Annot_df] = self.DataList[i].get_Analyte_Concentration('normConc by ISTD',self.DataAnnotationList[i])
-            self.__compare_df('normConc by ISTD',norm_Conc_df,self.DataResultList[i])
-            self.__compare_df('Sample Annot',Sample_Annot_df,self.DataResultList[i])
+            [norm_Conc_df,ISTD_Conc_df,ISTD_Samp_Ratio_df,Sample_Annot_df] = self.DataList[i].get_Analyte_Concentration('normConc by ISTD')
+            self.__compare_df('normConc_by_ISTD',norm_Conc_df,self.DataResultList[i])
+            self.__compare_df('Sample_Annot',Sample_Annot_df,self.DataResultList[i])
       
     def tearDown(self):
         for i in range(len(self.DataResultList)):
