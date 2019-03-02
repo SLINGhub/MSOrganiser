@@ -47,12 +47,10 @@ class MS_Analysis():
 
         #Initialise the data in long table starting with an empty dataframe
         self.LongTable_df = pd.DataFrame()
-        self.LongTable = False
-        if longtable:
-            self.LongTable = True
-        self.LongTable_Annot = False
-        if longtable_annot:
-            self.LongTable_Annot = True
+
+        self.LongTable = longtable
+        self.LongTable_Annot = longtable_annot
+
 
         #For analysis that depends on other analysis
 
@@ -88,7 +86,10 @@ class MS_Analysis():
 
         #Reorder the columns
         col_order = self.LongTable_df.columns.tolist()
-        col_order = ["Transition_Name","Transition_Name_ISTD","Sample_Name","Sample_Type"] + [item for item in col_order if item not in ["Sample_Name","Sample_Type","Transition_Name","Transition_Name_ISTD"]]
+        if self.LongTable_Annot and self.Annotation_FilePath:
+            col_order = ["Transition_Name","Transition_Name_ISTD","Sample_Name","Sample_Type"] + [item for item in col_order if item not in ["Sample_Name","Sample_Type","Transition_Name","Transition_Name_ISTD"]]
+        else:
+            col_order = ["Transition_Name","Sample_Name"] + [item for item in col_order if item not in ["Sample_Name","Transition_Name"]]
         self.LongTable_df = self.LongTable_df[col_order] 
 
         return self.LongTable_df

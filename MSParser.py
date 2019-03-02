@@ -67,6 +67,12 @@ def parse_MSOrganiser_args(args_json_file_path=""):
     else:
         stored_args['Long_Table'] = False
 
+    #Convert the string in Long Table to boolean
+    if stored_args['Long_Table_Annot'] == 'True':
+        stored_args['Long_Table_Annot'] = True
+    else:
+        stored_args['Long_Table_Annot'] = False
+
     return stored_args
 
 def _load_args_from_json(args_file):

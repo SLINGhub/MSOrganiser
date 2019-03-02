@@ -41,4 +41,6 @@ exe = EXE(pyz,
           upx=True,
           console=False,
           windowed=True,
-          icon=os.path.join(gooey_root, 'images', 'program_icon.ico'))
+          icon=os.path.join(gooey_root, 'images', 'program_icon.ico'),
+		  version='version.txt'
+		  )
