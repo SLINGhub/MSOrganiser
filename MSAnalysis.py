@@ -75,19 +75,26 @@ class MS_Analysis():
 
         #If we ask for the Sample Type and Transition Name ISTD to be present in the Long Table and an annotation file is given
         if self.LongTable_Annot and self.Annotation_FilePath:
+            #To handle the case when no normalization is required but we still need to read the annotation file
             if self.ISTD_map_df.empty:
-                self.ISTD_map_df = ISTD_Operations.read_ISTD_map(self.Annotation_FilePath,"LongTable",logger=self.logger,ingui=self.ingui)
+                self.ISTD_map_df = ISTD_Operations.read_ISTD_map(self.Annotation_FilePath,"LongTable",logger=self.logger,ingui=self.ingui,doing_normalization = False)
             if self.Sample_Annot_df.empty:
-                self.Sample_Annot_df = ISTD_Operations.read_Sample_Annot(self.Annotation_FilePath,[os.path.basename(self.MS_FilePath)],"LongTable",self.logger,ingui=self.ingui)
+                self.Sample_Annot_df = ISTD_Operations.read_Sample_Annot(self.Annotation_FilePath,[os.path.basename(self.MS_FilePath)],"LongTable",self.logger,ingui=self.ingui,doing_normalization = False)
 
-            #self.LongTable can never be empty as it must have at least one output option e.g "Area" 
-            self.LongTable_df = pd.merge(self.LongTable_df, self.ISTD_map_df[["Transition_Name","Transition_Name_ISTD"]] , on=["Transition_Name"], how='left')
-            self.LongTable_df = pd.merge(self.LongTable_df, self.Sample_Annot_df[["Sample_Name","Sample_Type"]] , on=["Sample_Name"], how='left')
+            #self.LongTable can never be empty as it must have at least one output option e.g "Area"
+            #It could be the case that the df is empty after reading the file
+            if not self.ISTD_map_df.empty:
+                merge_column = ["Transition_Name","Transition_Name_ISTD"]
+                self.LongTable_df = pd.merge(self.LongTable_df, self.ISTD_map_df[[item for item in merge_column if item in self.ISTD_map_df.columns.tolist()]] , on=["Transition_Name"], how='left')
+            if not self.Sample_Annot_df.empty:
+                merge_column = ["Sample_Name","Sample_Type"]
+                self.LongTable_df = pd.merge(self.LongTable_df, self.Sample_Annot_df[[item for item in merge_column if item in self.Sample_Annot_df.columns.tolist()]] , on=["Sample_Name"], how='left')
 
         #Reorder the columns
         col_order = self.LongTable_df.columns.tolist()
         if self.LongTable_Annot and self.Annotation_FilePath:
-            col_order = ["Transition_Name","Transition_Name_ISTD","Sample_Name","Sample_Type"] + [item for item in col_order if item not in ["Sample_Name","Sample_Type","Transition_Name","Transition_Name_ISTD"]]
+            first_few_column = ["Transition_Name","Transition_Name_ISTD","Sample_Name","Sample_Type"]
+            col_order =  [item for item in first_few_column if item in col_order]  + [item for item in col_order if item not in first_few_column]
         else:
             col_order = ["Transition_Name","Sample_Name"] + [item for item in col_order if item not in ["Sample_Name","Transition_Name"]]
         self.LongTable_df = self.LongTable_df[col_order] 
@@ -137,7 +144,7 @@ class MS_Analysis():
         Area_df = self.RawData.get_table('Area',is_numeric=True)
         
         #Get ISTD map df
-        ISTD_map_df = ISTD_Operations.read_ISTD_map(self.Annotation_FilePath,analysis_name,self.logger,ingui=self.ingui)
+        ISTD_map_df = ISTD_Operations.read_ISTD_map(self.Annotation_FilePath,analysis_name,self.logger,ingui=self.ingui,doing_normalization = True)
         self.ISTD_map_df = ISTD_map_df
 
         #Perform normalisation using ISTD
@@ -175,7 +182,7 @@ class MS_Analysis():
             self.get_Normalised_Area(analysis_name,outputdata=False)
 
         #Perform concentration calculation, we need norm_Area_df, ISTD_map_df and Sample_Annot_df
-        Sample_Annot_df = ISTD_Operations.read_Sample_Annot(self.Annotation_FilePath,[os.path.basename(self.MS_FilePath)],analysis_name,self.logger,ingui=self.ingui)
+        Sample_Annot_df = ISTD_Operations.read_Sample_Annot(self.Annotation_FilePath,[os.path.basename(self.MS_FilePath)],analysis_name,self.logger,ingui=self.ingui,doing_normalization = True)
         self.Sample_Annot_df = Sample_Annot_df
 
         [norm_Conc_df,ISTD_Conc_df,ISTD_Samp_Ratio_df] = ISTD_Operations.getConc_by_ISTD(self.norm_Area_df,self.ISTD_map_df,self.Sample_Annot_df,self.logger,ingui=self.ingui)

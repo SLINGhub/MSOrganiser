@@ -16,11 +16,12 @@ class MS_Template():
         ingui (bool): if True, print analysis status to screen
     """
 
-    def __init__(self,filepath,column_name, logger=None,ingui=True):
+    def __init__(self,filepath,column_name, logger=None,ingui=True, doing_normalization = False):
         self.__logger = logger
         self.__ingui = ingui
         self.filepath = filepath
         self.__filecheck(column_name)
+        self.__doing_normalization = doing_normalization
 
     def remove_whiteSpaces(df):
         """Strip the whitespaces for each string columns of a df
@@ -136,18 +137,23 @@ class MS_Template():
         #Reset the row index
         Transition_Name_Annot_df = Transition_Name_Annot_df.reset_index(drop=True)
 
-        #Remove rows and columns with all None, NA,NaN
+        #Remove rows with all None, NA,NaN
         Transition_Name_Annot_df = Transition_Name_Annot_df.dropna(axis=0, how='all')
-        Transition_Name_Annot_df = Transition_Name_Annot_df.dropna(axis=1, how='all')
 
         #Validate the Transition_Name_Annot sheet is valid (Has the Transition_Name and Transition_Name_ISTD columns are not empty)
         self.__validate_Transition_Name_Annot_sheet("Transition_Name_Annot",Transition_Name_Annot_df)
 
         #Remove whitespaces in column names
         Transition_Name_Annot_df.columns = Transition_Name_Annot_df.columns.str.strip()
-            
+
         #Remove whitespace for each string column
         Transition_Name_Annot_df = MS_Template.remove_whiteSpaces(Transition_Name_Annot_df)
+
+        #Remove columns with all None, NA,NaN
+        Transition_Name_Annot_df = Transition_Name_Annot_df.dropna(axis=1, how='all')
+          
+
+        #print(Transition_Name_Annot_df)
 
         #Close the workbook
         wb.close()
@@ -155,8 +161,9 @@ class MS_Template():
         return Transition_Name_Annot_df
 
     def __validate_Transition_Name_Annot_sheet(self,sheetname,Transition_Name_Annot_df):
-        #Validate the Transition_Name_Annot sheet has data
-        self.__check_if_df_is_empty(sheetname,Transition_Name_Annot_df)
+        #Validate the Transition_Name_Annot sheet has data when normalization is performed
+        if self.__doing_normalization:
+            self.__check_if_df_is_empty(sheetname,Transition_Name_Annot_df)
 
         #Check if the column Transition_Name exists as a header in Transition_Name_Annot_df
         self.__checkColumns_in_df('Transition_Name',sheetname,Transition_Name_Annot_df)
@@ -289,11 +296,10 @@ class MS_Template():
         #Reset the row index
         Sample_Annot_df = Sample_Annot_df.reset_index(drop=True)
 
-        #Remove rows and columns with all None, NA,NaN
+        #Remove rows with all None, NA,NaN
         Sample_Annot_df = Sample_Annot_df.dropna(axis=0, how='all')
-        Sample_Annot_df = Sample_Annot_df.dropna(axis=1, how='all')
 
-        #Validate the Transition_Name_Annot sheet is valid (Has the Transition_Name and Transition_Name_ISTD columns are not empty)
+        #Validate the Sample_Annot sheet is valid (the columns are not remove in the excel sheet but can be empty)
         self.__validate_Sample_Annot_sheet("Sample_Annot",Sample_Annot_df)
 
         #We take the Sample Annotation data that can be found in the MS_FilePathList
@@ -309,6 +315,9 @@ class MS_Template():
         Sample_Annot_df['ISTD_Mixture_Volume_[uL]'] = pd.to_numeric(Sample_Annot_df['ISTD_Mixture_Volume_[uL]'], errors='coerce')
         #print(Sample_Annot_df.info())
 
+        #Remove columns with all None, NA,NaN
+        Sample_Annot_df = Sample_Annot_df.dropna(axis=1, how='all')
+
         #Remove whitespace for each string column
         Sample_Annot_df = MS_Template.remove_whiteSpaces(Sample_Annot_df)
 
@@ -318,8 +327,9 @@ class MS_Template():
         return Sample_Annot_df
 
     def __validate_Sample_Annot_sheet(self,sheetname,Sample_Annot_df):
-        #Validate the Sample_Annot sheet has data
-        self.__check_if_df_is_empty(sheetname,Sample_Annot_df)
+        #Validate the Sample_Annot sheet has data when normalization is performed
+        if self.__doing_normalization:
+            self.__check_if_df_is_empty(sheetname,Sample_Annot_df)
 
         #Check if the column Raw_Data_File_Name exists as a header in Sample_Annot_df
         self.__checkColumns_in_df('Raw_Data_File_Name',sheetname,Sample_Annot_df)

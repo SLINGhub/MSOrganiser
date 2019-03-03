@@ -21,7 +21,7 @@ class ISTD_Operations():
         #df[df.select_dtypes(['object']).columns] = df.select_dtypes(['object']).apply(lambda x: x.str.strip())
         #return df
 
-    def read_ISTD_map(filepath,column_name,logger=None,ingui=False):
+    def read_ISTD_map(filepath,column_name,logger=None,ingui=False,doing_normalization = False):
         """Function to get the transition names annotation dataframe from the MS Template Creator annotation file.
 
         Args:
@@ -29,13 +29,14 @@ class ISTD_Operations():
             column_name (str): The name of the column given in the Output_Options.
             logger (object): logger object created by start_logger in MSOrganiser
             ingui (bool): if True, print analysis status to screen
+            doing_normalization (bool): if True, check if input file has data. If no data, throws an error
 
         Returns:
             Transition_Name_Annot_df (pandas DataFrame): A data frame of showing the transition names annotation
 
         """
 
-        AnnotationList = MS_Template(filepath=filepath,column_name=column_name, logger=logger,ingui=ingui)
+        AnnotationList = MS_Template(filepath=filepath,column_name=column_name, logger=logger,ingui=ingui,doing_normalization = doing_normalization)
         Transition_Name_Annot_df = AnnotationList.Read_Transition_Name_Annot_Sheet()
         ISTD_Annot_df = AnnotationList.Read_ISTD_Annot_Sheet()
         
@@ -57,13 +58,14 @@ class ISTD_Operations():
                         print('\"' + Transition_Name + '\"',flush=True)
             #Merge the two data frame by common ISTD
             Transition_Name_Annot_df = pd.merge(Transition_Name_Annot_df, ISTD_Annot_df, on='Transition_Name_ISTD', how='outer')
- 
-        #Remove Rows with ISTD with no Transition_Names
-        Transition_Name_Annot_df = Transition_Name_Annot_df.dropna(subset=['Transition_Name'])
+
+        if not Transition_Name_Annot_df.empty:
+            #Remove Rows with ISTD with no Transition_Names
+            Transition_Name_Annot_df = Transition_Name_Annot_df.dropna(subset=['Transition_Name'])
 
         return Transition_Name_Annot_df
 
-    def read_Sample_Annot(filepath,MS_FilePathList,column_name,logger=None,ingui=False):
+    def read_Sample_Annot(filepath,MS_FilePathList,column_name,logger=None,ingui=False,doing_normalization=False):
         """Function to get the sample names annotation dataframe from the MS Template Creator annotation file.
 
         Args:
@@ -72,6 +74,7 @@ class ISTD_Operations():
             column_name (str): The name of the column given in the Output_Options.
             logger (object): logger object created by start_logger in MSOrganiser
             ingui (bool): if True, print analysis status to screen
+            doing_normalization (bool): if True, check if input file has data. If no data, throws an error
 
         Note:
             The list of MRM transition name file names names is to help the program properly filter 
@@ -82,7 +85,7 @@ class ISTD_Operations():
             Sample_Annot_df (pandas DataFrame): A data frame of showing the sample names annotation
 
         """
-        AnnotationList = MS_Template(filepath=filepath,column_name=column_name, logger=logger,ingui=ingui)
+        AnnotationList = MS_Template(filepath=filepath,column_name=column_name, logger=logger,ingui=ingui,doing_normalization = doing_normalization)
         Sample_Annot_df = AnnotationList.Read_Sample_Annot_Sheet(MS_FilePathList)
         return Sample_Annot_df
 
