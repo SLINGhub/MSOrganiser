@@ -440,33 +440,33 @@ class ISTD_Operations():
                 print("Skipping step to get normConc. Sample Annotation data frame is missing column " , ', '.join(["Raw_Data_File_Name","Sample_Amount","Sample_Amount_Unit","ISTD_Mixture_Volume_[uL]"]),flush=True)
             return [Conc_df,Conc_df,Conc_df]
 
-        #We cannot accept duplicated Raw_Data_File_path
-        if(len(Sample_Annot_df.Raw_Data_File_Name.unique()) > 1):
-            #Return empty data set
-            if logger:
-                logger.error('Skipping step to get normConc. Sample Annotation data frame has duplicate Raw_Data_File_Name.')
-            if ingui:
-                print('Skipping step to get normConc. Sample Annotation data frame has duplicate Raw_Data_File_Name.' ,flush=True)
-            for things in Sample_Annot_df.Raw_Data_File_Name.unique():
-                if logger:
-                    logger.warning('/"%s/"',things)
-                if ingui:
-                    print('\"' + things + '\"',flush=True)
-            return [Conc_df,Conc_df,Conc_df]
+        ##We cannot accept duplicated Raw_Data_File_path
+        #if(len(Sample_Annot_df.Raw_Data_File_Name.unique()) > 1):
+        #    #Return empty data set
+        #    if logger:
+        #        logger.error('Skipping step to get normConc. Sample Annotation data frame has more than one Raw_Data_File_Name.')
+        #    if ingui:
+        #        print('Skipping step to get normConc. Sample Annotation data frame has more than one Raw_Data_File_Name.' ,flush=True)
+        #    for things in Sample_Annot_df.Raw_Data_File_Name.unique():
+        #        if logger:
+        #            logger.warning('/"%s/"',things)
+        #        if ingui:
+        #            print('\"' + things + '\"',flush=True)
+        #    return [Conc_df,Conc_df,Conc_df]
 
-        #We cannot accept duplicated Sample_Amount_Unit
-        if(len(Sample_Annot_df.Sample_Amount_Unit.unique()) > 1):
-            #Return empty data set
-            if logger:
-                logger.error('Skipping step to get normConc. Sample Annotation data frame has duplicate Sample_Amount_Unit.')
-            if ingui:
-                print('Skipping step to get normConc. Sample Annotation data frame has duplicate Sample_Amount_Unit.' ,flush=True)
-            for things in Sample_Annot_df.Sample_Amount_Unit.unique():
-                if logger:
-                    logger.warning('/"%s/"',things)
-                if ingui:
-                    print('\"' + things + '\"',flush=True)
-            return [Conc_df,Conc_df,Conc_df]
+        ##We cannot accept more than one Sample_Amount_Unit
+        #if(len(Sample_Annot_df.Sample_Amount_Unit.unique()) > 1):
+        #    #Return empty data set
+        #    if logger:
+        #        logger.error('Skipping step to get normConc. Sample Annotation data frame has more than one Sample_Amount_Unit.')
+        #    if ingui:
+        #        print('Skipping step to get normConc. Sample Annotation data frame has more than one Sample_Amount_Unit.' ,flush=True)
+        #    for things in Sample_Annot_df.Sample_Amount_Unit.unique():
+        #        if logger:
+        #            logger.warning('/"%s/"',things)
+        #        if ingui:
+        #            print('\"' + things + '\"',flush=True)
+        #    return [Conc_df,Conc_df,Conc_df]
 
         Sample_Annot_df["ISTD_to_Sample_Amount_Ratio"] = Sample_Annot_df["ISTD_Mixture_Volume_[uL]"].astype('float64') / Sample_Annot_df["Sample_Amount"].astype('float64')
         #Sample_Annot_df["ISTD_to_Sample_Amount_Ratio"] = Sample_Annot_df["ISTD_to_Sample_Amount_Ratio"].replace([np.inf, -np.inf], np.nan)

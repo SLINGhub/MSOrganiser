@@ -51,7 +51,7 @@ class MS_Template():
             if self.__logger:
                 self.__logger.error('%s does not exists. Please check the input file',self.filepath)
             if self.__ingui:
-                print(filepath + ' does not exists. Please check the input file',flush=True)
+                print(self.filepath + ' does not exists. Please check the input file',flush=True)
             sys.exit(-1)
 
         if self.filepath.endswith('.csv'):
