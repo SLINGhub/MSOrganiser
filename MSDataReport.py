@@ -23,15 +23,15 @@ def _get_report_dir(dir_name):
                  "file. Please copy `msreport` folders into `{}{}` directory.".format(resource_dir, os.sep)))
         return resource_dir
     else:
-        resource_dir = os.path.dirname(__file__)
+        resource_dir = os.path.dirname('__file__')
     return os.path.join(resource_dir, dir_name)
 
 os.environ['PATH'] = _get_report_dir('cairo_dll') + os.pathsep + os.environ['PATH']
 
 #To remove the @font-face not available in Windows warning
-with warnings.catch_warnings():
-    warnings.filterwarnings("ignore", category=UserWarning)
-    from weasyprint import HTML
+#with warnings.catch_warnings():
+#    warnings.filterwarnings("ignore", category=UserWarning)
+from weasyprint import HTML
 
 class MSDataReport:
     """

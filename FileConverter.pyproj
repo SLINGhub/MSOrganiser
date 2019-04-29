@@ -129,6 +129,7 @@
     <Content Include="tests\testdata\WideTableForm_Results.xlsx" />
     <Content Include="tests\__pycache__\test_MSCalculate.cpython-36.pyc" />
     <Content Include="tests\__pycache__\test_MSRawData.cpython-36.pyc" />
+    <Content Include="version.txt" />
   </ItemGroup>
   <ItemGroup>
     <Interpreter Include="testenv\">
