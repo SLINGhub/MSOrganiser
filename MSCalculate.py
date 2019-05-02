@@ -429,30 +429,43 @@ class ISTD_Operations():
             return [Conc_df,Conc_df,Conc_df]
 
         #Creating the ISTD_Samp_Ratio_df
-
+          
         #Ensure that the necessary columns are there
         Sample_Annot_Columns = list(Sample_Annot_df.columns.values)
-        if not all(things in Sample_Annot_Columns for things in ["Raw_Data_File_Name","Sample_Amount","Sample_Amount_Unit","ISTD_Mixture_Volume_[uL]"]):
+        if not all(things in Sample_Annot_Columns for things in ["Raw_Data_File_Name","Sample_Name","Sample_Amount","Sample_Amount_Unit","ISTD_Mixture_Volume_[uL]"]):
             #Return empty data set
             if logger:
-                logger.warning("Skipping step to get normConc. Sample Annotation data frame is missing column %s" , ', '.join(["Raw_Data_File_Name","Sample_Amount","Sample_Amount_Unit","ISTD_Mixture_Volume_[uL]"]) )
+                logger.warning("Skipping step to get normConc. Sample Annotation data frame is missing column %s" , ', '.join(["Raw_Data_File_Name","Sample_Name","Sample_Amount","Sample_Amount_Unit","ISTD_Mixture_Volume_[uL]"]) )
             if ingui:
-                print("Skipping step to get normConc. Sample Annotation data frame is missing column " , ', '.join(["Raw_Data_File_Name","Sample_Amount","Sample_Amount_Unit","ISTD_Mixture_Volume_[uL]"]),flush=True)
+                print("Skipping step to get normConc. Sample Annotation data frame is missing column " , ', '.join(["Raw_Data_File_Name","Sample_Name","Sample_Amount","Sample_Amount_Unit","ISTD_Mixture_Volume_[uL]"]),flush=True)
             return [Conc_df,Conc_df,Conc_df]
 
-        ##We cannot accept duplicated Raw_Data_File_path
-        #if(len(Sample_Annot_df.Raw_Data_File_Name.unique()) > 1):
-        #    #Return empty data set
-        #    if logger:
-        #        logger.error('Skipping step to get normConc. Sample Annotation data frame has more than one Raw_Data_File_Name.')
-        #    if ingui:
-        #        print('Skipping step to get normConc. Sample Annotation data frame has more than one Raw_Data_File_Name.' ,flush=True)
-        #    for things in Sample_Annot_df.Raw_Data_File_Name.unique():
-        #        if logger:
-        #            logger.warning('/"%s/"',things)
-        #        if ingui:
-        #            print('\"' + things + '\"',flush=True)
-        #    return [Conc_df,Conc_df,Conc_df]
+        #We cannot accept duplicated Raw_Data_File_path
+        #By right Raw_Data_File_Name should be uniquely one value since it has been filtered in ISTD_Operations.read_Sample_Annot
+        if(len(Sample_Annot_df.Raw_Data_File_Name.unique()) > 1):
+            #Return empty data set
+            if logger:
+                logger.error('Skipping step to get normConc. Sample Annotation data frame has more than one Raw_Data_File_Name.')
+            if ingui:
+                print('Skipping step to get normConc. Sample Annotation data frame has more than one Raw_Data_File_Name.' ,flush=True)
+            for things in Sample_Annot_df.Raw_Data_File_Name.unique():
+                if logger:
+                    logger.warning('/"%s/"',things)
+                if ingui:
+                    print('\"' + things + '\"',flush=True)
+            return [Conc_df,Conc_df,Conc_df]
+
+        #We cannot accept duplicated Raw_Data_File_Name and Sample Name
+        #By right Raw_Data_File_Name should be uniquely one value since it has been filtered in ISTD_Operations.read_Sample_Annot
+        if(len(Sample_Annot_df[["Raw_Data_File_Name","Sample_Name"]][Sample_Annot_df[["Raw_Data_File_Name","Sample_Name"]].duplicated(keep=False)]) > 0):
+            #Return empty data set
+            if logger:
+                logger.warning('Skipping step to get normConc. Sample Annotation data frame has non-unique Sample_Name.')
+                logger.warning('\n{}'.format( Sample_Annot_df[["Raw_Data_File_Name","Sample_Name"]][Sample_Annot_df[["Raw_Data_File_Name","Sample_Name"]].duplicated(keep=False)] ) )
+            if ingui:
+                print('Skipping step to get normConc. Sample Annotation data frame has non-unique Sample_Name.' ,flush=True)
+                print(Sample_Annot_df[["Raw_Data_File_Name","Sample_Name"]][Sample_Annot_df[["Raw_Data_File_Name","Sample_Name"]].duplicated(keep=False)], flush =True)
+            return [Conc_df,Conc_df,Conc_df]
 
         ##We cannot accept more than one Sample_Amount_Unit
         #if(len(Sample_Annot_df.Sample_Amount_Unit.unique()) > 1):
@@ -471,7 +484,9 @@ class ISTD_Operations():
         Sample_Annot_df["ISTD_to_Sample_Amount_Ratio"] = Sample_Annot_df["ISTD_Mixture_Volume_[uL]"].astype('float64') / Sample_Annot_df["Sample_Amount"].astype('float64')
         #Sample_Annot_df["ISTD_to_Sample_Amount_Ratio"] = Sample_Annot_df["ISTD_to_Sample_Amount_Ratio"].replace([np.inf, -np.inf], np.nan)
 
+        #Filter the Transition_Name_df to get the Sample_Name column
         merged_df = Transition_Name_df.loc[:, Transition_Name_df.columns == 'Sample_Name']
+        #Merge it with the Sample_Annot_df so that the order of the Sample_name follows Transition_Name_df
         merged_df = pd.merge(merged_df, Sample_Annot_df.loc[:, ["Sample_Name","ISTD_to_Sample_Amount_Ratio"]], on="Sample_Name")
 
         ISTD_Samp_Ratio_df = pd.DataFrame(index=Transition_Name_df.index, columns=Transition_Name_df.columns,dtype='float64')

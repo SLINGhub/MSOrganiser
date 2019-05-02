@@ -83,6 +83,18 @@ def get_Parameters_df(stored_args,MS_FilePath):
         for things in stored_args['Output_Options']:
             Parameter_list.append(("Output_Options",things))
 
+    if stored_args['Long_Table'] is not None:
+        Parameter_list.append(("Long_Table",stored_args['Long_Table']))
+
+    if stored_args['Merge'] is not None:
+        Parameter_list.append(("Merge",stored_args['Merge']))
+
+    if stored_args['Long_Table_Annot'] is not None:
+        Parameter_list.append(("Long_Table_Annot",stored_args['Long_Table_Annot']))
+
+    if stored_args['Transpose_Results'] is not None:
+        Parameter_list.append(("Transpose_Results",stored_args['Transpose_Results']))
+
     Parameters_df = pd.DataFrame(Parameter_list,columns=['Parameters', 'Value'])
     return Parameters_df
 
@@ -97,6 +109,11 @@ if __name__ == '__main__':
     logger.info("Starting the job.")
     print("Starting the job.",flush=True)
 
+    #Find the number of input files
+    input_files_amount = len(stored_args['MS_Files'].split(';'))
+    merged_df_list = []
+    merged_df_sheet_name = []
+
     #We do this for every mass hunter file output
     #MS_Files is not a long string of paths separated by ;, we split them into a list
     for MS_FilePath in stored_args['MS_Files'].split(';'):
@@ -105,6 +122,10 @@ if __name__ == '__main__':
         logger.info("Working on " + MS_FilePath)
 
         MyData = MS_Analysis(MS_FilePath, stored_args['MS_FileType'], stored_args['Annot_File'],logger, ingui=True, longtable = stored_args['Long_Table'], longtable_annot = stored_args['Long_Table_Annot'])
+
+        #Initialise a list of df and sheet name
+        one_file_df_list = []
+        one_file_df_sheet_name = []
 
         #Initiate the pdf report file
         PDFReport = MSDataReport_PDF(stored_args['Output_Directory'], MS_FilePath, logger, ingui=True)
@@ -115,11 +136,12 @@ if __name__ == '__main__':
             result_name = "Results"
 
         #Set up the file writing configuration for Excel, or csv ...
-        if stored_args['Output_Format'] == "Excel" :
-            DfOutput = MSDataOutput_Excel(stored_args['Output_Directory'], MS_FilePath, result_name = result_name ,logger=logger, ingui=True)
-        elif stored_args['Output_Format'] == "csv" :
-            DfOutput = MSDataOutput_csv(stored_args['Output_Directory'], MS_FilePath, result_name = result_name ,logger=logger, ingui=True)
-        DfOutput.start_writer()
+        if not stored_args['Merge']:
+            if stored_args['Output_Format'] == "Excel" :
+                DfOutput = MSDataOutput_Excel(stored_args['Output_Directory'], MS_FilePath, result_name = result_name ,logger=logger, ingui=True)
+            elif stored_args['Output_Format'] == "csv" :
+                DfOutput = MSDataOutput_csv(stored_args['Output_Directory'], MS_FilePath, result_name = result_name ,logger=logger, ingui=True)
+            DfOutput.start_writer()
 
         #Generate the parameters report
         Parameters_df = get_Parameters_df(stored_args,MS_FilePath)
@@ -132,9 +154,18 @@ if __name__ == '__main__':
 
                 #Output the normalised area results
                 if stored_args['Testing']:
-                    DfOutput.df_to_file("ISTD_Area",ISTD_Area,transpose=stored_args['Transpose_Results'])
-                DfOutput.df_to_file("Transition_Name_Annot",ISTD_map_df)
-                DfOutput.df_to_file("normArea_by_ISTD",norm_Area_df,transpose=stored_args['Transpose_Results'])
+                    if stored_args['Merge']:
+                        one_file_df_list.extend([ISTD_Area])
+                        one_file_df_sheet_name.extend(["ISTD_Area"])
+                    else:
+                        DfOutput.df_to_file("ISTD_Area",ISTD_Area,transpose=stored_args['Transpose_Results'])
+
+                if stored_args['Merge']:
+                    one_file_df_list.extend([ISTD_map_df,norm_Area_df])
+                    one_file_df_sheet_name.extend(["Transition_Name_Annot","normArea_by_ISTD"])
+                else:
+                    DfOutput.df_to_file("Transition_Name_Annot",ISTD_map_df)
+                    DfOutput.df_to_file("normArea_by_ISTD",norm_Area_df,transpose=stored_args['Transpose_Results'])
                     
                 #Generate the ISTD normalisation report
                 PDFReport.create_ISTD_report(ISTD_Report)
@@ -144,37 +175,98 @@ if __name__ == '__main__':
                 [norm_Conc_df,ISTD_Conc_df,ISTD_Samp_Ratio_df,Sample_Annot_df] = MyData.get_Analyte_Concentration(column_name,stored_args['Annot_File'])
 
                 if stored_args['Testing']:
-                    DfOutput.df_to_file("ISTD_Conc",ISTD_Conc_df,transpose=stored_args['Transpose_Results'])
-                    DfOutput.df_to_file("ISTD_to_Samp_Vol_Ratio",ISTD_Samp_Ratio_df,transpose=stored_args['Transpose_Results'])
-                DfOutput.df_to_file("Sample_Annot",Sample_Annot_df)
-                DfOutput.df_to_file("normConc_by_ISTD",norm_Conc_df,transpose=stored_args['Transpose_Results'])
+                    if stored_args['Merge']:
+                        one_file_df_list.extend([ISTD_Conc_df,ISTD_Samp_Ratio_df])
+                        one_file_df_sheet_name.extend(["ISTD_Conc","ISTD_to_Samp_Vol_Ratio"])
+                    else:
+                        DfOutput.df_to_file("ISTD_Conc",ISTD_Conc_df,transpose=stored_args['Transpose_Results'])
+                        DfOutput.df_to_file("ISTD_to_Samp_Vol_Ratio",ISTD_Samp_Ratio_df,transpose=stored_args['Transpose_Results'])
+
+                if stored_args['Merge']:
+                    one_file_df_list.extend([Sample_Annot_df,norm_Conc_df])
+                    one_file_df_sheet_name.extend(["Sample_Annot","normConc_by_ISTD"])
+                else:
+                    DfOutput.df_to_file("Sample_Annot",Sample_Annot_df)
+                    DfOutput.df_to_file("normConc_by_ISTD",norm_Conc_df,transpose=stored_args['Transpose_Results'])
 
             else:
                 #We extract the data directly from the file and output accordingly
                 Output_df = MyData.get_from_Input_Data(column_name)
-                DfOutput.df_to_file(column_name,Output_df,transpose=stored_args['Transpose_Results'])
+
+                if stored_args['Merge']:
+                    one_file_df_list.append(Output_df)
+                    one_file_df_sheet_name.append(column_name)
+                else:
+                    DfOutput.df_to_file(column_name,Output_df,transpose=stored_args['Transpose_Results'])
 
         #End the writing configuration for Excel, ...
-        if stored_args['Output_Format'] == "Excel" :
-            DfOutput.end_writer()
+        if stored_args['Output_Format'] == "Excel":
+            if not stored_args['Merge']:
+                DfOutput.end_writer()
 
         #Output the report to a pdf file
         PDFReport.output_to_PDF()
-                 
+
         #Output the LongTable Data Table in another csv or excel sheet
+        if stored_args['Long_Table']:
+            Long_Table_df = MyData.get_Long_Table()
+            if stored_args['Merge']:
+                one_file_df_list.append(Long_Table_df)
+                one_file_df_sheet_name.append("Long_Table")
+            else:
+                #Set up the file writing configuration for Excel, or csv ...
+                if stored_args['Output_Format'] == "Excel" :
+                    DfLongOutput = MSDataOutput_Excel(stored_args['Output_Directory'], MS_FilePath, result_name = "LongTable" ,logger=logger, ingui=True)
+                elif stored_args['Output_Format'] == "csv" :
+                    DfLongOutput = MSDataOutput_csv(stored_args['Output_Directory'], MS_FilePath, result_name = "LongTable" ,logger=logger, ingui=True)
+                DfLongOutput.start_writer()
+                DfLongOutput.df_to_file("Long_Table",Long_Table_df)
+                if stored_args['Output_Format'] == "Excel" :
+                    DfLongOutput.end_writer()
+
+        if stored_args['Merge']:
+            if len(merged_df_list) == 0:
+                merged_df_list = one_file_df_list
+                merged_df_sheet_name = one_file_df_sheet_name
+            else:
+                for i in range(len(one_file_df_list)):
+                    merged_df_list[i] = pd.concat([merged_df_list[i], one_file_df_list[i]], ignore_index=True)
+
+    #Merge data when this option is choosen
+    if stored_args['Merge']:
+
+        logger.info("Creating merged file.")
+        print("Creating merged file.",flush=True)
+
+        if stored_args['Transpose_Results']:
+            result_name = "TransposeResults"
+        else:
+            result_name = "Results"
+        #Set up the file writing configuration for Excel, or csv ...
+        if stored_args['Output_Format'] == "Excel" :
+            DfMergeOutput = MSDataOutput_Excel(stored_args['Output_Directory'], "Merged", result_name ,logger=logger, ingui=True)
+        elif stored_args['Output_Format'] == "csv" :
+            DfMergeOutput = MSDataOutput_csv(stored_args['Output_Directory'], "Merged", result_name ,logger=logger, ingui=True)
+        DfMergeOutput.start_writer()
+        for i in range(len(merged_df_list)):
+            if merged_df_sheet_name[i] != "Long_Table":
+                DfMergeOutput.df_to_file(merged_df_sheet_name[i],merged_df_list[i])
+        if stored_args['Output_Format'] == "Excel" :
+            DfMergeOutput.end_writer()
+
         if stored_args['Long_Table']:
             #Set up the file writing configuration for Excel, or csv ...
             if stored_args['Output_Format'] == "Excel" :
-                DfLongOutput = MSDataOutput_Excel(stored_args['Output_Directory'], MS_FilePath, result_name = "LongTable" ,logger=logger, ingui=True)
+                DfMergeOutput = MSDataOutput_Excel(stored_args['Output_Directory'], "Merged", result_name = "LongTable" ,logger=logger, ingui=True)
             elif stored_args['Output_Format'] == "csv" :
-                DfLongOutput = MSDataOutput_csv(stored_args['Output_Directory'], MS_FilePath, result_name = "LongTable" ,logger=logger, ingui=True)
-            DfLongOutput.start_writer()
-            DfLongOutput.df_to_file("Long_Table",MyData.get_Long_Table())
-            if stored_args['Output_Format'] == "Excel" :
-                DfLongOutput.end_writer()
+                DfMergeOutput = MSDataOutput_csv(stored_args['Output_Directory'], "Merged", result_name = "LongTable" ,logger=logger, ingui=True)
+            DfMergeOutput.start_writer()
+            Long_Table_index = merged_df_sheet_name.index("Long_Table")
+            DfMergeOutput.df_to_file(merged_df_sheet_name[Long_Table_index],merged_df_list[Long_Table_index])
+        if stored_args['Output_Format'] == "Excel" :
+            DfMergeOutput.end_writer()
 
-        #Output the report to a pdf file
-        PDFReport.output_to_PDF()
+
 
     #End log on a job
     logger.info("Job is finished.")

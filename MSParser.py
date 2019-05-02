@@ -7,8 +7,9 @@ import sys
 #This needs to be be right at the top with parse_MSOrganiser_args
 @Gooey(program_name='MS Data Organiser',
        program_description='Create summary tables from MassHunter csv files',
-       advanced=True, 
-       default_size=(610,710))
+       advanced=True,
+       #tabbed_groups=True,
+       default_size=(600,650))
 def parse_MSOrganiser_args(args_json_file_path=""):
     """Function to start the Gooey Interface, record the stored arguments and write them to a json file
     
@@ -54,6 +55,12 @@ def parse_MSOrganiser_args(args_json_file_path=""):
 
     #Store the values of the arguments so we have them next time we run
     _save_args_to_json(args_file,stored_args)
+
+    #Convert the string in Transpose Results to boolean
+    if stored_args['Merge'] == 'True':
+        stored_args['Merge'] = True
+    else:
+        stored_args['Merge'] = False
 
     #Convert the string in Transpose Results to boolean
     if stored_args['Transpose_Results'] == 'True':
@@ -120,6 +127,11 @@ def _create_Gooey_Parser(stored_args):
     else:
         Output_Format = stored_args.get('Output_Format')
 
+    if not stored_args.get('Merge'):
+        Merge = 'False'
+    else:
+        Merge = stored_args.get('Merge')
+
     if not stored_args.get('Transpose_Results'):
         Transpose_Results = 'False'
     else:
@@ -136,9 +148,9 @@ def _create_Gooey_Parser(stored_args):
         Long_Table_Annot = stored_args.get('Long_Table_Annot')
 
     required_args = parser.add_argument_group("Required Input", gooey_options={'columns': 1 } )
-    analysis_args = parser.add_argument_group("For Normalisation", gooey_options={'columns': 1 } )
+    analysis_args = parser.add_argument_group("Data Extraction", gooey_options={'columns': 1 } )
     output_args = parser.add_argument_group("Output Settings", gooey_options={ 'columns': 2 } )
-    optional_args = parser.add_argument_group(gooey_options={'show_border': True, 'columns': 2 } )
+    optional_args = parser.add_argument_group("Optional Settings", gooey_options={'columns': 1 } )
 
     #Required Arguments 
     #required_args.add_argument('--MS_Files',action='store',nargs="+",help="Input the MS raw files.\nData File is a required column for MassHunter\nSample Name and Component Name are required columns for Sciex", 
@@ -154,16 +166,18 @@ def _create_Gooey_Parser(stored_args):
                                help='Input the MS raw file type', default=MS_FileType)
     required_args.add_argument('--Output_Directory',action='store', help="Output directory to save summary report.", 
                                widget="DirChooser", default=stored_args.get('Output_Directory'))
-    required_args.add_argument('--Output_Options', choices=['Area','normArea by ISTD','normConc by ISTD','RT','FWHM','S/N','Symmetry','Precursor Ion','Product Ion'], nargs="+", help='Select specific information to output', widget="Listbox", default=stored_args.get('Output_Options'))
+    #required_args.add_argument('--Output_Options', choices=['Area','normArea by ISTD','normConc by ISTD','RT','FWHM','S/N','Symmetry','Precursor Ion','Product Ion'], nargs="+", help='Select specific information to output', widget="Listbox", default=stored_args.get('Output_Options'))
 
     #Analysis Arguments
+    analysis_args.add_argument('--Output_Options', choices=['Area','normArea by ISTD','normConc by ISTD','RT','FWHM','S/N','Symmetry','Precursor Ion','Product Ion'], nargs="+", help='Select specific information to output', widget="Listbox", default=stored_args.get('Output_Options'))
     analysis_args.add_argument('--Annot_File', action='store', help='Input the annotation excel macro file required for normalisation and concentration calculation', widget="FileChooser",default=stored_args.get('Annot_File'))
 
     #Output Arguments 
     output_args.add_argument('--Output_Format', choices=['Excel','csv'], help='Select specific file type to output\ncsv form will give multiple sheets', default=Output_Format)
-    output_args.add_argument('--Transpose_Results', choices=['True','False'], help='Set this option to True to let the samples\nto be the columns instead of the Transition_Name',default=Transpose_Results)
+    output_args.add_argument('--Merge', choices=['True','False'], help='Set this option to True to merge multiple\ninput files into one output file', default=Merge)
     output_args.add_argument('--Long_Table', choices=['True','False'], help='Set this option to True to output the data in\nLong Table as well',default=Long_Table)
     output_args.add_argument('--Long_Table_Annot', choices=['True','False'], help='Set this option to True to add ISTD and Sample Type\nfrom Annot_File to the Long Table output',default=Long_Table_Annot)
+    output_args.add_argument('--Transpose_Results', choices=['True','False'], help='Set this option to True to let the samples to be the columns instead of the Transition_Name\nApplicable when Long_Table is set to False',default=Transpose_Results)
     
     #Optional Arguments 
     optional_args.add_argument('--Testing', action='store_true', help='Testing mode will generate more output tables.')

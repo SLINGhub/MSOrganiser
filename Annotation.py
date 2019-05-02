@@ -304,7 +304,8 @@ class MS_Template():
 
         #We take the Sample Annotation data that can be found in the MS_FilePathList
         #Else we just take all of them
-        if not MS_FilePathList:
+        print(MS_FilePathList)
+        if len(MS_FilePathList) > 0:
             Sample_Annot_df = Sample_Annot_df[Sample_Annot_df.Raw_Data_File_Name.isin(MS_FilePathList)]
 
         #Remove whitespaces in column names
