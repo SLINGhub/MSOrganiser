@@ -9,7 +9,7 @@ import sys
        program_description='Create summary tables from MassHunter csv files',
        advanced=True,
        #tabbed_groups=True,
-       default_size=(600,650))
+       default_size=(620,650))
 def parse_MSOrganiser_args(args_json_file_path=""):
     """Function to start the Gooey Interface, record the stored arguments and write them to a json file
     
@@ -53,14 +53,13 @@ def parse_MSOrganiser_args(args_json_file_path=""):
         print("Please key in at least one result to output",flush=True)
         sys.exit(-1)
 
+    #Check if Concatenate is selected
+    if not stored_args['Concatenate']:
+        print("Please key in at least one option",flush=True)
+        sys.exit(-1)
+
     #Store the values of the arguments so we have them next time we run
     _save_args_to_json(args_file,stored_args)
-
-    #Convert the string in Transpose Results to boolean
-    if stored_args['Merge'] == 'True':
-        stored_args['Merge'] = True
-    else:
-        stored_args['Merge'] = False
 
     #Convert the string in Transpose Results to boolean
     if stored_args['Transpose_Results'] == 'True':
@@ -127,10 +126,10 @@ def _create_Gooey_Parser(stored_args):
     else:
         Output_Format = stored_args.get('Output_Format')
 
-    if not stored_args.get('Merge'):
-        Merge = 'False'
+    if not stored_args.get('Concatenate'):
+        Concatenate = 'No Concatenate'
     else:
-        Merge = stored_args.get('Merge')
+        Concatenate = stored_args.get('Concatenate')
 
     if not stored_args.get('Transpose_Results'):
         Transpose_Results = 'False'
@@ -174,10 +173,10 @@ def _create_Gooey_Parser(stored_args):
 
     #Output Arguments 
     output_args.add_argument('--Output_Format', choices=['Excel','csv'], help='Select specific file type to output\ncsv form will give multiple sheets', default=Output_Format)
-    output_args.add_argument('--Merge', choices=['True','False'], help='Set this option to True to merge multiple\ninput files into one output file', default=Merge)
+    output_args.add_argument('--Concatenate', choices=['No Concatenate','Concatenate along Sample Name (rows)','Concatenate along Transition Name (columns)'], help='Concatenate multiple input files into one output file\nThis is done before transposing', default=Concatenate)
     output_args.add_argument('--Long_Table', choices=['True','False'], help='Set this option to True to output the data in\nLong Table as well',default=Long_Table)
     output_args.add_argument('--Long_Table_Annot', choices=['True','False'], help='Set this option to True to add ISTD and Sample Type\nfrom Annot_File to the Long Table output',default=Long_Table_Annot)
-    output_args.add_argument('--Transpose_Results', choices=['True','False'], help='Set this option to True to let the samples to be the columns instead of the Transition_Name\nApplicable when Long_Table is set to False',default=Transpose_Results)
+    output_args.add_argument('--Transpose_Results', choices=['True','False'], help='Set this option to True to let the samples to be the columns instead of the Transition_Name',default=Transpose_Results)
     
     #Optional Arguments 
     optional_args.add_argument('--Testing', action='store_true', help='Testing mode will generate more output tables.')

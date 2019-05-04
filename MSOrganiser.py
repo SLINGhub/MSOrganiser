@@ -86,8 +86,8 @@ def get_Parameters_df(stored_args,MS_FilePath):
     if stored_args['Long_Table'] is not None:
         Parameter_list.append(("Long_Table",stored_args['Long_Table']))
 
-    if stored_args['Merge'] is not None:
-        Parameter_list.append(("Merge",stored_args['Merge']))
+    if stored_args['Concatenate']:
+        Parameter_list.append(("Concatenate",stored_args['Concatenate']))
 
     if stored_args['Long_Table_Annot'] is not None:
         Parameter_list.append(("Long_Table_Annot",stored_args['Long_Table_Annot']))
@@ -111,8 +111,8 @@ if __name__ == '__main__':
 
     #Find the number of input files
     input_files_amount = len(stored_args['MS_Files'].split(';'))
-    merged_df_list = []
-    merged_df_sheet_name = []
+    concatenate_df_list = []
+    concatenate_df_sheet_name = []
 
     #We do this for every mass hunter file output
     #MS_Files is not a long string of paths separated by ;, we split them into a list
@@ -136,7 +136,7 @@ if __name__ == '__main__':
             result_name = "Results"
 
         #Set up the file writing configuration for Excel, or csv ...
-        if not stored_args['Merge']:
+        if stored_args['Concatenate']=="No Concatenate":
             if stored_args['Output_Format'] == "Excel" :
                 DfOutput = MSDataOutput_Excel(stored_args['Output_Directory'], MS_FilePath, result_name = result_name ,logger=logger, ingui=True)
             elif stored_args['Output_Format'] == "csv" :
@@ -154,13 +154,13 @@ if __name__ == '__main__':
 
                 #Output the normalised area results
                 if stored_args['Testing']:
-                    if stored_args['Merge']:
+                    if stored_args['Concatenate']!="No Concatenate":
                         one_file_df_list.extend([ISTD_Area])
                         one_file_df_sheet_name.extend(["ISTD_Area"])
                     else:
                         DfOutput.df_to_file("ISTD_Area",ISTD_Area,transpose=stored_args['Transpose_Results'])
 
-                if stored_args['Merge']:
+                if stored_args['Concatenate']!="No Concatenate":
                     one_file_df_list.extend([ISTD_map_df,norm_Area_df])
                     one_file_df_sheet_name.extend(["Transition_Name_Annot","normArea_by_ISTD"])
                 else:
@@ -175,14 +175,14 @@ if __name__ == '__main__':
                 [norm_Conc_df,ISTD_Conc_df,ISTD_Samp_Ratio_df,Sample_Annot_df] = MyData.get_Analyte_Concentration(column_name,stored_args['Annot_File'])
 
                 if stored_args['Testing']:
-                    if stored_args['Merge']:
+                    if stored_args['Concatenate']!="No Concatenate":
                         one_file_df_list.extend([ISTD_Conc_df,ISTD_Samp_Ratio_df])
                         one_file_df_sheet_name.extend(["ISTD_Conc","ISTD_to_Samp_Vol_Ratio"])
                     else:
                         DfOutput.df_to_file("ISTD_Conc",ISTD_Conc_df,transpose=stored_args['Transpose_Results'])
                         DfOutput.df_to_file("ISTD_to_Samp_Vol_Ratio",ISTD_Samp_Ratio_df,transpose=stored_args['Transpose_Results'])
 
-                if stored_args['Merge']:
+                if stored_args['Concatenate']!="No Concatenate":
                     one_file_df_list.extend([Sample_Annot_df,norm_Conc_df])
                     one_file_df_sheet_name.extend(["Sample_Annot","normConc_by_ISTD"])
                 else:
@@ -192,8 +192,7 @@ if __name__ == '__main__':
             else:
                 #We extract the data directly from the file and output accordingly
                 Output_df = MyData.get_from_Input_Data(column_name)
-
-                if stored_args['Merge']:
+                if stored_args['Concatenate']!="No Concatenate":
                     one_file_df_list.append(Output_df)
                     one_file_df_sheet_name.append(column_name)
                 else:
@@ -201,7 +200,7 @@ if __name__ == '__main__':
 
         #End the writing configuration for Excel, ...
         if stored_args['Output_Format'] == "Excel":
-            if not stored_args['Merge']:
+            if stored_args['Concatenate']=="No Concatenate":
                 DfOutput.end_writer()
 
         #Output the report to a pdf file
@@ -210,7 +209,7 @@ if __name__ == '__main__':
         #Output the LongTable Data Table in another csv or excel sheet
         if stored_args['Long_Table']:
             Long_Table_df = MyData.get_Long_Table()
-            if stored_args['Merge']:
+            if stored_args['Concatenate']!="No Concatenate":
                 one_file_df_list.append(Long_Table_df)
                 one_file_df_sheet_name.append("Long_Table")
             else:
@@ -224,19 +223,25 @@ if __name__ == '__main__':
                 if stored_args['Output_Format'] == "Excel" :
                     DfLongOutput.end_writer()
 
-        if stored_args['Merge']:
-            if len(merged_df_list) == 0:
-                merged_df_list = one_file_df_list
-                merged_df_sheet_name = one_file_df_sheet_name
+        if stored_args['Concatenate']!="No Concatenate":
+            if len(concatenate_df_list) == 0:
+                concatenate_df_list = one_file_df_list
+                concatenate_df_sheet_name = one_file_df_sheet_name
             else:
                 for i in range(len(one_file_df_list)):
-                    merged_df_list[i] = pd.concat([merged_df_list[i], one_file_df_list[i]], ignore_index=True)
+                    if stored_args['Concatenate']=="Concatenate along Sample Name":
+                        concatenate_df_list[i] = pd.concat([concatenate_df_list[i], one_file_df_list[i]], ignore_index=True, sort=False, axis = 0)
+                    elif stored_args['Concatenate']=="Concatenate along Transition Name":
+                        if one_file_df_sheet_name[i] in ["Transition_Name_Annot","Sample_Annot","Long_Table"]:
+                            concatenate_df_list[i] = pd.concat([concatenate_df_list[i], one_file_df_list[i]], ignore_index=True, sort=False, axis = 0)
+                        else:
+                            concatenate_df_list[i] = pd.concat([concatenate_df_list[i], one_file_df_list[i]], ignore_index=False, sort=False, axis = 1)
 
-    #Merge data when this option is choosen
-    if stored_args['Merge']:
+    #Concatenate data when this option is choosen
+    if stored_args['Concatenate']!="No Concatenate":
 
-        logger.info("Creating merged file.")
-        print("Creating merged file.",flush=True)
+        logger.info("Creating concatenated file.")
+        print("Creating concatenated file.",flush=True)
 
         if stored_args['Transpose_Results']:
             result_name = "TransposeResults"
@@ -244,27 +249,27 @@ if __name__ == '__main__':
             result_name = "Results"
         #Set up the file writing configuration for Excel, or csv ...
         if stored_args['Output_Format'] == "Excel" :
-            DfMergeOutput = MSDataOutput_Excel(stored_args['Output_Directory'], "Merged", result_name ,logger=logger, ingui=True)
+            DfConcatenateOutput = MSDataOutput_Excel(stored_args['Output_Directory'], "Concatenated", result_name ,logger=logger, ingui=True)
         elif stored_args['Output_Format'] == "csv" :
-            DfMergeOutput = MSDataOutput_csv(stored_args['Output_Directory'], "Merged", result_name ,logger=logger, ingui=True)
-        DfMergeOutput.start_writer()
-        for i in range(len(merged_df_list)):
-            if merged_df_sheet_name[i] != "Long_Table":
-                DfMergeOutput.df_to_file(merged_df_sheet_name[i],merged_df_list[i])
+            DfConcatenateOutput = MSDataOutput_csv(stored_args['Output_Directory'], "Concatenated", result_name ,logger=logger, ingui=True)
+        DfConcatenateOutput.start_writer()
+        for i in range(len(concatenate_df_list)):
+            if concatenate_df_sheet_name[i] != "Long_Table":
+                DfConcatenateOutput.df_to_file(concatenate_df_sheet_name[i],concatenate_df_list[i])
         if stored_args['Output_Format'] == "Excel" :
-            DfMergeOutput.end_writer()
+            DfConcatenateOutput.end_writer()
 
         if stored_args['Long_Table']:
             #Set up the file writing configuration for Excel, or csv ...
             if stored_args['Output_Format'] == "Excel" :
-                DfMergeOutput = MSDataOutput_Excel(stored_args['Output_Directory'], "Merged", result_name = "LongTable" ,logger=logger, ingui=True)
+                DfConcatenateOutput = MSDataOutput_Excel(stored_args['Output_Directory'], "Concatenated", result_name = "LongTable" ,logger=logger, ingui=True)
             elif stored_args['Output_Format'] == "csv" :
-                DfMergeOutput = MSDataOutput_csv(stored_args['Output_Directory'], "Merged", result_name = "LongTable" ,logger=logger, ingui=True)
-            DfMergeOutput.start_writer()
-            Long_Table_index = merged_df_sheet_name.index("Long_Table")
-            DfMergeOutput.df_to_file(merged_df_sheet_name[Long_Table_index],merged_df_list[Long_Table_index])
+                DfConcatenateOutput = MSDataOutput_csv(stored_args['Output_Directory'], "Concatenated", result_name = "LongTable" ,logger=logger, ingui=True)
+            DfConcatenateOutput.start_writer()
+            Long_Table_index = concatenate_df_sheet_name.index("Long_Table")
+            DfConcatenateOutput.df_to_file(concatenate_df_sheet_name[Long_Table_index],concatenate_df_list[Long_Table_index])
         if stored_args['Output_Format'] == "Excel" :
-            DfMergeOutput.end_writer()
+            DfConcatenateOutput.end_writer()
 
 
 
