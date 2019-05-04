@@ -215,9 +215,9 @@ if __name__ == '__main__':
             else:
                 #Set up the file writing configuration for Excel, or csv ...
                 if stored_args['Output_Format'] == "Excel" :
-                    DfLongOutput = MSDataOutput_Excel(stored_args['Output_Directory'], MS_FilePath, result_name = "LongTable" ,logger=logger, ingui=True)
+                    DfLongOutput = MSDataOutput_Excel(stored_args['Output_Directory'], MS_FilePath, result_name = "Long_Table" ,logger=logger, ingui=True)
                 elif stored_args['Output_Format'] == "csv" :
-                    DfLongOutput = MSDataOutput_csv(stored_args['Output_Directory'], MS_FilePath, result_name = "LongTable" ,logger=logger, ingui=True)
+                    DfLongOutput = MSDataOutput_csv(stored_args['Output_Directory'], MS_FilePath, result_name = "" ,logger=logger, ingui=True)
                 DfLongOutput.start_writer()
                 DfLongOutput.df_to_file("Long_Table",Long_Table_df)
                 if stored_args['Output_Format'] == "Excel" :
@@ -229,9 +229,9 @@ if __name__ == '__main__':
                 concatenate_df_sheet_name = one_file_df_sheet_name
             else:
                 for i in range(len(one_file_df_list)):
-                    if stored_args['Concatenate']=="Concatenate along Sample Name":
+                    if stored_args['Concatenate']=="Concatenate along Sample Name (rows)":
                         concatenate_df_list[i] = pd.concat([concatenate_df_list[i], one_file_df_list[i]], ignore_index=True, sort=False, axis = 0)
-                    elif stored_args['Concatenate']=="Concatenate along Transition Name":
+                    elif stored_args['Concatenate']=="Concatenate along Transition Name (columns)":
                         if one_file_df_sheet_name[i] in ["Transition_Name_Annot","Sample_Annot","Long_Table"]:
                             concatenate_df_list[i] = pd.concat([concatenate_df_list[i], one_file_df_list[i]], ignore_index=True, sort=False, axis = 0)
                         else:
@@ -262,9 +262,9 @@ if __name__ == '__main__':
         if stored_args['Long_Table']:
             #Set up the file writing configuration for Excel, or csv ...
             if stored_args['Output_Format'] == "Excel" :
-                DfConcatenateOutput = MSDataOutput_Excel(stored_args['Output_Directory'], "Concatenated", result_name = "LongTable" ,logger=logger, ingui=True)
+                DfConcatenateOutput = MSDataOutput_Excel(stored_args['Output_Directory'], "Concatenated", result_name = "Long_Table" ,logger=logger, ingui=True)
             elif stored_args['Output_Format'] == "csv" :
-                DfConcatenateOutput = MSDataOutput_csv(stored_args['Output_Directory'], "Concatenated", result_name = "LongTable" ,logger=logger, ingui=True)
+                DfConcatenateOutput = MSDataOutput_csv(stored_args['Output_Directory'], "Concatenated", result_name = "" ,logger=logger, ingui=True)
             DfConcatenateOutput.start_writer()
             Long_Table_index = concatenate_df_sheet_name.index("Long_Table")
             DfConcatenateOutput.df_to_file(concatenate_df_sheet_name[Long_Table_index],concatenate_df_list[Long_Table_index])

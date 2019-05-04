@@ -148,9 +148,14 @@ class MSDataOutput_csv(MSDataOutput):
             return
 
         if(output_option in ['Sample_Annot', 'Transition_Name_Annot']) :
-            csv_filename = output_option + '.csv'
+            csv_filename = os.path.join(self.output_directory,output_option + '.csv')
         else:
-            csv_filename = self.writer + '_' + self.result_name + '_' + output_option + '.csv'
+            if self.result_name == "":
+                csv_filename = self.writer + '_' + output_option + '.csv'
+            else:
+                csv_filename = self.writer + '_' + self.result_name + '_' + output_option + '.csv'
+        print(output_option)
+        print(csv_filename)
 
         try:
             df.to_csv(csv_filename,sep=',',index=False)
