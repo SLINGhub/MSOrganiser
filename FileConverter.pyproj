@@ -13,6 +13,8 @@
     <Name>FileConverter</Name>
     <RootNamespace>FileConverter</RootNamespace>
     <InterpreterId>MSBuild|testenv|$(MSBuildProjectFullPath)</InterpreterId>
+    <SuppressConfigureTestFrameworkPrompt>true</SuppressConfigureTestFrameworkPrompt>
+    <SuppressPackageInstallationPrompt>True</SuppressPackageInstallationPrompt>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>true</DebugSymbols>
@@ -134,8 +136,8 @@
   <ItemGroup>
     <Interpreter Include="testenv\">
       <Id>testenv</Id>
-      <Version>3.6</Version>
-      <Description>testenv (Python 3.6 (64-bit))</Description>
+      <Version>3.7</Version>
+      <Description>testenv (Python 3.7 (64-bit))</Description>
       <InterpreterPath>Scripts\python.exe</InterpreterPath>
       <WindowsInterpreterPath>Scripts\pythonw.exe</WindowsInterpreterPath>
       <PathEnvironmentVariable>PYTHONPATH</PathEnvironmentVariable>

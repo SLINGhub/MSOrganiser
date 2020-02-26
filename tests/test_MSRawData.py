@@ -108,7 +108,7 @@ class Agilent_Test(unittest.TestCase):
             MSDataObject = MSDataOutput.transpose_MSdata(MSDataObject.get_table(table_name)).apply(pd.to_numeric, errors='ignore', downcast = 'float')
         else:
             MSDataObject = MSDataObject.get_table(table_name).apply(pd.to_numeric, errors='ignore', downcast = 'float')
-        pd.util.testing.assert_frame_equal(MSDataObject,ExcelWorkbook)
+        pd.testing.assert_frame_equal(MSDataObject,ExcelWorkbook)
 
     def __sheet_to_table(self,workbook,sheet_name):
         '''Convert an Excel sheet table into a pandas data frame.'''

@@ -77,7 +77,7 @@ class Agilent_Test(unittest.TestCase):
     def __compare_df(self,table_name,MSData_df,ExcelWorkbook):
         MSData_df = MSData_df.apply(pd.to_numeric, errors='ignore', downcast = 'float')
         ExcelWorkbook = self.__sheet_to_table(ExcelWorkbook,table_name).apply(pd.to_numeric, errors='ignore', downcast = 'float')
-        pd.util.testing.assert_frame_equal(MSData_df,ExcelWorkbook)
+        pd.testing.assert_frame_equal(MSData_df,ExcelWorkbook)
 
     def __sheet_to_table(self,workbook,sheet_name):
         ws = workbook[sheet_name]
