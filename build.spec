@@ -47,7 +47,7 @@ cairocffi_root = os.path.dirname(cairocffi.__file__)
 
 cairosvg_root = os.path.dirname(cairosvg.__file__)
 
-tinycss2_root = os.path.dirname(tinycss2.__file__)
+#tinycss2_root = os.path.dirname(tinycss2.__file__)
 
 cairo_toc = Tree(os.path.join(os.getcwd(),'cairo_dll'), prefix = 'cairo_dll' )
 extras_toc = Tree(os.path.join(os.getcwd(),'msreport'), prefix = 'msreport' )
