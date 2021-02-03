@@ -54,7 +54,7 @@ def start_logger(log_directory_path):
     logger.addHandler(fh)
     return logger
 
-def get_Parameters_df(stored_args,MS_FilePath):
+def get_Parameters_df(stored_args, MS_FilePath):
     """To set up a pandas dataframe storing the input parameters, This data frame will be converted to a PDF page
 
     Args:
@@ -98,6 +98,18 @@ def get_Parameters_df(stored_args,MS_FilePath):
     Parameters_df = pd.DataFrame(Parameter_list,columns=['Parameters', 'Value'])
     return Parameters_df
 
+def set_DfOutput_configuration(stored_args, MS_FilePath, result_name, logger, ingui = True):
+
+    if stored_args['Output_Format'] == "Excel" :
+        DfOutput = MSDataOutput_Excel(stored_args['Output_Directory'], MS_FilePath, result_name = result_name ,
+                                      logger = logger, ingui = ingui)
+    elif stored_args['Output_Format'] == "csv" :
+        DfOutput = MSDataOutput_csv(stored_args['Output_Directory'], MS_FilePath, result_name = result_name ,
+                                    logger = logger, ingui = ingui)
+
+    return DfOutput
+
+
 if __name__ == '__main__':
 
     #Read the parser
@@ -109,26 +121,38 @@ if __name__ == '__main__':
     logger.info("Starting the job.")
     print("Starting the job.",flush=True)
 
+    #In Gooey 1.0.8, there is no need to split stored_args['MS_Files'] by ";"
+    #As stored_args['MS_Files'] is a list
     #Find the number of input files
-    input_files_amount = len(stored_args['MS_Files'].split(';'))
+    input_files_amount = len(stored_args['MS_Files'])
     concatenate_df_list = []
     concatenate_df_sheet_name = []
 
     #We do this for every mass hunter file output
-    #MS_Files is not a long string of paths separated by ;, we split them into a list
-    for MS_FilePath in stored_args['MS_Files'].split(';'):
+    #MS_Files is no longer a long string of paths separated by ;, we split them into a list
+    for MS_FilePath in stored_args['MS_Files']:
 
         print("Working on " + MS_FilePath,flush=True)
         logger.info("Working on " + MS_FilePath)
 
-        MyData = MS_Analysis(MS_FilePath, stored_args['MS_FileType'], stored_args['Annot_File'],logger, ingui=True, longtable = stored_args['Long_Table'], longtable_annot = stored_args['Long_Table_Annot'])
-
-        #Initialise a list of df and sheet name
-        one_file_df_list = []
-        one_file_df_sheet_name = []
+        MyData = MS_Analysis(MS_FilePath = MS_FilePath, 
+                             MS_FileType = stored_args['MS_FileType'], 
+                             Annotation_FilePath = stored_args['Annot_File'],
+                             logger = logger, 
+                             ingui = True, 
+                             longtable = stored_args['Long_Table'], 
+                             longtable_annot = stored_args['Long_Table_Annot'])
 
         #Initiate the pdf report file
-        PDFReport = MSDataReport_PDF(stored_args['Output_Directory'], MS_FilePath, logger, ingui=True)
+        PDFReport = MSDataReport_PDF(output_directory = stored_args['Output_Directory'], 
+                                     input_file_path = MS_FilePath, 
+                                     logger = logger, 
+                                     ingui = True)
+
+        #Generate the parameters report
+        Parameters_df = get_Parameters_df(stored_args = stored_args,
+                                          MS_FilePath = MS_FilePath)
+        PDFReport.create_parameters_report(Parameters_df)
 
         if stored_args['Transpose_Results']:
             result_name = "TransposeResults"
@@ -137,22 +161,25 @@ if __name__ == '__main__':
 
         #Set up the file writing configuration for Excel, or csv ...
         if stored_args['Concatenate']=="No Concatenate":
-            if stored_args['Output_Format'] == "Excel" :
-                DfOutput = MSDataOutput_Excel(stored_args['Output_Directory'], MS_FilePath, result_name = result_name ,logger=logger, ingui=True)
-            elif stored_args['Output_Format'] == "csv" :
-                DfOutput = MSDataOutput_csv(stored_args['Output_Directory'], MS_FilePath, result_name = result_name ,logger=logger, ingui=True)
+
+            DfOutput = set_DfOutput_configuration(stored_args = stored_args, 
+                                                  MS_FilePath = MS_FilePath, 
+                                                  result_name = result_name, 
+                                                  logger = logger, ingui = True)
             DfOutput.start_writer()
 
-        #Generate the parameters report
-        Parameters_df = get_Parameters_df(stored_args,MS_FilePath)
-        PDFReport.create_parameters_report(Parameters_df)
 
+        #Initialise a list of df and sheet name
+        one_file_df_list = []
+        one_file_df_sheet_name = []
         for column_name in stored_args['Output_Options']:
             if column_name == 'normArea by ISTD':
                 #Perform normalisation using ISTD
                 [norm_Area_df,ISTD_Area,ISTD_map_df,ISTD_Report] = MyData.get_Normalised_Area(column_name,stored_args['Annot_File'])
 
                 #Output the normalised area results
+
+                #If testing, output the ISTD_Area results
                 if stored_args['Testing']:
                     if stored_args['Concatenate']!="No Concatenate":
                         one_file_df_list.extend([ISTD_Area])
@@ -160,6 +187,7 @@ if __name__ == '__main__':
                     else:
                         DfOutput.df_to_file("ISTD_Area",ISTD_Area,transpose=stored_args['Transpose_Results'])
 
+                #Output the normalised area and transition annotation results
                 if stored_args['Concatenate']!="No Concatenate":
                     one_file_df_list.extend([ISTD_map_df,norm_Area_df])
                     one_file_df_sheet_name.extend(["Transition_Name_Annot","normArea_by_ISTD"])
@@ -193,14 +221,15 @@ if __name__ == '__main__':
                 #We extract the data directly from the file and output accordingly
                 Output_df = MyData.get_from_Input_Data(column_name)
                 if stored_args['Concatenate']!="No Concatenate":
-                    one_file_df_list.append(Output_df)
-                    one_file_df_sheet_name.append(column_name)
+                    one_file_df_list.extend([Output_df])
+                    one_file_df_sheet_name.extend([column_name])
                 else:
                     DfOutput.df_to_file(column_name,Output_df,transpose=stored_args['Transpose_Results'])
 
         #End the writing configuration for Excel, ...
         if stored_args['Output_Format'] == "Excel":
             if stored_args['Concatenate']=="No Concatenate":
+                print("Here1",flush=True)
                 DfOutput.end_writer()
 
         #Output the report to a pdf file
@@ -210,66 +239,102 @@ if __name__ == '__main__':
         if stored_args['Long_Table']:
             Long_Table_df = MyData.get_Long_Table()
             if stored_args['Concatenate']!="No Concatenate":
-                one_file_df_list.append(Long_Table_df)
-                one_file_df_sheet_name.append("Long_Table")
+                one_file_df_list.extend([Long_Table_df])
+                one_file_df_sheet_name.extend(["Long_Table"])
             else:
                 #Set up the file writing configuration for Excel, or csv ...
                 if stored_args['Output_Format'] == "Excel" :
-                    DfLongOutput = MSDataOutput_Excel(stored_args['Output_Directory'], MS_FilePath, result_name = "Long_Table" ,logger=logger, ingui=True)
+                    DfLongOutput = MSDataOutput_Excel(stored_args['Output_Directory'], MS_FilePath, 
+                                                      result_name = "Long_Table" ,logger=logger, ingui=True)
                 elif stored_args['Output_Format'] == "csv" :
-                    DfLongOutput = MSDataOutput_csv(stored_args['Output_Directory'], MS_FilePath, result_name = "" ,logger=logger, ingui=True)
+                    DfLongOutput = MSDataOutput_csv(stored_args['Output_Directory'], MS_FilePath, 
+                                                    result_name = "" ,logger=logger, ingui=True)
                 DfLongOutput.start_writer()
                 DfLongOutput.df_to_file("Long_Table",Long_Table_df)
                 if stored_args['Output_Format'] == "Excel" :
+                    print("Here2",flush=True)
                     DfLongOutput.end_writer()
 
+        #Concatenate data when this option is chosen for a given file
         if stored_args['Concatenate']!="No Concatenate":
+            #When we have the first file
             if len(concatenate_df_list) == 0:
                 concatenate_df_list = one_file_df_list
                 concatenate_df_sheet_name = one_file_df_sheet_name
             else:
+                #When we have the second file onwards
                 for i in range(len(one_file_df_list)):
                     if stored_args['Concatenate']=="Concatenate along Sample Name (rows)":
-                        concatenate_df_list[i] = pd.concat([concatenate_df_list[i], one_file_df_list[i]], ignore_index=True, sort=False, axis = 0)
+                        #Concatenate all df except those indicated
+                        if not one_file_df_sheet_name[i] in ["Transition_Name_Annot"]:
+                            concatenate_df_list[i] = pd.concat([concatenate_df_list[i], one_file_df_list[i]], 
+                                                               ignore_index=True, 
+                                                               sort=False, 
+                                                               axis = 0)
                     elif stored_args['Concatenate']=="Concatenate along Transition Name (columns)":
+                        #Concantenate Row Wise
                         if one_file_df_sheet_name[i] in ["Transition_Name_Annot","Sample_Annot","Long_Table"]:
-                            concatenate_df_list[i] = pd.concat([concatenate_df_list[i], one_file_df_list[i]], ignore_index=True, sort=False, axis = 0)
+                            #Concatenate all df except those indicated
+                            if not one_file_df_sheet_name[i] in ["Transition_Name_Annot"]:
+                                concatenate_df_list[i] = pd.concat([concatenate_df_list[i], one_file_df_list[i]], 
+                                                                   ignore_index=True,
+                                                                   sort=False, 
+                                                                   axis = 0)
                         else:
-                            concatenate_df_list[i] = pd.concat([concatenate_df_list[i], one_file_df_list[i]], ignore_index=False, sort=False, axis = 1)
+                            #Concantenate Column Wise
+                            concatenate_df_list[i] = pd.concat([concatenate_df_list[i], one_file_df_list[i]], 
+                                                               ignore_index=False, 
+                                                               sort=False, 
+                                                               axis = 1)
 
-    #Concatenate data when this option is choosen
+
+
+    #Output concatenated data after going through all the files
     if stored_args['Concatenate']!="No Concatenate":
-
-        logger.info("Creating concatenated file.")
-        print("Creating concatenated file.",flush=True)
 
         if stored_args['Transpose_Results']:
             result_name = "TransposeResults"
         else:
             result_name = "Results"
+
+        logger.info("Outputting concatenated file.")
+        print("Creating concatenated file.",flush=True)
+
         #Set up the file writing configuration for Excel, or csv ...
         if stored_args['Output_Format'] == "Excel" :
-            DfConcatenateOutput = MSDataOutput_Excel(stored_args['Output_Directory'], "Concatenated", result_name ,logger=logger, ingui=True)
+            DfConcatenateOutput = MSDataOutput_Excel(stored_args['Output_Directory'], "Concatenated", 
+                                                     result_name ,logger=logger, ingui=True)
         elif stored_args['Output_Format'] == "csv" :
-            DfConcatenateOutput = MSDataOutput_csv(stored_args['Output_Directory'], "Concatenated", result_name ,logger=logger, ingui=True)
+            DfConcatenateOutput = MSDataOutput_csv(stored_args['Output_Directory'], "Concatenated",
+                                                  result_name ,logger=logger, ingui=True)
         DfConcatenateOutput.start_writer()
         for i in range(len(concatenate_df_list)):
             if concatenate_df_sheet_name[i] != "Long_Table":
-                DfConcatenateOutput.df_to_file(concatenate_df_sheet_name[i],concatenate_df_list[i])
+                #Decide the appropriate table to perfrom the transpose if set to True.
+                if concatenate_df_sheet_name[i] in ["Transition_Name_Annot","Sample_Annot"]:
+                    #For these two data frame, no transpose is required.
+                    DfConcatenateOutput.df_to_file(concatenate_df_sheet_name[i],concatenate_df_list[i])
+                else:
+                    DfConcatenateOutput.df_to_file(concatenate_df_sheet_name[i],concatenate_df_list[i],
+                                                   transpose=stored_args['Transpose_Results'])
         if stored_args['Output_Format'] == "Excel" :
+            print("Here3",flush=True)
             DfConcatenateOutput.end_writer()
 
         if stored_args['Long_Table']:
             #Set up the file writing configuration for Excel, or csv ...
             if stored_args['Output_Format'] == "Excel" :
-                DfConcatenateOutput = MSDataOutput_Excel(stored_args['Output_Directory'], "Concatenated", result_name = "Long_Table" ,logger=logger, ingui=True)
+                DfConcatenateLongOutput = MSDataOutput_Excel(stored_args['Output_Directory'], "Concatenated", 
+                                                             result_name = "Long_Table" ,logger=logger, ingui=True)
             elif stored_args['Output_Format'] == "csv" :
-                DfConcatenateOutput = MSDataOutput_csv(stored_args['Output_Directory'], "Concatenated", result_name = "" ,logger=logger, ingui=True)
-            DfConcatenateOutput.start_writer()
+                DfConcatenateLongOutput = MSDataOutput_csv(stored_args['Output_Directory'], "Concatenated", 
+                                                           result_name = "" ,logger=logger, ingui=True)
+            DfConcatenateLongOutput.start_writer()
             Long_Table_index = concatenate_df_sheet_name.index("Long_Table")
-            DfConcatenateOutput.df_to_file(concatenate_df_sheet_name[Long_Table_index],concatenate_df_list[Long_Table_index])
-        if stored_args['Output_Format'] == "Excel" :
-            DfConcatenateOutput.end_writer()
+            DfConcatenateLongOutput.df_to_file(concatenate_df_sheet_name[Long_Table_index],concatenate_df_list[Long_Table_index])
+            if stored_args['Output_Format'] == "Excel" :
+                print("Here4",flush=True)
+                DfConcatenateLongOutput.end_writer()
 
 
 
