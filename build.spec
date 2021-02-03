@@ -60,8 +60,8 @@ a = Analysis(['MSOrganiser.py'],
              runtime_hooks=None,
              binaries=[],
              datas=[ (os.path.join(cairocffi_root, 'VERSION'), 'cairocffi'),
-                     (os.path.join(cairosvg_root, 'VERSION'), 'cairosvg'),
-                     (os.path.join(tinycss2_root, 'VERSION'), 'tinycss2')
+                     (os.path.join(cairosvg_root, 'VERSION'), 'cairosvg')
+                     #(os.path.join(tinycss2_root, 'VERSION'), 'tinycss2')
 			 ],
              )
 
@@ -91,3 +91,4 @@ exe = EXE(pyz,
 
 #Command line
 #pyinstaller MSOrganiser.py --add-data "./testenv/Lib/site-packages/pyphen/dictionaries;pyphen/dictionaries" --add-data "./testenv/Lib/site-packages/gooey/images;gooey/images" --add-data "./testenv/Lib/site-packages/gooey/languages;gooey/languages" --add-data "./cairo_dll;cairo_dll" --add-data "./msreport;msreport" --add-data "./testenv/Lib/site-packages/cairocffi/VERSION;cairocffi" --add-data "./testenv/Lib/site-packages/cairosvg/VERSION;cairosvg" --add-data "./testenv/Lib/site-packages/tinycss2/VERSION;tinycss2"
+#pyinstaller MSOrganiser.py --add-data "./testenv/Lib/site-packages/pyphen/dictionaries;pyphen/dictionaries" --add-data "./testenv/Lib/site-packages/gooey/images;gooey/images" --add-data "./testenv/Lib/site-packages/gooey/languages;gooey/languages" --add-data "./cairo_dll;cairo_dll" --add-data "./msreport;msreport" --add-data "./testenv/Lib/site-packages/cairocffi/VERSION;cairocffi" --add-data "./testenv/Lib/site-packages/cairosvg/VERSION;cairosvg"
