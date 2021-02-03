@@ -176,13 +176,28 @@ class MSDataOutput_Excel(MSDataOutput):
     """
     def start_writer(self):
         """Function to open an Excel writer object using openpyxl"""
-        self.writer = os.path.join(self.output_directory, self.output_filename + '_' +  self.result_name + '.xlsx' )
-        self.writer = ExcelWriter(self.writer,engine='openpyxl')
 
+        #Set options for excel to not turn strings into formulas
+        #From https://stackoverflow.com/questions/54094172/file-corruption-while-writing-using-pandas
+        options = {}
+        options['strings_to_formulas'] = False
+        options['strings_to_urls'] = False
+
+        self.writer = os.path.join(self.output_directory, self.output_filename + '_' +  self.result_name + '.xlsx' )
+        self.writer = pd.ExcelWriter(self.writer, engine = 'openpyxl', options = options)
+        #self.writer = pd.ExcelWriter(self.writer, engine = 'xlsxwriter', options = options)
     def end_writer(self):
         """Function to close an Excel writer object"""
+        if self.writer.engine=="xlsxwriter":
+            if self.writer.book.fileclosed:
+                return()
+
         try:
             self.writer.save()
+        except UserWarning as w:
+            if self.logger:
+                self.logger.warning(w)
+            sys.exit(-1)
         except Exception as e:
             if self.ingui:
                 print('Unable to save Excel file due to:',flush=True)
@@ -226,7 +241,13 @@ class MSDataOutput_Excel(MSDataOutput):
             for i, width in enumerate(MSDataOutput_Excel.__get_col_widths(df)):
                 if i==0:
                     continue
-                worksheet.column_dimensions[get_column_letter(i)].width = width + 1
+
+                if self.writer.engine=="openpyxl":
+                    worksheet.column_dimensions[get_column_letter(i)].width = width + 1
+
+                if self.writer.engine=="xlsxwriter":
+                    column_width_name = get_column_letter(i) + ":" + get_column_letter(i)
+                    worksheet.set_column(column_width_name, width + 1)
         except Exception as e:
             print("Unable to write df to excel file",flush=True)
             print(e,flush=True)
