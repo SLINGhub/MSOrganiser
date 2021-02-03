@@ -9,7 +9,22 @@ import sys
        program_description='Create summary tables from MassHunter csv files',
        advanced=True,
        #tabbed_groups=True,
-       default_size=(620,650))
+       default_size=(620,650),
+       #menu=[{
+       # 'name': 'File',
+       # 'items': [{
+       #         'type': 'AboutDialog',
+       #         'menuTitle': 'About',
+       #         'name': 'Gooey Layout Demo',
+       #         'description': 'An example of Gooey\'s layout flexibility',
+       #         'version': '1.2.1',
+       #         'copyright': '2018',
+       #         'website': 'https://github.com/chriskiehl/Gooey',
+       #         'developer': 'http://chriskiehl.com/',
+       #         'license': 'MIT'
+       #     }]
+       # }]
+       )
 def parse_MSOrganiser_args(args_json_file_path=""):
     """Function to start the Gooey Interface, record the stored arguments and write them to a json file
     
@@ -95,6 +110,10 @@ def _load_args_from_json(args_file):
 def _save_args_to_json(args_file,stored_args):
     #Store the values of the arguments so we have them next time we run
 
+    #When outputing the json file, the list needs to combine into one string
+    #separated by ";", to output as {File1};{File2}, not [{File1},{File2}]
+    stored_args['MS_Files'] = ';'.join(stored_args['MS_Files'])
+
     #By default json file will be the same directory as the exe file
     try:
         with open(args_file, 'w') as data_file:
@@ -102,6 +121,9 @@ def _save_args_to_json(args_file,stored_args):
     except Exception as e:
         print("Warning: Unable to save input settings in " + args_file + " due to this error message",flush=True)
         print(e,flush=True)
+
+    #We now convert it back into a list
+    stored_args['MS_Files'] = list(stored_args['MS_Files'].split(";"))
 
 def _create_Gooey_Parser(stored_args):
     """Function to create the Gooey Interface, record the stored arguments into the gui interface
@@ -113,7 +135,6 @@ def _create_Gooey_Parser(stored_args):
         parser (object): A dictionary storing the input parameters.
 
     """
-
     parser = GooeyParser()
 
     if not stored_args.get('MS_FileType'):
@@ -152,18 +173,23 @@ def _create_Gooey_Parser(stored_args):
     optional_args = parser.add_argument_group("Optional Settings", gooey_options={'columns': 1 } )
 
     #Required Arguments 
-    #required_args.add_argument('--MS_Files',action='store',nargs="+",help="Input the MS raw files.\nData File is a required column for MassHunter\nSample Name and Component Name are required columns for Sciex", 
-    #                           widget="MultiFileChooser", 
-    #                           default=stored_args.get('MS_Files'))
-    required_args.add_argument('--MS_Files',help="Input the MS raw files.\nData File is a required column for MassHunter\nSample Name and Component Name are required columns for Sciex", 
+    #nargs="+" is needed to turn multiple input into a list.
+    required_args.add_argument('--MS_Files',
+                               required=True,
+                               nargs='+',
+                               help="Input the MS raw files.\nData File is a required column for MassHunter\nSample Name and Component Name are required columns for Sciex", 
                                widget='MultiFileChooser', 
                                default=stored_args.get('MS_Files'))
-    required_args.add_argument('--MS_FileType', 
+    required_args.add_argument('--MS_FileType',
+                               required=True,
                                choices=['Agilent Wide Table in csv',
                                         'Agilent Compound Table in csv',
                                         'Multiquant Long Table in txt'], 
                                help='Input the MS raw file type', default=MS_FileType)
-    required_args.add_argument('--Output_Directory',action='store', help="Output directory to save summary report.", 
+    required_args.add_argument('--Output_Directory',
+                               required=True,
+                               action='store', 
+                               help="Output directory to save summary report.", 
                                widget="DirChooser", default=stored_args.get('Output_Directory'))
     #required_args.add_argument('--Output_Options', choices=['Area','normArea by ISTD','normConc by ISTD','RT','FWHM','S/N','Symmetry','Precursor Ion','Product Ion'], nargs="+", help='Select specific information to output', widget="Listbox", default=stored_args.get('Output_Options'))
 
@@ -173,7 +199,7 @@ def _create_Gooey_Parser(stored_args):
 
     #Output Arguments 
     output_args.add_argument('--Output_Format', choices=['Excel','csv'], help='Select specific file type to output\ncsv form will give multiple sheets', default=Output_Format)
-    output_args.add_argument('--Concatenate', choices=['No Concatenate','Concatenate along Sample Name (rows)','Concatenate along Transition Name (columns)'], help='Concatenate multiple input files into one output file\nThis is done before transposing', default=Concatenate)
+    output_args.add_argument('--Concatenate', choices=['No Concatenate','Concatenate along Sample Name (rows)','Concatenate along Transition Name (columns)'], help='Concatenate multiple input files into one output file\nThis is done before transposing\n(Feature is still underdevelopment)', default=Concatenate)
     output_args.add_argument('--Long_Table', choices=['True','False'], help='Set this option to True to output the data in\nLong Table as well',default=Long_Table)
     output_args.add_argument('--Long_Table_Annot', choices=['True','False'], help='Set this option to True to add ISTD and Sample Type\nfrom Annot_File to the Long Table output',default=Long_Table_Annot)
     output_args.add_argument('--Transpose_Results', choices=['True','False'], help='Set this option to True to let the samples to be the columns instead of the Transition_Name',default=Transpose_Results)
