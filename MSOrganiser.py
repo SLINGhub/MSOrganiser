@@ -229,7 +229,6 @@ if __name__ == '__main__':
         #End the writing configuration for Excel, ...
         if stored_args['Output_Format'] == "Excel":
             if stored_args['Concatenate']=="No Concatenate":
-                print("Here1",flush=True)
                 DfOutput.end_writer()
 
         #Output the report to a pdf file
@@ -252,7 +251,6 @@ if __name__ == '__main__':
                 DfLongOutput.start_writer()
                 DfLongOutput.df_to_file("Long_Table",Long_Table_df)
                 if stored_args['Output_Format'] == "Excel" :
-                    print("Here2",flush=True)
                     DfLongOutput.end_writer()
 
         #Concatenate data when this option is chosen for a given file
@@ -318,7 +316,6 @@ if __name__ == '__main__':
                     DfConcatenateOutput.df_to_file(concatenate_df_sheet_name[i],concatenate_df_list[i],
                                                    transpose=stored_args['Transpose_Results'])
         if stored_args['Output_Format'] == "Excel" :
-            print("Here3",flush=True)
             DfConcatenateOutput.end_writer()
 
         if stored_args['Long_Table']:
@@ -333,7 +330,6 @@ if __name__ == '__main__':
             Long_Table_index = concatenate_df_sheet_name.index("Long_Table")
             DfConcatenateLongOutput.df_to_file(concatenate_df_sheet_name[Long_Table_index],concatenate_df_list[Long_Table_index])
             if stored_args['Output_Format'] == "Excel" :
-                print("Here4",flush=True)
                 DfConcatenateLongOutput.end_writer()
 
 
