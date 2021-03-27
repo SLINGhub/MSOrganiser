@@ -202,6 +202,13 @@ if __name__ == '__main__':
                 #Perform concentration calculation
                 [norm_Conc_df,ISTD_Conc_df,ISTD_Samp_Ratio_df,Sample_Annot_df] = MyData.get_Analyte_Concentration(column_name,stored_args['Annot_File'])
 
+                #Remove the column "Merge_Status" as it is not relevant
+                #Reorder the column such that "Concentration_Unit" is at the last column
+                Sample_Annot_df = Sample_Annot_df[["Data_File_Name", "Sample_Name",
+                                                   "Sample_Amount", "Sample_Amount_Unit",
+                                                   "ISTD_Mixture_Volume_[uL]", "ISTD_to_Sample_Amount_Ratio",
+                                                   "Concentration_Unit"]]
+
                 if stored_args['Testing']:
                     if stored_args['Concatenate']!="No Concatenate":
                         one_file_df_list.extend([ISTD_Conc_df,ISTD_Samp_Ratio_df])

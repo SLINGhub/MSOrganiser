@@ -275,7 +275,7 @@ class MS_Template():
            
         Note:
             The list of MRM transition name file names names is to help the program properly filter 
-            the Sample annotation such that we only pick rows whose Raw_Data_File_Name values is in the list. 
+            the Sample annotation such that we only pick rows whose Data_File_Name values is in the list. 
             Currently, our input is set as [os.path.basename(self.MS_FilePath)] from MSAnalysis.
 
         Returns:
@@ -308,7 +308,7 @@ class MS_Template():
         #We take the Sample Annotation data that can be found in the MS_FilePathList
         #Else we just take all of them
         if len(MS_FilePathList) > 0:
-            Sample_Annot_df = Sample_Annot_df[Sample_Annot_df.Raw_Data_File_Name.isin(MS_FilePathList)]
+            Sample_Annot_df = Sample_Annot_df[Sample_Annot_df.Data_File_Name.isin(MS_FilePathList)]
 
         #Remove whitespaces in column names
         Sample_Annot_df.columns = Sample_Annot_df.columns.str.strip()
@@ -334,8 +334,8 @@ class MS_Template():
         if self.__doing_normalization:
             self.__check_if_df_is_empty(sheetname,Sample_Annot_df)
 
-        #Check if the column Raw_Data_File_Name exists as a header in Sample_Annot_df
-        self.__checkColumns_in_df('Raw_Data_File_Name',sheetname,Sample_Annot_df)
+        #Check if the column Data_File_Name exists as a header in Sample_Annot_df
+        self.__checkColumns_in_df('Data_File_Name',sheetname,Sample_Annot_df)
 
         #Check if the column Merge_Status exists as a header in Sample_Annot_df
         #self.__checkColumns_in_df('Merge_Status',sheetname,Sample_Annot_df)
@@ -354,4 +354,7 @@ class MS_Template():
 
         #Check if the column ISTD_Mixture_Volume_[uL] exists as a header in Sample_Annot_df
         self.__checkColumns_in_df('ISTD_Mixture_Volume_[uL]',sheetname,Sample_Annot_df)
+
+        #Check if the column Concentration_Unit exists as a header in Sample_Annot_df
+        self.__checkColumns_in_df('Concentration_Unit',sheetname,Sample_Annot_df)
 
