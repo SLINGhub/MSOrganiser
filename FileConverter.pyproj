@@ -122,6 +122,8 @@
     <Content Include="msreport\Parameters_Report.html" />
     <Content Include="msreport\ISTD_Report.html" />
     <Content Include="msreport\typography.css" />
+    <Content Include="NEWS.md" />
+    <Content Include="README.md" />
     <Content Include="requirements.txt" />
     <Content Include="tests\testdata\CompoundTableForm.csv" />
     <Content Include="tests\testdata\MessyWideTableForm.csv" />
