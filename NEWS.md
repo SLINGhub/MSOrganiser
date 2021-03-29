@@ -2,6 +2,10 @@
 
 ## TODO
 
+## Completed
+
+* Changed output excel sheet font to "Consolas" so that the number "0" and the letter "O" can be differentiated easily.
+
 # MSOrganiser 0.0.1
 
 * Added a `NEWS.md` file to track changes to the package.

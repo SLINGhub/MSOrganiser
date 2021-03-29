@@ -1,5 +1,6 @@
 from openpyxl import Workbook
 from openpyxl.utils import get_column_letter
+from openpyxl.styles import Font
 from pandas import ExcelWriter
 import os
 import sys
@@ -208,6 +209,7 @@ class MSDataOutput_Excel(MSDataOutput):
             sys.exit(-1)
 
     def __get_col_widths(dataframe):
+
         """Function to get the correct width to output the excel file nicely"""
         # First we find the maximum length of the index column   
         idx_max = max([len(str(s)) for s in dataframe.index.values] + [len(str(dataframe.index.name))])
@@ -238,12 +240,28 @@ class MSDataOutput_Excel(MSDataOutput):
         try:
             df.to_excel(excel_writer=self.writer,sheet_name=output_option, index=False)
             worksheet = self.writer.sheets[output_option]
+
+            #Change the font to Consolas and set first row to bold
+            if self.writer.engine=="openpyxl":
+                for i in range(1,len(df.columns)):
+                    cells = get_column_letter(i) + ":" + get_column_letter(i)
+                    for cell in worksheet[cells]:
+                        cell.font = Font(name='Consolas')
+                #Set the first row to bold
+                for cell in worksheet[1:1]:
+                     cell.font = Font(name='Consolas', bold = True)
+
             for i, width in enumerate(MSDataOutput_Excel.__get_col_widths(df)):
                 if i==0:
                     continue
 
                 if self.writer.engine=="openpyxl":
-                    worksheet.column_dimensions[get_column_letter(i)].width = width + 1
+                    worksheet.column_dimensions[get_column_letter(i)].width = width + 5
+
+                    #cells = get_column_letter(i) + ":" + get_column_letter(i)
+                    #for cell in worksheet[cells]:
+                    #    cell.font = Font(name='Consolas')
+                    
 
                 if self.writer.engine=="xlsxwriter":
                     column_width_name = get_column_letter(i) + ":" + get_column_letter(i)
