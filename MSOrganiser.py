@@ -212,10 +212,10 @@ if __name__ == '__main__':
                 if stored_args['Testing']:
                     if stored_args['Concatenate']!="No Concatenate":
                         one_file_df_list.extend([ISTD_Conc_df,ISTD_Samp_Ratio_df])
-                        one_file_df_sheet_name.extend(["ISTD_Conc","ISTD_to_Samp_Vol_Ratio"])
+                        one_file_df_sheet_name.extend(["ISTD_Conc","ISTD_to_Samp_Amt_Ratio"])
                     else:
                         DfOutput.df_to_file("ISTD_Conc",ISTD_Conc_df,transpose=stored_args['Transpose_Results'])
-                        DfOutput.df_to_file("ISTD_to_Samp_Vol_Ratio",ISTD_Samp_Ratio_df,transpose=stored_args['Transpose_Results'])
+                        DfOutput.df_to_file("ISTD_to_Samp_Amt_Ratio",ISTD_Samp_Ratio_df,transpose=stored_args['Transpose_Results'])
 
                 if stored_args['Concatenate']!="No Concatenate":
                     one_file_df_list.extend([Sample_Annot_df,norm_Conc_df])
