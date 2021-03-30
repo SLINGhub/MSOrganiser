@@ -243,7 +243,7 @@ class MSDataOutput_Excel(MSDataOutput):
 
             #Change the font to Consolas and set first row to bold
             if self.writer.engine=="openpyxl":
-                for i in range(1,len(df.columns)):
+                for i in range(1,len(df.columns) + 1):
                     cells = get_column_letter(i) + ":" + get_column_letter(i)
                     for cell in worksheet[cells]:
                         cell.font = Font(name='Consolas')
