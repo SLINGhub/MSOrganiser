@@ -334,6 +334,25 @@ class MS_Template():
         if self.__doing_normalization:
             self.__check_if_df_is_empty(sheetname,Sample_Annot_df)
 
+        #Check if "Raw_Data_File_Name" exists as a header in Sample_Annot_df
+        #If yes, give an error and ask the user to use the latest version of
+        #the MSTemplate_Creator
+        #Check if the column name exists as a header in the df
+        if "Raw_Data_File_Name" in Sample_Annot_df:
+            if self.__logger:
+                self.__logger.error('The ' + sheetname  + ' sheet contains the column "Raw_Data_File_Name". ' +
+                                    'This column name is no longer accepted in MSOrganiser. ' + 
+                                    'Please use a later version of MSTemplate_Creator (above 0.0.1) that ' +
+                                    'uses "Data_File_Name" instead.')
+            if self.__ingui:
+                print('The ' + sheetname  + ' sheet contains the column "Raw_Data_File_Name". ' +
+                      'This column name is no longer accepted in MSOrganiser. ' + 
+                      'Please use a later version of MSTemplate_Creator (above 0.0.1) that ' +
+                      'uses "Data_File_Name" instead.',
+                      flush=True)
+            sys.exit(-1)
+
+
         #Check if the column Data_File_Name exists as a header in Sample_Annot_df
         self.__checkColumns_in_df('Data_File_Name',sheetname,Sample_Annot_df)
 
