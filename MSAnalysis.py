@@ -87,13 +87,13 @@ class MS_Analysis():
                 merge_column = ["Transition_Name","Transition_Name_ISTD"]
                 self.LongTable_df = pd.merge(self.LongTable_df, self.ISTD_map_df[[item for item in merge_column if item in self.ISTD_map_df.columns.tolist()]] , on=["Transition_Name"], how='left')
             if not self.Sample_Annot_df.empty:
-                merge_column = ["Sample_Name","Sample_Type"]
+                merge_column = ["Sample_Name","Sample_Type","Concentration_Unit"]
                 self.LongTable_df = pd.merge(self.LongTable_df, self.Sample_Annot_df[[item for item in merge_column if item in self.Sample_Annot_df.columns.tolist()]] , on=["Sample_Name"], how='left')
 
         #Reorder the columns
         col_order = self.LongTable_df.columns.tolist()
         if self.LongTable_Annot and self.Annotation_FilePath:
-            first_few_column = ["Transition_Name","Transition_Name_ISTD","Sample_Name","Sample_Type"]
+            first_few_column = ["Transition_Name","Transition_Name_ISTD","Sample_Name","Sample_Type","Concentration_Unit"]
             col_order =  [item for item in first_few_column if item in col_order]  + [item for item in col_order if item not in first_few_column]
         else:
             col_order = ["Transition_Name","Sample_Name"] + [item for item in col_order if item not in ["Sample_Name","Transition_Name"]]
