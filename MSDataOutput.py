@@ -155,8 +155,6 @@ class MSDataOutput_csv(MSDataOutput):
                 csv_filename = self.writer + '_' + output_option + '.csv'
             else:
                 csv_filename = self.writer + '_' + self.result_name + '_' + output_option + '.csv'
-        print(output_option)
-        print(csv_filename)
 
         try:
             df.to_csv(csv_filename,sep=',',index=False)
@@ -185,8 +183,35 @@ class MSDataOutput_Excel(MSDataOutput):
         options['strings_to_urls'] = False
 
         self.writer = os.path.join(self.output_directory, self.output_filename + '_' +  self.result_name + '.xlsx' )
-        self.writer = pd.ExcelWriter(self.writer, engine = 'openpyxl', options = options)
-        #self.writer = pd.ExcelWriter(self.writer, engine = 'xlsxwriter', options = options)
+
+        try:
+            self.writer = pd.ExcelWriter(self.writer, engine = 'openpyxl', options = options)
+            #self.writer = pd.ExcelWriter(self.writer, engine = 'xlsxwriter', options = options)
+        except UserWarning as w:
+            if self.logger:
+                self.logger.warning(w)
+            sys.exit(-1)
+        except IOError as i:
+            if self.ingui:
+                print('Unable to save Excel file due to:',flush=True)
+                print(i,flush=True)
+                print('Please close the file if it is still open on your computer, ' +
+                      'then try running the software again',flush=True)
+            if self.logger:
+                self.logger.error('Unable to save Excel file due to:')
+                self.logger.error(i)
+                self.logger.error('Please close the file if it is still open on your computer, ' +
+                                  'then try running the software again')
+            sys.exit(-1)
+        except Exception as e:
+            if self.ingui:
+                print('Unable to save Excel file due to:',flush=True)
+                print(e,flush=True)
+            if self.logger:
+                self.logger.error('Unable to save Excel file due to:')
+                self.logger.error(e)
+            sys.exit(-1)
+
     def end_writer(self):
         """Function to close an Excel writer object"""
         if self.writer.engine=="xlsxwriter":
@@ -242,14 +267,15 @@ class MSDataOutput_Excel(MSDataOutput):
             worksheet = self.writer.sheets[output_option]
 
             #Change the font to Consolas and set first row to bold
-            if self.writer.engine=="openpyxl":
-                for i in range(1,len(df.columns) + 1):
-                    cells = get_column_letter(i) + ":" + get_column_letter(i)
-                    for cell in worksheet[cells]:
-                        cell.font = Font(name='Consolas')
+            #Go to openpyxl -> writer -> theme.py and change minor font to Consolas
+            #if self.writer.engine=="openpyxl":
+                #for i in range(1,len(df.columns) + 1):
+                    #cells = get_column_letter(i) + ":" + get_column_letter(i)
+                    #for cell in worksheet[cells]:
+                    #    cell.font = Font(name='Consolas')
                 #Set the first row to bold
-                for cell in worksheet[1:1]:
-                     cell.font = Font(name='Consolas', bold = True)
+                #for cell in worksheet[1:1]:
+                #     cell.font = Font(name='Consolas', bold = True)
 
             for i, width in enumerate(MSDataOutput_Excel.__get_col_widths(df)):
                 if i==0:
@@ -257,11 +283,6 @@ class MSDataOutput_Excel(MSDataOutput):
 
                 if self.writer.engine=="openpyxl":
                     worksheet.column_dimensions[get_column_letter(i)].width = width + 5
-
-                    #cells = get_column_letter(i) + ":" + get_column_letter(i)
-                    #for cell in worksheet[cells]:
-                    #    cell.font = Font(name='Consolas')
-                    
 
                 if self.writer.engine=="xlsxwriter":
                     column_width_name = get_column_letter(i) + ":" + get_column_letter(i)
