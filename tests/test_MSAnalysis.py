@@ -8,17 +8,17 @@ WIDETABLEFORM_FILENAME = os.path.join(os.path.dirname(__file__),"testdata", 'Wid
 WIDETABLEFORM_ANNOTATION = os.path.join(os.path.dirname(__file__),"testdata", 'WideTableForm_Annotation.xlsm')
 WIDETABLEFORM_RESULTS_FILENAME = os.path.join(os.path.dirname(__file__),"testdata", 'WideTableForm_Results.xlsx')
 
-LARGE_WIDETABLEFORM_FILENAME = os.path.join(os.path.dirname(__file__),"testdata", 'sPerfect_Index_AllLipids_raw.csv')
-LARGE_WIDETABLEFORM_ANNOTATION = os.path.join(os.path.dirname(__file__),"testdata", 'sPerfect_Index_AllLipids_raw_Annotation.xlsm')
-LARGE_WIDETABLEFORM_RESULTS_FILENAME = os.path.join(os.path.dirname(__file__),"testdata", 'sPerfect_Index_AllLipids_raw_Results.xlsx')
+LARGE_WIDETABLEFORM_FILENAME = os.path.join(os.path.dirname(__file__),"testdata", 'LargeTestData.csv')
+LARGE_WIDETABLEFORM_ANNOTATION = os.path.join(os.path.dirname(__file__),"testdata", 'LargeTestData_Annotation.xlsm')
+LARGE_WIDETABLEFORM_RESULTS_FILENAME = os.path.join(os.path.dirname(__file__),"testdata", 'LargeTestData_Results.xlsx')
 
 COMPOUNDTABLEFORM_FILENAME = os.path.join(os.path.dirname(__file__),"testdata", 'CompoundTableForm.csv')
 COMPOUNDTABLEFORM_ANNOTATION = os.path.join(os.path.dirname(__file__),"testdata", 'CompoundTableForm_Annotation.xlsm')
 COMPOUNDTABLEFORM_RESULTS_FILENAME = os.path.join(os.path.dirname(__file__),"testdata", 'CompoundTableForm_Results.xlsx')
 
-SCIEX_FILENAME = os.path.join(os.path.dirname(__file__),"testdata", 'Mohammed_SciEx_data.txt')
-SCIEX_ANNOTATION = os.path.join(os.path.dirname(__file__),"testdata", 'Mohammed_SciEx_data_Annotation.xlsm')
-SCIEX_RESULTS_FILENAME = os.path.join(os.path.dirname(__file__),"testdata", 'Mohammed_SciEx_data_Results.xlsx')
+SCIEX_FILENAME = os.path.join(os.path.dirname(__file__),"testdata", 'SciExTestData.txt')
+SCIEX_ANNOTATION = os.path.join(os.path.dirname(__file__),"testdata", 'SciExTestData_Annotation.xlsm')
+SCIEX_RESULTS_FILENAME = os.path.join(os.path.dirname(__file__),"testdata", 'SciExTestData_Results.xlsx')
 
 class Agilent_Test(unittest.TestCase):
 
@@ -43,9 +43,9 @@ class Agilent_Test(unittest.TestCase):
         """Check if the software is able to calculate the normalise area using MS_Analysis.get_Normalised_Area from these datasets 
 
         * WideTableForm.csv
-        * sPerfect_Index_AllLipids_raw.csv
+        * LargeTestData.csv
         * CompoundTableForm.csv
-        * Mohammed_SciEx_data.txt
+        * SciExTestData.txt
         """
 
         #Perform normalisation using ISTD
@@ -59,15 +59,22 @@ class Agilent_Test(unittest.TestCase):
         """Check if the software is able to calculate the transition names concentration using MS_Analysis.get_Analyte_Concentration from these datasets
 
         * WideTableForm.csv
-        * sPerfect_Index_AllLipids_raw.csv
+        * LargeTestData.csv
         * CompoundTableForm.csv
-        * Mohammed_SciEx_data.txt
+        * SciExTestData.txt
         """
 
         #Perform analyte concentration using ISTD
         for i in range(len(self.DataList)):
             [norm_Conc_df,ISTD_Conc_df,ISTD_Samp_Ratio_df,Sample_Annot_df] = self.DataList[i].get_Analyte_Concentration('normConc by ISTD')
             self.__compare_df('normConc_by_ISTD',norm_Conc_df,self.DataResultList[i])
+            #Remove the column "Merge_Status" as it is not relevant
+            #Reorder the column such that "Concentration_Unit" is at the last column
+            Sample_Annot_df = Sample_Annot_df[["Data_File_Name", "Sample_Name",
+                                               "Sample_Amount", "Sample_Amount_Unit",
+                                               "ISTD_Mixture_Volume_[uL]", "ISTD_to_Sample_Amount_Ratio",
+                                               "Concentration_Unit"]]
+
             self.__compare_df('Sample_Annot',Sample_Annot_df,self.DataResultList[i])
       
     def tearDown(self):

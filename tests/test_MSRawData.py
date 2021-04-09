@@ -13,14 +13,14 @@ WIDETABLEFORM_TRANSPOSE_RESULTS_FILENAME = os.path.join(os.path.dirname(__file__
 WIDETABLEFORM_ISO_8859_1_ENCODE_FILENAME = os.path.join(os.path.dirname(__file__),"testdata", 'ISO_8859_1_Encoding.csv')
 WIDETABLEFORM_ISO_8859_1_ENCODE_RESULTS_FILENAME = os.path.join(os.path.dirname(__file__),"testdata", 'ISO_8859_1_Encoding_Results.xlsx')
 
-LARGE_WIDETABLEFORM_FILENAME = os.path.join(os.path.dirname(__file__),"testdata", 'sPerfect_Index_AllLipids_raw.csv')
-LARGE_WIDETABLEFORM_RESULTS_FILENAME = os.path.join(os.path.dirname(__file__),"testdata", 'sPerfect_Index_AllLipids_raw_Results.xlsx')
+LARGE_WIDETABLEFORM_FILENAME = os.path.join(os.path.dirname(__file__),"testdata", 'LargeTestData.csv')
+LARGE_WIDETABLEFORM_RESULTS_FILENAME = os.path.join(os.path.dirname(__file__),"testdata", 'LargeTestData_Results.xlsx')
 
 COMPOUNDTABLEFORM_FILENAME = os.path.join(os.path.dirname(__file__),"testdata", 'CompoundTableForm.csv')
 COMPOUNDTABLEFORM_RESULTS_FILENAME = os.path.join(os.path.dirname(__file__),"testdata", 'CompoundTableForm_Results.xlsx')
 
-SCIEX_FILENAME = os.path.join(os.path.dirname(__file__),"testdata", 'Mohammed_SciEx_data.txt')
-SCIEX_RESULTS_FILENAME = os.path.join(os.path.dirname(__file__),"testdata", 'Mohammed_SciEx_data_Results.xlsx')
+SCIEX_FILENAME = os.path.join(os.path.dirname(__file__),"testdata", 'SciExTestData.txt')
+SCIEX_RESULTS_FILENAME = os.path.join(os.path.dirname(__file__),"testdata", 'SciExTestData_Results.xlsx')
 
 class Agilent_Test(unittest.TestCase):
 
