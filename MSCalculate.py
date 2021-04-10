@@ -342,6 +342,7 @@ class ISTD_Operations():
                 #if ingui:
                     #print(Transition_Name_dict[x.name] + " cannot be found in the input data frame. Ignore normalisation in this column " + x.name)
                 ISTD_report_list.append(("!Missing Transition_Name_ISTD in data", x.name + " -> " + Transition_Name_dict[x.name] ))
+            return
 
 
         #When a Transition_Name name has nan Transition_Name_ISTD, just leave the funtion
