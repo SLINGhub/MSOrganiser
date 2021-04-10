@@ -73,9 +73,6 @@ def get_Parameters_df(stored_args, MS_FilePath):
 
     Parameter_list.append(("Input_File_Type",stored_args['MS_FileType']))
 
-    if stored_args['Output_Format']:
-        Parameter_list.append(("Output_Format",stored_args['Output_Format']))
-
     if stored_args['Annot_File']:
         Parameter_list.append(("Annot_File",os.path.basename(stored_args['Annot_File'])))
 
@@ -83,17 +80,23 @@ def get_Parameters_df(stored_args, MS_FilePath):
         for things in stored_args['Output_Options']:
             Parameter_list.append(("Output_Options",things))
 
-    if stored_args['Long_Table'] is not None:
-        Parameter_list.append(("Long_Table",stored_args['Long_Table']))
+    if stored_args['Output_Format']:
+        Parameter_list.append(("Output_Format",stored_args['Output_Format']))
 
     if stored_args['Concatenate']:
         Parameter_list.append(("Concatenate",stored_args['Concatenate']))
 
-    if stored_args['Long_Table_Annot'] is not None:
-        Parameter_list.append(("Long_Table_Annot",stored_args['Long_Table_Annot']))
+    if stored_args['Allow_Multiple_ISTD'] is not None:
+        Parameter_list.append(("Allow_Multiple_ISTD",stored_args['Allow_Multiple_ISTD']))
 
     if stored_args['Transpose_Results'] is not None:
         Parameter_list.append(("Transpose_Results",stored_args['Transpose_Results']))
+
+    if stored_args['Long_Table'] is not None:
+        Parameter_list.append(("Long_Table",stored_args['Long_Table']))
+
+    if stored_args['Long_Table_Annot'] is not None:
+        Parameter_list.append(("Long_Table_Annot",stored_args['Long_Table_Annot']))
 
     Parameters_df = pd.DataFrame(Parameter_list,columns=['Parameters', 'Value'])
     return Parameters_df
@@ -175,7 +178,8 @@ if __name__ == '__main__':
         for column_name in stored_args['Output_Options']:
             if column_name == 'normArea by ISTD':
                 #Perform normalisation using ISTD
-                [norm_Area_df,ISTD_Area,ISTD_map_df,ISTD_Report] = MyData.get_Normalised_Area(column_name,stored_args['Annot_File'])
+                [norm_Area_df,ISTD_Area,ISTD_map_df,ISTD_Report] = MyData.get_Normalised_Area(column_name,stored_args['Annot_File'],
+                                                                                              allow_multiple_istd = stored_args['Allow_Multiple_ISTD'])
 
                 #Output the normalised area results
 
@@ -243,7 +247,7 @@ if __name__ == '__main__':
 
         #Output the LongTable Data Table in another csv or excel sheet
         if stored_args['Long_Table']:
-            Long_Table_df = MyData.get_Long_Table()
+            Long_Table_df = MyData.get_Long_Table(allow_multiple_istd = False)
             if stored_args['Concatenate']!="No Concatenate":
                 one_file_df_list.extend([Long_Table_df])
                 one_file_df_sheet_name.extend(["Long_Table"])

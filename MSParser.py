@@ -9,7 +9,7 @@ import sys
        program_description='Create summary tables from MassHunter csv files',
        advanced=True,
        #tabbed_groups=True,
-       default_size=(620,650),
+       default_size=(650,650),
        #menu=[{
        # 'name': 'File',
        # 'items': [{
@@ -81,6 +81,12 @@ def parse_MSOrganiser_args(args_json_file_path=""):
         stored_args['Transpose_Results'] = True
     else:
         stored_args['Transpose_Results'] = False
+
+    #Convert the string in Allow Mulitple ISTD to boolean
+    if stored_args['Allow_Multiple_ISTD'] == 'True':
+        stored_args['Allow_Multiple_ISTD'] = True
+    else:
+        stored_args['Allow_Multiple_ISTD'] = False
 
     #Convert the string in Long Table to boolean
     if stored_args['Long_Table'] == 'True':
@@ -157,6 +163,11 @@ def _create_Gooey_Parser(stored_args):
     else:
         Transpose_Results = stored_args.get('Transpose_Results')
 
+    if not stored_args.get('Allow_Multiple_ISTD'):
+        Allow_Multiple_ISTD = 'False'
+    else:
+        Allow_Multiple_ISTD = stored_args.get('Allow_Multiple_ISTD')
+
     if not stored_args.get('Long_Table'):
         Long_Table = 'False'
     else:
@@ -201,10 +212,11 @@ def _create_Gooey_Parser(stored_args):
 
     #Output Arguments 
     output_args.add_argument('--Output_Format', choices=['Excel','csv'], help='Select specific file type to output\ncsv form will give multiple sheets', default=Output_Format)
-    output_args.add_argument('--Concatenate', choices=['No Concatenate','Concatenate along Sample Name (rows)','Concatenate along Transition Name (columns)'], help='Concatenate multiple input files into one output file\nThis is done before transposing\n(Feature is still underdevelopment)', default=Concatenate)
-    output_args.add_argument('--Long_Table', choices=['True','False'], help='Set this option to True to output the data in\nLong Table as well',default=Long_Table)
-    output_args.add_argument('--Long_Table_Annot', choices=['True','False'], help='Set this option to True to add ISTD and Sample Type\nfrom Annot_File to the Long Table output',default=Long_Table_Annot)
+    output_args.add_argument('--Concatenate', choices=['No Concatenate','Concatenate along Sample Name (rows)','Concatenate along Transition Name (columns)'], help='Concatenate multiple input files into one output file', default=Concatenate)
     output_args.add_argument('--Transpose_Results', choices=['True','False'], help='Set this option to True to let the samples to be the columns instead of the Transition_Name',default=Transpose_Results)
+    output_args.add_argument('--Allow_Multiple_ISTD', choices=['True','False'], help='Set this option to True to normalised using multiple ISTD',default=Allow_Multiple_ISTD)
+    output_args.add_argument('--Long_Table', choices=['True','False'], help='Set this option to True to output the data in\nLong Table as well',default=Long_Table)
+    output_args.add_argument('--Long_Table_Annot', choices=['True','False'], help='Set this option to True to add ISTD and Sample Type from Annot_File to the Long Table output',default=Long_Table_Annot)
     
     #Optional Arguments 
     optional_args.add_argument('--Testing', action='store_true', help='Testing mode will generate more output tables.')

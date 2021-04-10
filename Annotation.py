@@ -14,14 +14,18 @@ class MS_Template():
         filePath (str): file path of the input MS Template Creator file
         logger (object): logger object created by start_logger in MSOrganiser
         ingui (bool): if True, print analysis status to screen
+        doing_normalization (bool): if True, check if input file has data. If no data, throws an error
+        allow_multiple_istd (bool): if True, allow normalization of data by mulitple internal standards
     """
 
-    def __init__(self,filepath,column_name, logger=None,ingui=True, doing_normalization = False):
+    def __init__(self,filepath,column_name, logger=None,ingui=True, 
+                 doing_normalization = False, allow_multiple_istd = False):
         self.__logger = logger
         self.__ingui = ingui
         self.filepath = filepath
         self.__filecheck(column_name)
         self.__doing_normalization = doing_normalization
+        self.__allow_multiple_istd = allow_multiple_istd
 
     def remove_whiteSpaces(df):
         """Strip the whitespaces for each string columns of a df
@@ -102,15 +106,18 @@ class MS_Template():
                 print('The ' + sheetname  + ' sheet is missing the column ' + colname + '.',flush=True)
             sys.exit(-1)
 
-    def __checkDuplicates_in_cols(self,colname,sheetname,df):
+    def __checkDuplicates_in_cols(self,colname_list,sheetname,df):
         #Check if Transition_Name column has duplicate Transition_Names
-        duplicateValues = df[colname].duplicated()
+        #duplicateValues = df[colname].duplicated()
+        duplicateValues = df.duplicated(subset=colname_list)
         if duplicateValues.any():
             duplicatelist = [ str(int(i) + 2)  for i in duplicateValues[duplicateValues==True].index.tolist()]
             if self.__logger:
-                self.__logger.error('The ' + colname + ' in the ' + sheetname + ' sheet has duplicate transition names at row %s', ', '.join(duplicatelist))
+                self.__logger.error('The ' + ', '.join(colname_list) + ' in the ' + sheetname + 
+                                    ' sheet has duplicate transition names at row %s', ', '.join(duplicatelist))
             if self.__ingui:
-                print('The ' + colname + ' in the ' + sheetname + ' sheet has duplicate transition names at row ' + ', '.join(duplicatelist),flush=True)
+                print('The ' + ', '.join(colname_list) + ' in the ' + sheetname + 
+                      ' sheet has duplicate transition names at row ' + ', '.join(duplicatelist),flush=True)
             sys.exit(-1)
 
     def Read_Transition_Name_Annot_Sheet(self):
@@ -141,7 +148,8 @@ class MS_Template():
         Transition_Name_Annot_df = Transition_Name_Annot_df.dropna(axis=0, how='all')
 
         #Validate the Transition_Name_Annot sheet is valid (Has the Transition_Name and Transition_Name_ISTD columns are not empty)
-        self.__validate_Transition_Name_Annot_sheet("Transition_Name_Annot",Transition_Name_Annot_df)
+        self.__validate_Transition_Name_Annot_sheet("Transition_Name_Annot",Transition_Name_Annot_df, 
+                                                    allow_multiple_istd = self.__allow_multiple_istd)
 
         #Remove whitespaces in column names
         Transition_Name_Annot_df.columns = Transition_Name_Annot_df.columns.str.strip()
@@ -160,7 +168,8 @@ class MS_Template():
 
         return Transition_Name_Annot_df
 
-    def __validate_Transition_Name_Annot_sheet(self,sheetname,Transition_Name_Annot_df):
+    def __validate_Transition_Name_Annot_sheet(self,sheetname,Transition_Name_Annot_df,
+                                               allow_multiple_istd = False):
         #Validate the Transition_Name_Annot sheet has data when normalization is performed
         if self.__doing_normalization:
             self.__check_if_df_is_empty(sheetname,Transition_Name_Annot_df)
@@ -169,7 +178,14 @@ class MS_Template():
         self.__checkColumns_in_df('Transition_Name',sheetname,Transition_Name_Annot_df)
 
         #Check if Transition_Name column has duplicate Transition_Names
-        self.__checkDuplicates_in_cols('Transition_Name',sheetname,Transition_Name_Annot_df)
+        if allow_multiple_istd:
+            self.__checkDuplicates_in_cols(colname_list = ['Transition_Name', 'Transition_Name_ISTD'],
+                                           sheetname = sheetname,
+                                           df = Transition_Name_Annot_df)
+        else:
+            self.__checkDuplicates_in_cols(colname_list = ['Transition_Name'],
+                                           sheetname = sheetname,
+                                           df = Transition_Name_Annot_df)
 
         #Check if the column Transition_Name exists as a header in Transition_Name_Annot_df
         self.__checkColumns_in_df('Transition_Name_ISTD',sheetname,Transition_Name_Annot_df)
@@ -217,7 +233,9 @@ class MS_Template():
         #ISTD_Annot_df = ISTD_Annot_df.dropna(axis=0, how='all')
 
         #Check if Transition_Name_ISTD column has duplicate Transition_Name_ISTD
-        self.__checkDuplicates_in_cols('Transition_Name_ISTD','ISTD_Annot',ISTD_Annot_df)
+        self.__checkDuplicates_in_cols(colname_list = ['Transition_Name_ISTD'],
+                                       sheetname = 'ISTD_Annot',
+                                       df = ISTD_Annot_df)
 
         #Remove whitespaces in column names
         ISTD_Annot_df.columns = ISTD_Annot_df.columns.str.strip()

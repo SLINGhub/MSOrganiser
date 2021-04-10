@@ -65,8 +65,11 @@ class MS_Analysis():
         else:
             self.LongTable_df = pd.merge(self.LongTable_df, wide_df , on=["Sample_Name","Transition_Name"], how='left')
 
-    def get_Long_Table(self):
+    def get_Long_Table(self, allow_multiple_istd = False):
         """Function to get the long table of the extracted or calculated MRM transition name data.
+
+        Args:
+            allow_multiple_istd (bool): if True, allow Transition_Annot data by to have mulitple internal standards (in development)
 
         Returns:
             Output_df (pandas DataFrame): A long data frame of with column name Sample_Name, Transition_Name and other relevant data
@@ -77,9 +80,12 @@ class MS_Analysis():
         if self.LongTable_Annot and self.Annotation_FilePath:
             #To handle the case when no normalization is required but we still need to read the annotation file
             if self.ISTD_map_df.empty:
-                self.ISTD_map_df = ISTD_Operations.read_ISTD_map(self.Annotation_FilePath,"LongTable",logger=self.logger,ingui=self.ingui,doing_normalization = False)
+                self.ISTD_map_df = ISTD_Operations.read_ISTD_map(self.Annotation_FilePath,"LongTable",logger=self.logger,
+                                                                 ingui=self.ingui, doing_normalization = False, 
+                                                                 allow_multiple_istd = allow_multiple_istd)
             if self.Sample_Annot_df.empty:
-                self.Sample_Annot_df = ISTD_Operations.read_Sample_Annot(self.Annotation_FilePath,[os.path.basename(self.MS_FilePath)],"LongTable",self.logger,ingui=self.ingui,doing_normalization = False)
+                self.Sample_Annot_df = ISTD_Operations.read_Sample_Annot(self.Annotation_FilePath,[os.path.basename(self.MS_FilePath)],"LongTable",
+                                                                         logger = self.logger, ingui = self.ingui)
 
             #self.LongTable can never be empty as it must have at least one output option e.g "Area"
             #It could be the case that the df is empty after reading the file
@@ -120,12 +126,13 @@ class MS_Analysis():
 
         return Output_df
 
-    def get_Normalised_Area(self,analysis_name,outputdata=True):
+    def get_Normalised_Area(self,analysis_name,outputdata=True,allow_multiple_istd = False):
         """Function to calculate the normalised area from the input MRM transition name data and MS Template Creator annotation file.
 
         Args:
             analysis_name (str): The name of the column given in the Output_Options. Should be "normArea by ISTD"
             outputdata (bool): if True, return the results as a pandas dataframe. Else, the dataframe is stored in the class and nothing is returned
+            allow_multiple_istd (bool): if True, allow normalisation of peak area by mulitple internal standards (in development)
         
         When outputdata is set to True,
 
@@ -144,11 +151,14 @@ class MS_Analysis():
         Area_df = self.RawData.get_table('Area',is_numeric=True)
         
         #Get ISTD map df
-        ISTD_map_df = ISTD_Operations.read_ISTD_map(self.Annotation_FilePath,analysis_name,self.logger,ingui=self.ingui,doing_normalization = True)
+        ISTD_map_df = ISTD_Operations.read_ISTD_map(self.Annotation_FilePath,analysis_name,self.logger,
+                                                    ingui=self.ingui, doing_normalization = True, 
+                                                    allow_multiple_istd = allow_multiple_istd)
         self.ISTD_map_df = ISTD_map_df
 
         #Perform normalisation using ISTD
-        [norm_Area_df,ISTD_Area,ISTD_Report] = ISTD_Operations.normalise_by_ISTD(Area_df,self.ISTD_map_df,self.logger,ingui=self.ingui)
+        [norm_Area_df,ISTD_Area,ISTD_Report] = ISTD_Operations.normalise_by_ISTD(Area_df,self.ISTD_map_df,self.logger,ingui=self.ingui,
+                                                                                 allow_multiple_istd = allow_multiple_istd)
         self.norm_Area_df = norm_Area_df
 
         #Create the Long Table dataframe
@@ -182,7 +192,8 @@ class MS_Analysis():
             self.get_Normalised_Area(analysis_name,outputdata=False)
 
         #Perform concentration calculation, we need norm_Area_df, ISTD_map_df and Sample_Annot_df
-        Sample_Annot_df = ISTD_Operations.read_Sample_Annot(self.Annotation_FilePath,[os.path.basename(self.MS_FilePath)],analysis_name,self.logger,ingui=self.ingui,doing_normalization = True)
+        Sample_Annot_df = ISTD_Operations.read_Sample_Annot(self.Annotation_FilePath,[os.path.basename(self.MS_FilePath)],analysis_name,
+                                                            logger= self.logger, ingui=self.ingui)
         self.Sample_Annot_df = Sample_Annot_df
 
         [norm_Conc_df,ISTD_Conc_df,ISTD_Samp_Ratio_df] = ISTD_Operations.getConc_by_ISTD(self.norm_Area_df,self.ISTD_map_df,self.Sample_Annot_df,self.logger,ingui=self.ingui)
