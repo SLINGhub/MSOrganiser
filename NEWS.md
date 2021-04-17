@@ -1,6 +1,10 @@
 # MSOrganiser 0.0.1.9000 (development version)
 
 ## TODO
+* Allow normalisation of multiple ISTD
+* Allow concentration calculation of multiple ISTD\
+* Create a test unit for concentration calculation using multiple ISTD.
+* Fix the cell dimension for multiple headers in excel (low)
 
 ## Completed
 
