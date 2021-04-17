@@ -209,7 +209,8 @@ if __name__ == '__main__':
 
             elif column_name == 'normConc by ISTD':
                 #Perform concentration calculation
-                [norm_Conc_df,ISTD_Conc_df,ISTD_Samp_Ratio_df,Sample_Annot_df] = MyData.get_Analyte_Concentration(column_name,stored_args['Annot_File'])
+                [norm_Conc_df,ISTD_Conc_df,ISTD_Samp_Ratio_df,Sample_Annot_df] = MyData.get_Analyte_Concentration(column_name,stored_args['Annot_File'],
+                                                                                                                  allow_multiple_istd=stored_args['Allow_Multiple_ISTD'])
 
                 #Remove the column "Merge_Status" as it is not relevant
                 #Reorder the column such that "Concentration_Unit" is at the last column

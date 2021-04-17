@@ -199,12 +199,13 @@ class MS_Analysis():
         if outputdata:
             return([norm_Area_df,ISTD_Area,ISTD_map_df,ISTD_report])
 
-    def get_Analyte_Concentration(self,analysis_name,outputdata=True):
+    def get_Analyte_Concentration(self,analysis_name,outputdata=True,allow_multiple_istd = False):
         """Function to calculate the transition names concentration from the input MRM transition name data and MS Template Creator annotation file.
 
         Args:
             analysis_name (str): The name of the column given in the Output_Options. Should be "normConc by ISTD"
             outputdata (bool): if True, return the results as a pandas dataframe. Else, the dataframe is stored in the class and nothing is returned
+            allow_multiple_istd (bool): if True, allow normalisation of peak area by mulitple internal standards
         
         When outputdata is set to True,
 
@@ -220,14 +221,17 @@ class MS_Analysis():
 
         #Perform normalisation using ISTD if it is not done earlier
         if(self.norm_Area_df.empty or self.ISTD_map_df.empty):
-            self.get_Normalised_Area(analysis_name,outputdata=False)
+            self.get_Normalised_Area(analysis_name,
+                                     outputdata=False,allow_multiple_istd = allow_multiple_istd)
 
         #Perform concentration calculation, we need norm_Area_df, ISTD_map_df and Sample_Annot_df
         Sample_Annot_df = ISTD_Operations.read_Sample_Annot(self.Annotation_FilePath,[os.path.basename(self.MS_FilePath)],analysis_name,
                                                             logger= self.logger, ingui=self.ingui)
         self.Sample_Annot_df = Sample_Annot_df
 
-        [norm_Conc_df,ISTD_Conc_df,ISTD_Samp_Ratio_df] = ISTD_Operations.getConc_by_ISTD(self.norm_Area_df,self.ISTD_map_df,self.Sample_Annot_df,self.logger,ingui=self.ingui)
+        [norm_Conc_df,ISTD_Conc_df,ISTD_Samp_Ratio_df] = ISTD_Operations.getConc_by_ISTD(self.norm_Area_df,self.ISTD_map_df,self.Sample_Annot_df,
+                                                                                         logger=self.logger,ingui=self.ingui,
+                                                                                         allow_multiple_istd = allow_multiple_istd)
 
         #Create the Long Form dataframe
         if self.LongTable:

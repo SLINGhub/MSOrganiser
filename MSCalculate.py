@@ -474,7 +474,9 @@ class ISTD_Operations():
 
         return [norm_Transition_Name_df,ISTD_data]
 
-    def _create_ISTD_Conc_from_Transition_Name_Annot(Transition_Name_df,ISTD_Annot_df,ISTD_column,logger,ingui):
+    def _create_ISTD_Conc_from_Transition_Name_Annot(Transition_Name_df,ISTD_Annot_df,ISTD_column,
+                                                     logger=None,ingui=False,
+                                                     allow_multiple_istd = False):
         """Create a dataframe of ISTD Concentrations
 
         Args:
@@ -507,13 +509,28 @@ class ISTD_Operations():
                 print("\"" + ISTD_column + "\" is not a column in the ISTD_Annot file. Returning an empty data frame",flush=True)
             return [ISTD_Conc]
 
+        #Each row of ISTD_Annot_df is a column of transition name, 
+        #a transition name ISTD and its concentration (denoted as ISTD_column)
         for index, row in ISTD_Annot_df.iterrows():
-            if row['Transition_Name'] in ISTD_Conc.columns:
-                ISTD_Conc[row['Transition_Name']] = row[ISTD_column]
+            if allow_multiple_istd:
+                #For each row, we map the concentration to ISTD_Conc 
+                #which share the same transition name and transition name ISTD
+                if (row['Transition_Name'],row['Transition_Name_ISTD']) in ISTD_Conc.columns:
+                    ISTD_Conc[(row['Transition_Name'],row['Transition_Name_ISTD'])] = row[ISTD_column]
+            else:
+                #For each row, we map the concentration to ISTD_Conc 
+                #which share the same transition name
+                if row['Transition_Name'] in ISTD_Conc.columns:
+                    ISTD_Conc[row['Transition_Name']] = row[ISTD_column]
+
+        #print(ISTD_Annot_df)
+        #exit(0)
         
         return(ISTD_Conc)
 
-    def getConc_by_ISTD(Transition_Name_df,ISTD_Annot_df,Sample_Annot_df,logger=None,ingui=False):
+    def getConc_by_ISTD(Transition_Name_df,ISTD_Annot_df,Sample_Annot_df,
+                        logger=None,ingui=False,
+                        allow_multiple_istd = False):
         """Perform calculation of analyte concentration using values from Transition_Name_Annot_ISTD
         
         Args:
@@ -522,6 +539,7 @@ class ISTD_Operations():
             Sample_Annot_df (pandas DataFrame): A data frame showing the sample name annotation
             logger (object): logger object created by start_logger in MSOrganiser
             ingui (bool): if True, print analysis status to screen
+            allow_multiple_istd (bool): if True, allow normalisation of Transition_Name_df mulitple internal standards
 
         Returns:
             (list): list containing:
@@ -531,6 +549,7 @@ class ISTD_Operations():
                 * ISTD_Samp_Ratio_df (pandas DataFrame): A data frame of with transition names, its corresponding ISTD and ISTD to Sample ratio as columns
  
         """
+
         #If the Transition_Name_df or Sample_Annot_df is empty, return an empty data frame
         if Transition_Name_df.empty:
             if logger:
@@ -569,8 +588,9 @@ class ISTD_Operations():
         if len(ISTD_Conc_Column) == 1:
             #Some values may be missing because some transition names have no ISTD, logging it may be unnecessary 
             ISTD_Conc_Column = ISTD_Conc_Column[0]
-            #ISTD_Conc_df = ISTD_Operations._create_ISTD_Conc_from_Transition_Name_Annot(Transition_Name_df,ISTD_Annot_df,"ISTD_Conc_[nM]",logger,ingui)
-            ISTD_Conc_df = ISTD_Operations._create_ISTD_Conc_from_Transition_Name_Annot(Transition_Name_df,ISTD_Annot_df,ISTD_Conc_Column,logger,ingui)
+            ISTD_Conc_df = ISTD_Operations._create_ISTD_Conc_from_Transition_Name_Annot(Transition_Name_df,ISTD_Annot_df,ISTD_Conc_Column,
+                                                                                        logger=logger,ingui=ingui,
+                                                                                        allow_multiple_istd = allow_multiple_istd)
         else:
             #Return empty data set
             if len(ISTD_Conc_Column) == 0:
@@ -637,7 +657,12 @@ class ISTD_Operations():
         #Sample_Annot_df["ISTD_to_Sample_Amount_Ratio"] = Sample_Annot_df["ISTD_to_Sample_Amount_Ratio"].replace([np.inf, -np.inf], np.nan)
 
         #Filter the Transition_Name_df to get the Sample_Name column
-        merged_df = Transition_Name_df.loc[:, Transition_Name_df.columns == 'Sample_Name']
+        if allow_multiple_istd :
+            merged_df = Transition_Name_df.loc[:, Transition_Name_df.columns == ("Sample_Name","")]
+            #Assuming the Sample_Name is on the first level and blank on the second level
+            merged_df.columns = merged_df.columns.droplevel(1)
+        else:
+            merged_df = Transition_Name_df.loc[:, Transition_Name_df.columns == 'Sample_Name']
 
         #Merge it with the Sample_Annot_df so that the order of the Sample_name follows Transition_Name_df
         merged_df = pd.merge(merged_df, Sample_Annot_df.loc[:, ["Sample_Name","ISTD_to_Sample_Amount_Ratio"]], on="Sample_Name")
