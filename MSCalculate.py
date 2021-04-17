@@ -207,34 +207,6 @@ class ISTD_Operations():
                 * ISTD_data (pandas DataFrame): A data frame of sample as rows and transition names as columns with the ISTD area as values. Output as excel only at testing mode
         """
 
-        #Create a dictionary to map the Transition_Name to the Transition_Name_ISTD and an ISTD report to map Transition_Name_ISTD to Transition_Name
-        #We start a new Transition_Name_dict and ISTD_report
-        #Transition_Name_dict = {}
-        #ISTD_report = []
-
-        #[ISTD_report,Transition_Name_dict] = ISTD_Operations._create_Transition_Name_dict(
-        #    Transition_Name_df=Transition_Name_df,
-        #    Transition_Name_Annot_df=Transition_Name_Annot_df,
-        #    logger=logger,ingui=ingui,
-        #    allow_multiple_istd = allow_multiple_istd)
-
-        #Create empty dataframe with a preset column name and index for ISTD_Data and the updated Transition_Name_df
-        #if allow_multiple_istd:
-        #    # Initialize empty list
-        #    tuples=[("Sample_Name","Sample_Name")]
-        #    for Transition_Name in Transition_Name_dict:
-        #        if len(Transition_Name_dict[Transition_Name]) == 0:
-        #            #print((Transition_Name, ""))
-        #            tuples.append((Transition_Name, ""))
-        #        else:
-        #            for Transition_Name_ISTD in Transition_Name_dict[Transition_Name]:
-        #                #print((Transition_Name, Transition_Name_ISTD))
-        #                tuples.append((Transition_Name, Transition_Name_ISTD))
-        #    column_index = pd.MultiIndex.from_tuples(tuples, names=["Transition_Name", "Transition_Name_ISTD"])
-        #    #ISTD_data = pd.DataFrame(columns=column_index, index=Transition_Name_df["Sample_Name"])
-        #    ISTD_data = pd.DataFrame(columns=column_index, index=Transition_Name_df.index)
-
-
         ISTD_data = pd.DataFrame(columns=Transition_Name_df.columns, index=Transition_Name_df.index)
 
         #print(ISTD_data.columns.values)
@@ -242,19 +214,6 @@ class ISTD_Operations():
         #Sample_Name must be present
         ISTD_Operations._validate_Transition_Name_df(Transition_Name_df,logger,ingui)
         
-        #Create new dataframe with a preset column name and index for Transition_Name_df
-        #if allow_multiple_istd:
-        #    updated_Transition_Name_df = pd.DataFrame(columns=ISTD_data.columns, index=Transition_Name_df.index)
-        #    updated_Transition_Name_df["Sample_Name"] = Transition_Name_df["Sample_Name"]
-        #    updated_Transition_Name_df.iloc[:,1:].apply(lambda x: ISTD_Operations._update_Transition_Name_df(
-        #        x=x,
-        #        Transition_Name_df=Transition_Name_df,
-        #        logger=logger),
-        #                                                axis=0)
-        #
-        #    Transition_Name_df = updated_Transition_Name_df
-        #print(updated_Transition_Name_df)
-
         #Create a ISTD table from the Transition_Name df
         ISTD_data["Sample_Name"] = Transition_Name_df["Sample_Name"]
         ISTD_data.iloc[:,1:].apply(lambda x: ISTD_Operations._update_ISTD_data_from_Transition_Name_df(x=x,
@@ -263,45 +222,6 @@ class ISTD_Operations():
                                                                                                        logger=logger,ingui=ingui,
                                                                                                        allow_multiple_istd = allow_multiple_istd),
                                    axis=0)
-
-        ##Convert ISTD report from list to dataframe and report any warnings if any
-        #ISTD_report = pd.DataFrame(ISTD_report)
-        #ISTD_report.columns=(['Transition_Name_ISTD','Transition_Name'])
-        #ISTD_report = ISTD_report.sort_values(by=['Transition_Name_ISTD','Transition_Name'])
-
-        ##Check ISTD_report for any problems
-        #if "!Missing Transition_Name in map file" in ISTD_report['Transition_Name_ISTD'].unique():
-        #    if ingui:
-        #        print("There are Transition_Names in data set not mentioned in the Transition_Name_Annot sheet.",flush=True)
-        #        for things in ISTD_report.loc[ ISTD_report['Transition_Name_ISTD'] == "!Missing Transition_Name in map file" , 'Transition_Name' ]:
-        #            print('\"' + things + '\"',flush=True)
-
-        #if "!Duplicate Transition_Name_ISTD in map file" in ISTD_report['Transition_Name_ISTD'].unique():
-        #    if ingui:
-        #        print("There are Transition_Names in data set with more than one Transition_Name_ISTDs mentioned in the Transition_Name_Annot sheet.",flush=True)
-        #        for things in ISTD_report.loc[ ISTD_report['Transition_Name_ISTD'] == "!Duplicate Transition_Name_ISTD in map file" , 'Transition_Name' ]:
-        #            print('\"' + things + '\"',flush=True)
-
-        #if "!Blank Transition_Name_ISTD in map file" in ISTD_report['Transition_Name_ISTD'].unique():
-        #    if ingui:
-        #        print("There are Transition_Names in data set mentioned in the Transition_Name_Annot sheet but have a blank Transition_Name_ISTD.",flush=True)
-        #        for things in ISTD_report.loc[ ISTD_report['Transition_Name_ISTD'] == "!Blank Transition_Name_ISTD in map file" , 'Transition_Name' ]:
-        #            print('\"' + things + '\"',flush=True)
-
-        #if "!Missing Transition_Name_ISTD in data" in ISTD_report['Transition_Name_ISTD'].unique():
-        #    if ingui:
-        #        print("There are Transition_Name_ISTDs in the Transition_Name_Annot sheet that cannot be found in data set.",flush=True)
-        #        for things in ISTD_report.loc[ ISTD_report['Transition_Name_ISTD'] == "!Missing Transition_Name_ISTD in data" , 'Transition_Name' ]:
-        #            print('\"' + things + '\"',flush=True)
-
-        #if "!Duplicate Transition_Name_ISTD in data" in ISTD_report['Transition_Name_ISTD'].unique():
-        #    if ingui:
-        #        print("There are Transition_Name_ISTDs in the Transition_Name_Annot sheet that are duplicated in data set. Please check input file",flush=True)
-        #        for things in ISTD_report.loc[ ISTD_report['Transition_Name_ISTD'] == "!Duplicate Transition_Name_ISTD in data" , 'Transition_Name' ]:
-        #            print('\"' + things + '\"',flush=True)
-
-        #Make ISTD column to be the index
-        #ISTD_report = ISTD_report.set_index(['Transition_Name_ISTD'])
 
         return [ISTD_data]
 
@@ -344,9 +264,9 @@ class ISTD_Operations():
                     if logger:
                         logger.warning("%s number %s has a blank internal standard. Please check ISTD map file",
                                        x.name, str(ISTD_index+1))
-                    if ingui:
-                        print(x.name + " number " +  str(ISTD_index+1) +
-                              " has a blank internal standard. Please check ISTD map file", flush=True)
+                    #if ingui:
+                    #    print(x.name + " number " +  str(ISTD_index+1) +
+                    #          " has a blank internal standard. Please check ISTD map file", flush=True)
                     #Append an empty ISTD, this is not done if we do not allow multiple ISTD
                     valid_ISTD.append("")
                     ISTD_report_list.append(("!Blank Transition_Name_ISTD in map file", x.name))
@@ -363,9 +283,9 @@ class ISTD_Operations():
                 else:
                     if logger:
                         logger.warning("%s has an invalid Transition_Name_ISTD of %s. Please check ISTD map file",x.name,str(ISTD))
-                    if ingui:
-                        print(x.name + " has an invalid Transition_Name_ISTD of " + str(ISTD) + ". Please check ISTD map file",flush=True)
-                    sys.exit(-1)
+                    #if ingui:
+                    #    print(x.name + " has an invalid Transition_Name_ISTD of " + str(ISTD) + ". Please check ISTD map file",flush=True)
+                    #sys.exit(-1)
             Transition_Name_dict[x.name] = valid_ISTD
             return
 
@@ -484,7 +404,7 @@ class ISTD_Operations():
 
         #Create empty dataframe with a preset column name and the expanded Transition_Name_df
         # Initialize empty list
-        tuples=[("Sample_Name","Sample_Name")]
+        tuples=[("Sample_Name","")]
         for Transition_Name in Transition_Name_dict:
             if len(Transition_Name_dict[Transition_Name]) == 0:
                 #print((Transition_Name, ""))
