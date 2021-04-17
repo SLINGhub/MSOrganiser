@@ -26,11 +26,12 @@ class MSDataOutput:
         self.ingui = ingui
         self.writer = None
 
-    def transpose_MSdata(MS_df):
+    def transpose_MSdata(MS_df,allow_multiple_istd=False):
         """Function to transpose data
 
         Args:
             MS_df (pandas DataFrame): A panda data frame
+            allow_multiple_istd (bool): if True, display the Transition_Name_ISTD as well besides the Transition_Name
 
         Returns:
             MS_df (pandas DataFrame): A panda data frame with data transposed
@@ -38,26 +39,41 @@ class MSDataOutput:
         """
         #Transpose the data
         MS_df = MS_df.T
-        #Now the first column is the index, we need to convert back to a first column
-        MS_df.reset_index(level=0, inplace=True)
-        #Assign the column names from first row
-        colnames = MS_df.iloc[0,:].astype('str').str.strip()
-        MS_df.columns = colnames
-        MS_df.columns.name = None
-        #We remove the first row because the column names are given
-        MS_df = MS_df.iloc[1:]
-        #Rename the first column to Compound Name
-        MS_df.rename(columns={'Sample_Name':'Transition_Name'}, inplace=True)
-        #Reset the index since we remove first row and convert numeric columns from object to numeric
-        MS_df = MS_df.reset_index(drop=True)
-        MS_df = MS_df.apply(pd.to_numeric, errors='ignore')
+
+        if allow_multiple_istd:
+            # The first two columns are the index
+            #Assign the column names from first row
+            colnames = MS_df.iloc[0,:].astype('str').str.strip()
+            MS_df.columns = colnames
+            MS_df.columns.name = None
+            #We remove the first row because the column names are given
+            MS_df = MS_df.iloc[1:]
+            #Convert the two index (Transition_Name and Transition_Name_ISTD) to columns
+            MS_df.reset_index(inplace=True)  
+        else:
+            #Now the first column is the index, we need to convert back to a first column
+            MS_df.reset_index(level=0, inplace=True)
+            #Assign the column names from first row
+            colnames = MS_df.iloc[0,:].astype('str').str.strip()
+            MS_df.columns = colnames
+            MS_df.columns.name = None
+            #We remove the first row because the column names are given
+            MS_df = MS_df.iloc[1:]
+            #Rename the first column to Transition Name
+            MS_df.rename(columns={'Sample_Name':'Transition_Name'}, inplace=True)
+            #Reset the index since we remove first row and convert numeric columns from object to numeric
+            MS_df = MS_df.reset_index(drop=True)
+            MS_df = MS_df.apply(pd.to_numeric, errors='ignore')
+
         return MS_df
 
     def start_writer(self):
         """Function to open a writer object"""
         self.writer = os.path.join(self.output_directory, self.output_filename)
 
-    def df_to_file_preparation(output_option,df,transpose=False,logger=None,ingui=False):
+    def df_to_file_preparation(output_option,df,transpose=False,
+                               logger=None,ingui=False,
+                               allow_multiple_istd=False):
         """Function to check and set up the settings needed before writing to a file.
 
         Args:
@@ -66,6 +82,7 @@ class MSDataOutput:
             transpose (bool): if True, transpose the dataframe first before writing to the Excel sheet
             logger (object): logger object created by start_logger in MSOrganiser
             ingui (bool): if True, print analysis status to screen
+            allow_multiple_istd (bool): if True, display the Transition_Name_ISTD as well besides the Transition_Name
 
         Returns:
             (list): list containing:
@@ -88,18 +105,20 @@ class MSDataOutput:
             output_option = output_option.replace('/','_to_')
 
         if transpose:
-            df = MSDataOutput.transpose_MSdata(df)
+            df = MSDataOutput.transpose_MSdata(df,allow_multiple_istd)
 
         return([df,output_option])
 
 
-    def df_to_file(self,output_option,df,transpose=False):
+    def df_to_file(self,output_option,df,transpose=False,
+                   allow_multiple_istd=False):
         """Funtion to write a df to a csv file named {input file name}_{output_option}_{result filename}.csv .
 
         Args:
             output_option (str): the name of the result csv file. MSOrganiser puts it as the Output_Options value
             df (pandas DataFrame): A panda data frame to output to csv
             transpose (bool): if True, transpose the dataframe first before writing to the Excel sheet
+            allow_multiple_istd (bool): if True, display the Transition_Name_ISTD as well besides the Transition_Name
 
         Note:
             For the output option S/N, it will be changed to S_to_N as filenames does not accept slashes. This is done in the function df_to_file_preparation
@@ -108,7 +127,8 @@ class MSDataOutput:
         if self.writer is None:
             self.start_writer()
 
-        [df,output_option] = MSDataOutput.df_to_file_preparation(output_option,df,transpose,self.logger,self.ingui)
+        [df,output_option] = MSDataOutput.df_to_file_preparation(output_option,df,transpose,self.logger,self.ingui,
+                                                                 allow_multiple_istd)
 
         #If df is empty, just leave the function, warning has been sent to df_to_file_preparation
         if df.empty:
@@ -127,13 +147,15 @@ class MSDataOutput_csv(MSDataOutput):
         ingui (bool): if True, print analysis status to screen
 
     """
-    def df_to_file(self,output_option,df,transpose=False):
+    def df_to_file(self,output_option,df,transpose=False,
+                   allow_multiple_istd=False):
         """Funtion to write a df to an excel file.
 
         Args:
             output_option (str): the name of the sheet
             df (pandas DataFrame): A panda data frame to output to Excel
             transpose (bool): if True, transpose the dataframe first before writing to the Excel sheet
+            allow_multiple_istd (bool): if True, display the Transition_Name_ISTD as well besides the Transition_Name
         
         Note:
             For the output option S/N, it will be changed to S_to_N as excel does not accept slashes. This is done in the function df_to_file_preparation
@@ -142,7 +164,8 @@ class MSDataOutput_csv(MSDataOutput):
         if self.writer is None:
             self.start_writer()
 
-        [df,output_option] = MSDataOutput.df_to_file_preparation(output_option,df,transpose,self.logger,self.ingui)
+        [df,output_option] = MSDataOutput.df_to_file_preparation(output_option,df,transpose,self.logger,self.ingui,
+                                                                 allow_multiple_istd)
 
         #If df is empty, just leave the function, warning has been sent to df_to_file_preparation
         if df.empty:
@@ -264,7 +287,7 @@ class MSDataOutput_Excel(MSDataOutput):
             output_option (str): the name of the sheet
             df (pandas DataFrame): A panda data frame to output to Excel
             transpose (bool): if True, transpose the dataframe first before writing to the Excel sheet
-            allow_multiple_istd (bool): if True, output normalisation of peak area by mulitple internal standards, index must be set to False
+            allow_multiple_istd (bool): if True, display the Transition_Name_ISTD as well besides the Transition_Name
         
         Note:
             For the output option S/N, it will be changed to S_to_N as excel does not accept slashes. This is done in the function df_to_file_preparation
@@ -273,16 +296,21 @@ class MSDataOutput_Excel(MSDataOutput):
         if self.writer is None:
             self.start_writer()
 
-        [df,output_option] = MSDataOutput.df_to_file_preparation(output_option,df,transpose,self.logger,self.ingui)
+        [df,output_option] = MSDataOutput.df_to_file_preparation(output_option,df,transpose,self.logger,self.ingui,allow_multiple_istd)
 
         #If df is empty, just leave the function, warning has been sent to df_to_file_preparation
         if df.empty:
             return
 
         try:
+            #It is a pity that index must be set to True for outputing df with MultiIndex on columns or rows
             if allow_multiple_istd:
-                df.to_excel(excel_writer=self.writer,sheet_name=output_option, 
-                            index=True, merge_cells=True)
+                if transpose:
+                    df.to_excel(excel_writer=self.writer,sheet_name=output_option, 
+                                index=False, merge_cells=True)
+                else:
+                    df.to_excel(excel_writer=self.writer,sheet_name=output_option, 
+                                index=True, merge_cells=True)
             else:
                 df.to_excel(excel_writer=self.writer,sheet_name=output_option, index=False)
             worksheet = self.writer.sheets[output_option]
