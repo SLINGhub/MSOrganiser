@@ -107,11 +107,12 @@ class MS_Analysis():
 
         return self.LongTable_df
 
-    def get_from_Input_Data(self,column_name):
+    def get_from_Input_Data(self,column_name,allow_multiple_istd = False):
         """Function to get a specific column from the input MRM transition name data.
 
         Args:
             column_name (str): The name of the column given in the Output_Options.
+            allow_multiple_istd (bool): if True, allow normalisation of peak area by mulitple internal standards which leads to an expansion of the Output_df
 
         Returns:
             Output_df (pandas DataFrame): A data frame of sample as rows and transition names as columns with values from the chosen column name
@@ -120,6 +121,24 @@ class MS_Analysis():
 
         #We extract the data directly from the file and output accordingly
         Output_df = self.RawData.get_table(column_name,is_numeric=True)
+
+        if allow_multiple_istd:
+            #Get ISTD map df
+            ISTD_map_df = ISTD_Operations.read_ISTD_map(self.Annotation_FilePath,column_name,
+                                                        logger=self.logger,ingui=self.ingui, 
+                                                        doing_normalization = False, 
+                                                        allow_multiple_istd = allow_multiple_istd)
+            self.ISTD_map_df = ISTD_map_df
+            
+            # We set the ingui to False by now to avoid multiple printing of errors such as
+            # There are Transition_Names in data set mentioned in the Transition_Name_Annot sheet 
+            # but have a blank Transition_Name_ISTD.
+            # We only need to print it once during the normalisation stage.
+            [ISTD_report,Transition_Name_dict] = ISTD_Operations.create_Transition_Name_dict(Output_df,self.ISTD_map_df,
+                                                                                             logger=self.logger,ingui=False,
+                                                                                             allow_multiple_istd = allow_multiple_istd)
+            Output_df = ISTD_Operations.expand_Transition_Name_df(Output_df,Transition_Name_dict,
+                                                                  logger=self.logger,ingui=self.ingui)
 
         if self.LongTable:
             MS_Analysis._add_to_LongTable_df(self,Output_df,column_name)
@@ -151,8 +170,9 @@ class MS_Analysis():
         Area_df = self.RawData.get_table('Area',is_numeric=True)
 
         #Get ISTD map df
-        ISTD_map_df = ISTD_Operations.read_ISTD_map(self.Annotation_FilePath,analysis_name,self.logger,
-                                                    ingui=self.ingui, doing_normalization = True, 
+        ISTD_map_df = ISTD_Operations.read_ISTD_map(self.Annotation_FilePath,analysis_name,
+                                                    logger=self.logger,ingui=self.ingui, 
+                                                    doing_normalization = True, 
                                                     allow_multiple_istd = allow_multiple_istd)
         self.ISTD_map_df = ISTD_map_df
 
@@ -163,7 +183,7 @@ class MS_Analysis():
 
         ##Update the Area_df so that it can be normalised by multiple ISTD
         if allow_multiple_istd:
-            Area_df = expand_Transition_Name_df(Area_df,Transition_Name_dict,
+            Area_df = ISTD_Operations.expand_Transition_Name_df(Area_df,Transition_Name_dict,
                                                 logger=self.logger,ingui=self.ingui)
 
         #Perform normalisation using ISTD
