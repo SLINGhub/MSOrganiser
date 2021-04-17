@@ -58,12 +58,24 @@ class MS_Analysis():
         self.ISTD_map_df = pd.DataFrame()
         self.Sample_Annot_df = pd.DataFrame()
 
-    def _add_to_LongTable_df(self,wide_df,column_name):
-        wide_df = pd.melt(wide_df,id_vars=["Sample_Name"],var_name="Transition_Name", value_name=column_name)
-        if self.LongTable_df.empty:
-            self.LongTable_df = wide_df
+    def _add_to_LongTable_df(self,wide_df,column_name,allow_multiple_istd = False):
+
+        if allow_multiple_istd:
+            wide_df = pd.melt(wide_df,id_vars=["Sample_Name"],
+                              var_name= ["Transition_Name","Transition_Name_ISTD"],
+                              value_name=column_name)
+            if self.LongTable_df.empty:
+                self.LongTable_df = wide_df
+            else:
+                self.LongTable_df = pd.merge(self.LongTable_df, wide_df , 
+                                             on=["Sample_Name","Transition_Name","Transition_Name_ISTD"], 
+                                             how='left')
         else:
-            self.LongTable_df = pd.merge(self.LongTable_df, wide_df , on=["Sample_Name","Transition_Name"], how='left')
+            wide_df = pd.melt(wide_df,id_vars=["Sample_Name"],var_name="Transition_Name", value_name=column_name)
+            if self.LongTable_df.empty:
+                self.LongTable_df = wide_df
+            else:
+                self.LongTable_df = pd.merge(self.LongTable_df, wide_df , on=["Sample_Name","Transition_Name"], how='left')
 
     def get_Long_Table(self, allow_multiple_istd = False):
         """Function to get the long table of the extracted or calculated MRM transition name data.
@@ -90,11 +102,16 @@ class MS_Analysis():
             #self.LongTable can never be empty as it must have at least one output option e.g "Area"
             #It could be the case that the df is empty after reading the file
             if not self.ISTD_map_df.empty:
-                merge_column = ["Transition_Name","Transition_Name_ISTD"]
-                self.LongTable_df = pd.merge(self.LongTable_df, self.ISTD_map_df[[item for item in merge_column if item in self.ISTD_map_df.columns.tolist()]] , on=["Transition_Name"], how='left')
+                #No merging is required for the case of allow_multiple_istd
+                #if allow_multiple_istd:
+                if not allow_multiple_istd:
+                    merge_column = ["Transition_Name","Transition_Name_ISTD"]
+                    self.LongTable_df = pd.merge(self.LongTable_df, self.ISTD_map_df[[item for item in merge_column if item in self.ISTD_map_df.columns.tolist()]] , 
+                                                 on=["Transition_Name"], how='left')
             if not self.Sample_Annot_df.empty:
                 merge_column = ["Sample_Name","Sample_Type","Concentration_Unit"]
-                self.LongTable_df = pd.merge(self.LongTable_df, self.Sample_Annot_df[[item for item in merge_column if item in self.Sample_Annot_df.columns.tolist()]] , on=["Sample_Name"], how='left')
+                self.LongTable_df = pd.merge(self.LongTable_df, self.Sample_Annot_df[[item for item in merge_column if item in self.Sample_Annot_df.columns.tolist()]] , 
+                                             on=["Sample_Name"], how='left')
 
         #Reorder the columns
         col_order = self.LongTable_df.columns.tolist()
@@ -102,7 +119,12 @@ class MS_Analysis():
             first_few_column = ["Transition_Name","Transition_Name_ISTD","Sample_Name","Sample_Type","Concentration_Unit"]
             col_order =  [item for item in first_few_column if item in col_order]  + [item for item in col_order if item not in first_few_column]
         else:
-            col_order = ["Transition_Name","Sample_Name"] + [item for item in col_order if item not in ["Sample_Name","Transition_Name"]]
+            if allow_multiple_istd  and "Transition_Name_ISTD" in self.LongTable_df.columns.tolist():
+                print("here")
+                col_order = ["Transition_Name","Transition_Name_ISTD","Sample_Name"] + [item for item in col_order if item not in ["Transition_Name","Transition_Name_ISTD","Sample_Name"]]
+            else:
+                col_order = ["Transition_Name","Sample_Name"] + [item for item in col_order if item not in ["Sample_Name","Transition_Name"]]
+
         self.LongTable_df = self.LongTable_df[col_order] 
 
         return self.LongTable_df
@@ -141,7 +163,7 @@ class MS_Analysis():
                                                                   logger=self.logger,ingui=self.ingui)
 
         if self.LongTable:
-            MS_Analysis._add_to_LongTable_df(self,Output_df,column_name)
+            MS_Analysis._add_to_LongTable_df(self,Output_df,column_name,allow_multiple_istd)
 
         return Output_df
 
@@ -194,7 +216,7 @@ class MS_Analysis():
 
         #Create the Long Table dataframe
         if self.LongTable:
-            MS_Analysis._add_to_LongTable_df(self,norm_Area_df,"normArea")
+            MS_Analysis._add_to_LongTable_df(self,norm_Area_df,"normArea",allow_multiple_istd)
 
         if outputdata:
             return([norm_Area_df,ISTD_Area,ISTD_map_df,ISTD_report])
@@ -235,7 +257,7 @@ class MS_Analysis():
 
         #Create the Long Form dataframe
         if self.LongTable:
-            MS_Analysis._add_to_LongTable_df(self,norm_Conc_df,"normConc")
+            MS_Analysis._add_to_LongTable_df(self,norm_Conc_df,"normConc",allow_multiple_istd)
 
         if outputdata:
             return([norm_Conc_df,ISTD_Conc_df,ISTD_Samp_Ratio_df,Sample_Annot_df])

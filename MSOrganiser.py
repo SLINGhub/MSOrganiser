@@ -263,7 +263,7 @@ if __name__ == '__main__':
 
         #Output the LongTable Data Table in another csv or excel sheet
         if stored_args['Long_Table']:
-            Long_Table_df = MyData.get_Long_Table(allow_multiple_istd = False)
+            Long_Table_df = MyData.get_Long_Table(allow_multiple_istd=stored_args['Allow_Multiple_ISTD'])
             if stored_args['Concatenate']!="No Concatenate":
                 one_file_df_list.extend([Long_Table_df])
                 one_file_df_sheet_name.extend(["Long_Table"])
