@@ -149,16 +149,27 @@ class MS_Analysis():
         #Perform normalisation using ISTD
         ##Get Area Table
         Area_df = self.RawData.get_table('Area',is_numeric=True)
-        
+
         #Get ISTD map df
         ISTD_map_df = ISTD_Operations.read_ISTD_map(self.Annotation_FilePath,analysis_name,self.logger,
                                                     ingui=self.ingui, doing_normalization = True, 
                                                     allow_multiple_istd = allow_multiple_istd)
         self.ISTD_map_df = ISTD_map_df
 
+
+        [ISTD_report,Transition_Name_dict] = ISTD_Operations.create_Transition_Name_dict(Area_df,self.ISTD_map_df,
+                                                                                         logger=self.logger,ingui=self.ingui,
+                                                                                         allow_multiple_istd = allow_multiple_istd)
+
+        ##Update the Area_df so that it can be normalised by multiple ISTD
+        if allow_multiple_istd:
+            Area_df = expand_Transition_Name_df(Area_df,Transition_Name_dict,
+                                                logger=self.logger,ingui=self.ingui)
+
         #Perform normalisation using ISTD
-        [norm_Area_df,ISTD_Area,ISTD_Report] = ISTD_Operations.normalise_by_ISTD(Area_df,self.ISTD_map_df,self.logger,ingui=self.ingui,
-                                                                                 allow_multiple_istd = allow_multiple_istd)
+        [norm_Area_df,ISTD_Area] = ISTD_Operations.normalise_by_ISTD(Area_df,Transition_Name_dict,
+                                                                     logger=self.logger,ingui=self.ingui,
+                                                                     allow_multiple_istd = allow_multiple_istd)
         self.norm_Area_df = norm_Area_df
 
         #Create the Long Table dataframe
@@ -166,7 +177,7 @@ class MS_Analysis():
             MS_Analysis._add_to_LongTable_df(self,norm_Area_df,"normArea")
 
         if outputdata:
-            return([norm_Area_df,ISTD_Area,ISTD_map_df,ISTD_Report])
+            return([norm_Area_df,ISTD_Area,ISTD_map_df,ISTD_report])
 
     def get_Analyte_Concentration(self,analysis_name,outputdata=True):
         """Function to calculate the transition names concentration from the input MRM transition name data and MS Template Creator annotation file.
