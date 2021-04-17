@@ -189,7 +189,10 @@ if __name__ == '__main__':
                         one_file_df_list.extend([ISTD_Area])
                         one_file_df_sheet_name.extend(["ISTD_Area"])
                     else:
-                        DfOutput.df_to_file("ISTD_Area",ISTD_Area,transpose=stored_args['Transpose_Results'])
+                        DfOutput.df_to_file("ISTD_Area",ISTD_Area,
+                                            transpose=stored_args['Transpose_Results'],
+                                            allow_multiple_istd=stored_args['Allow_Multiple_ISTD']
+                                            )
 
                 #Output the normalised area and transition annotation results
                 if stored_args['Concatenate']!="No Concatenate":
@@ -197,7 +200,9 @@ if __name__ == '__main__':
                     one_file_df_sheet_name.extend(["Transition_Name_Annot","normArea_by_ISTD"])
                 else:
                     DfOutput.df_to_file("Transition_Name_Annot",ISTD_map_df)
-                    DfOutput.df_to_file("normArea_by_ISTD",norm_Area_df,transpose=stored_args['Transpose_Results'])
+                    DfOutput.df_to_file("normArea_by_ISTD",norm_Area_df,
+                                        transpose=stored_args['Transpose_Results'],
+                                        allow_multiple_istd=stored_args['Allow_Multiple_ISTD'])
                     
                 #Generate the ISTD normalisation report
                 PDFReport.create_ISTD_report(ISTD_Report)
@@ -218,24 +223,34 @@ if __name__ == '__main__':
                         one_file_df_list.extend([ISTD_Conc_df,ISTD_Samp_Ratio_df])
                         one_file_df_sheet_name.extend(["ISTD_Conc","ISTD_to_Samp_Amt_Ratio"])
                     else:
-                        DfOutput.df_to_file("ISTD_Conc",ISTD_Conc_df,transpose=stored_args['Transpose_Results'])
-                        DfOutput.df_to_file("ISTD_to_Samp_Amt_Ratio",ISTD_Samp_Ratio_df,transpose=stored_args['Transpose_Results'])
+                        DfOutput.df_to_file("ISTD_Conc",ISTD_Conc_df,
+                                            transpose=stored_args['Transpose_Results'],
+                                            allow_multiple_istd=stored_args['Allow_Multiple_ISTD'])
+                        DfOutput.df_to_file("ISTD_to_Samp_Amt_Ratio",ISTD_Samp_Ratio_df,
+                                            transpose=stored_args['Transpose_Results'],
+                                            allow_multiple_istd=stored_args['Allow_Multiple_ISTD'])
 
                 if stored_args['Concatenate']!="No Concatenate":
                     one_file_df_list.extend([Sample_Annot_df,norm_Conc_df])
                     one_file_df_sheet_name.extend(["Sample_Annot","normConc_by_ISTD"])
                 else:
                     DfOutput.df_to_file("Sample_Annot",Sample_Annot_df)
-                    DfOutput.df_to_file("normConc_by_ISTD",norm_Conc_df,transpose=stored_args['Transpose_Results'])
+                    DfOutput.df_to_file("normConc_by_ISTD",norm_Conc_df,
+                                        transpose=stored_args['Transpose_Results'],
+                                        allow_multiple_istd=stored_args['Allow_Multiple_ISTD'])
 
             else:
                 #We extract the data directly from the file and output accordingly
-                Output_df = MyData.get_from_Input_Data(column_name)
+                Output_df = MyData.get_from_Input_Data(column_name,
+                                                       allow_multiple_istd=stored_args['Allow_Multiple_ISTD'])
+
                 if stored_args['Concatenate']!="No Concatenate":
                     one_file_df_list.extend([Output_df])
                     one_file_df_sheet_name.extend([column_name])
                 else:
-                    DfOutput.df_to_file(column_name,Output_df,transpose=stored_args['Transpose_Results'])
+                    DfOutput.df_to_file(column_name,Output_df,
+                                        transpose=stored_args['Transpose_Results'],
+                                        allow_multiple_istd=stored_args['Allow_Multiple_ISTD'])
 
         #End the writing configuration for Excel, ...
         if stored_args['Output_Format'] == "Excel":
@@ -325,7 +340,8 @@ if __name__ == '__main__':
                     DfConcatenateOutput.df_to_file(concatenate_df_sheet_name[i],concatenate_df_list[i])
                 else:
                     DfConcatenateOutput.df_to_file(concatenate_df_sheet_name[i],concatenate_df_list[i],
-                                                   transpose=stored_args['Transpose_Results'])
+                                                   transpose=stored_args['Transpose_Results'],
+                                                   allow_multiple_istd=stored_args['Allow_Multiple_ISTD'])
         if stored_args['Output_Format'] == "Excel" :
             DfConcatenateOutput.end_writer()
 
