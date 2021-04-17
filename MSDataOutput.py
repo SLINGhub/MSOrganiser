@@ -233,21 +233,38 @@ class MSDataOutput_Excel(MSDataOutput):
                 self.logger.error(e)
             sys.exit(-1)
 
-    def __get_col_widths(dataframe):
+    def __get_col_widths(dataframe,allow_multiple_istd=False):
 
         """Function to get the correct width to output the excel file nicely"""
         # First we find the maximum length of the index column   
         idx_max = max([len(str(s)) for s in dataframe.index.values] + [len(str(dataframe.index.name))])
+
+        if not allow_multiple_istd:
+            # Then, we concatenate this to the max of the lengths of column name and its values for each column, left to right
+            return [idx_max] + [max([len(str(s)) for s in dataframe[col].values] + [len(col)]) + 1 for col in dataframe.columns]
+
+
+        #for col in dataframe.columns:
+            #print(col)
+            #print(col[0])
+            #for s in dataframe[col].values:
+            #    print(s)
+
+            #max([len(str(s)) for s in dataframe[col].values] + [len(col)]) + 1 
+
+
         # Then, we concatenate this to the max of the lengths of column name and its values for each column, left to right
         return [idx_max] + [max([len(str(s)) for s in dataframe[col].values] + [len(col)]) + 1 for col in dataframe.columns]
 
-    def df_to_file(self,output_option,df,transpose=False):
+    def df_to_file(self,output_option,df,
+                   transpose=False, allow_multiple_istd=False):
         """Funtion to write a df to an excel file.
 
         Args:
             output_option (str): the name of the sheet
             df (pandas DataFrame): A panda data frame to output to Excel
             transpose (bool): if True, transpose the dataframe first before writing to the Excel sheet
+            allow_multiple_istd (bool): if True, output normalisation of peak area by mulitple internal standards, index must be set to False
         
         Note:
             For the output option S/N, it will be changed to S_to_N as excel does not accept slashes. This is done in the function df_to_file_preparation
@@ -263,7 +280,11 @@ class MSDataOutput_Excel(MSDataOutput):
             return
 
         try:
-            df.to_excel(excel_writer=self.writer,sheet_name=output_option, index=False)
+            if allow_multiple_istd:
+                df.to_excel(excel_writer=self.writer,sheet_name=output_option, 
+                            index=True, merge_cells=True)
+            else:
+                df.to_excel(excel_writer=self.writer,sheet_name=output_option, index=False)
             worksheet = self.writer.sheets[output_option]
 
             #Change the font to Consolas and set first row to bold
@@ -277,12 +298,19 @@ class MSDataOutput_Excel(MSDataOutput):
                 #for cell in worksheet[1:1]:
                 #     cell.font = Font(name='Consolas', bold = True)
 
-            for i, width in enumerate(MSDataOutput_Excel.__get_col_widths(df)):
+            for i, width in enumerate(MSDataOutput_Excel.__get_col_widths(df,allow_multiple_istd)):
+                #if output_option== "normArea_by_ISTD":
+                #    print(i)
+                #    print(width)
                 if i==0:
                     continue
-
+                #if output_option== "normArea_by_ISTD":
+                #    print(get_column_letter(i))
                 if self.writer.engine=="openpyxl":
-                    worksheet.column_dimensions[get_column_letter(i)].width = width + 5
+                    if allow_multiple_istd:
+                        worksheet.column_dimensions[get_column_letter(i)].width = width + 10
+                    else:
+                        worksheet.column_dimensions[get_column_letter(i)].width = width + 5
 
                 if self.writer.engine=="xlsxwriter":
                     column_width_name = get_column_letter(i) + ":" + get_column_letter(i)
