@@ -5,8 +5,9 @@
 * Allow concentration calculation of multiple ISTD (almost done)
 * Create a test unit for concentration calculation using multiple ISTD.
 * Fix the cell dimension for multiple headers in excel (low)
-* Fix the transpose problem for the multiple ISTD case
-* Fix the long table problem for the  multiple ISTD case
+* Fix the transpose problem for the multiple ISTD case (almost done)
+* Fix the long table problem for the multiple ISTD case (almost done)
+* Test if concatenation work for the multiple ISTD case
 
 ## Completed
 
