@@ -307,10 +307,18 @@ if __name__ == '__main__':
                                                                    axis = 0)
                         else:
                             #Concantenate Column Wise
-                            concatenate_df_list[i] = pd.concat([concatenate_df_list[i], one_file_df_list[i]], 
-                                                               ignore_index=False, 
-                                                               sort=False, 
-                                                               axis = 1)
+                            if stored_args['Allow_Multiple_ISTD']:
+                                #Remove the Sample_Name column
+                                appending_df = one_file_df_list[i].loc[:, one_file_df_list[i].columns != ('Sample_Name','')]
+                                concatenate_df_list[i] = pd.concat([concatenate_df_list[i], appending_df], 
+                                                                   ignore_index=False, 
+                                                                   sort=False, 
+                                                                   axis = 1)
+                            else:
+                                concatenate_df_list[i] = pd.concat([concatenate_df_list[i], one_file_df_list[i]], 
+                                                                   ignore_index=False, 
+                                                                   sort=False, 
+                                                                   axis = 1)
 
 
 
