@@ -120,7 +120,6 @@ class MS_Analysis():
             col_order =  [item for item in first_few_column if item in col_order]  + [item for item in col_order if item not in first_few_column]
         else:
             if allow_multiple_istd  and "Transition_Name_ISTD" in self.LongTable_df.columns.tolist():
-                print("here")
                 col_order = ["Transition_Name","Transition_Name_ISTD","Sample_Name"] + [item for item in col_order if item not in ["Transition_Name","Transition_Name_ISTD","Sample_Name"]]
             else:
                 col_order = ["Transition_Name","Sample_Name"] + [item for item in col_order if item not in ["Sample_Name","Transition_Name"]]
