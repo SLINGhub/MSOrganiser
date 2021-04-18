@@ -259,25 +259,47 @@ class MSDataOutput_Excel(MSDataOutput):
     def __get_col_widths(dataframe,allow_multiple_istd=False):
 
         """Function to get the correct width to output the excel file nicely"""
-        # First we find the maximum length of the index column   
-        idx_max = max([len(str(s)) for s in dataframe.index.values] + [len(str(dataframe.index.name))])
+
+        if allow_multiple_istd:
+            # Assuming multiindex on the columns but not the rows
+            # First we find the maximum length of the index column   
+            column_index_name_length_list = [len(column_index_name) for column_index_name in dataframe.columns.names]
+            row_index_name_length_list = [len(str(dataframe.index.name))]
+            row_index_value_length_list = [len(str(s)) for s in dataframe.index.values] 
+            idx_max = max(column_index_name_length_list + 
+                          row_index_name_length_list + 
+                          row_index_value_length_list
+                          )
+            #Next we proceed to the other columns
+            max_list = []
+            for cols in dataframe.columns:
+                #print(cols)
+                column_name_length_list = [len(col) for col in cols]            
+                column_value_length_list = [len(str(s)) for s in dataframe[cols].values]
+                max_list.append(max(max(column_name_length_list), max(column_value_length_list)) + 1)
+
+            # Then, we concatenate this to the max of the lengths of column name and its values for each column, left to right
+            return [idx_max] + max_list
 
         if not allow_multiple_istd:
+            # Assuming multiindex is not present in both row and columns
+            # First we find the maximum length of the index column
+            row_index_name_length_list = [len(str(dataframe.index.name))]
+            row_index_value_length_list = [len(str(s)) for s in dataframe.index.values]    
+            idx_max = max(row_index_name_length_list + 
+                          row_index_value_length_list
+                          )
+            #Next we proceed to the other columns
+            max_list = []
+            for col in dataframe.columns:
+                #print(cols)
+                column_name_length = len(col)
+                column_value_length_list = [len(str(s)) for s in dataframe[col].values]
+                max_list.append(max([column_name_length] + column_value_length_list) + 1)
+
             # Then, we concatenate this to the max of the lengths of column name and its values for each column, left to right
-            return [idx_max] + [max([len(str(s)) for s in dataframe[col].values] + [len(col)]) + 1 for col in dataframe.columns]
-
-
-        #for col in dataframe.columns:
-            #print(col)
-            #print(col[0])
-            #for s in dataframe[col].values:
-            #    print(s)
-
-            #max([len(str(s)) for s in dataframe[col].values] + [len(col)]) + 1 
-
-
-        # Then, we concatenate this to the max of the lengths of column name and its values for each column, left to right
-        return [idx_max] + [max([len(str(s)) for s in dataframe[col].values] + [len(col)]) + 1 for col in dataframe.columns]
+            return [idx_max] + max_list
+            #return [idx_max] + [max([len(str(s)) for s in dataframe[col].values] + [len(col)]) + 1 for col in dataframe.columns]
 
     def df_to_file(self,output_option,df,
                    transpose=False, allow_multiple_istd=False):
@@ -327,20 +349,22 @@ class MSDataOutput_Excel(MSDataOutput):
                 #     cell.font = Font(name='Consolas', bold = True)
 
             for i, width in enumerate(MSDataOutput_Excel.__get_col_widths(df,allow_multiple_istd)):
-                #if output_option== "normArea_by_ISTD":
-                #    print(i)
-                #    print(width)
-                if i==0:
-                    continue
-                #if output_option== "normArea_by_ISTD":
-                #    print(get_column_letter(i))
+
                 if self.writer.engine=="openpyxl":
-                    if allow_multiple_istd:
-                        worksheet.column_dimensions[get_column_letter(i)].width = width + 10
+                    if allow_multiple_istd and not transpose:
+                        #For this case the index needs to be displayed  
+                        #print("i is " + get_column_letter(i+1))
+                        worksheet.column_dimensions[get_column_letter(i+1)].width = width + 5
                     else:
+                        #i = 0 is for the index which we do not need to display
+                        if i==0:
+                            continue
+                        #print("i is " + get_column_letter(i))
                         worksheet.column_dimensions[get_column_letter(i)].width = width + 5
 
                 if self.writer.engine=="xlsxwriter":
+                    if i==0:
+                        continue
                     column_width_name = get_column_letter(i) + ":" + get_column_letter(i)
                     worksheet.set_column(column_width_name, width + 1)
         except Exception as e:
