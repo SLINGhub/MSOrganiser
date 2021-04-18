@@ -7,7 +7,7 @@
 * Fix the cell dimension for multiple headers in excel (low)
 * Fix the transpose problem for the multiple ISTD case (almost done)
 * Fix the long table problem for the multiple ISTD case (almost done)
-* Test if concatenation work for the multiple ISTD case
+* Test if concatenation work for the multiple ISTD case (almost done)
 
 ## Completed
 
