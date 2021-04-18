@@ -9,7 +9,7 @@ import sys
        program_description='Create summary tables from MassHunter csv files',
        advanced=True,
        #tabbed_groups=True,
-       default_size=(650,650),
+       default_size=(710,680),
        #menu=[{
        # 'name': 'File',
        # 'items': [{
@@ -211,12 +211,24 @@ def _create_Gooey_Parser(stored_args):
     analysis_args.add_argument('--Annot_File', action='store', help='Input the annotation excel macro file required for normalisation and concentration calculation', widget="FileChooser",default=stored_args.get('Annot_File'))
 
     #Output Arguments 
-    output_args.add_argument('--Output_Format', choices=['Excel','csv'], help='Select specific file type to output\ncsv form will give multiple sheets', default=Output_Format)
-    output_args.add_argument('--Concatenate', choices=['No Concatenate','Concatenate along Sample Name (rows)','Concatenate along Transition Name (columns)'], help='Concatenate multiple input files into one output file', default=Concatenate)
-    output_args.add_argument('--Transpose_Results', choices=['True','False'], help='Set this option to True to let the samples to be the columns instead of the Transition_Name',default=Transpose_Results)
-    output_args.add_argument('--Allow_Multiple_ISTD', choices=['True','False'], help='Set this option to True to normalised using multiple ISTD',default=Allow_Multiple_ISTD)
-    output_args.add_argument('--Long_Table', choices=['True','False'], help='Set this option to True to output the data in\nLong Table as well',default=Long_Table)
-    output_args.add_argument('--Long_Table_Annot', choices=['True','False'], help='Set this option to True to add ISTD and Sample Type from Annot_File to the Long Table output',default=Long_Table_Annot)
+    output_args.add_argument('--Output_Format', choices=['Excel','csv'], 
+                             help='Select specific file type to output csv form will give multiple sheets', 
+                             default=Output_Format)
+    output_args.add_argument('--Concatenate', choices=['No Concatenate','Concatenate along Sample Name (rows)','Concatenate along Transition Name (columns)'], 
+                             help='Concatenate multiple input files into one output file. Note that this is done after data cleaning and calculation for each input file', 
+                             default=Concatenate)
+    output_args.add_argument('--Transpose_Results', choices=['True','False'], 
+                             help='Set this option to True to let the samples to be the columns instead of the Transition_Name',
+                             default=Transpose_Results)
+    output_args.add_argument('--Allow_Multiple_ISTD', choices=['True','False'], 
+                             help='Set this option to True to normalised using multiple ISTD',
+                             default=Allow_Multiple_ISTD)
+    output_args.add_argument('--Long_Table', choices=['True','False'], 
+                             help='Set this option to True to output the data in Long Table',
+                             default=Long_Table)
+    output_args.add_argument('--Long_Table_Annot', choices=['True','False'], 
+                             help='Set this option to True to add ISTD and Sample Type from Annot_File to the Long Table output',
+                             default=Long_Table_Annot)
     
     #Optional Arguments 
     optional_args.add_argument('--Testing', action='store_true', help='Testing mode will generate more output tables.')
