@@ -256,11 +256,11 @@ class MSDataOutput_Excel(MSDataOutput):
                 self.logger.error(e)
             sys.exit(-1)
 
-    def __get_col_widths(dataframe,allow_multiple_istd=False):
+    def __get_col_widths(dataframe,transpose=False,allow_multiple_istd=False):
 
         """Function to get the correct width to output the excel file nicely"""
 
-        if allow_multiple_istd:
+        if allow_multiple_istd and not transpose:
             # Assuming multiindex on the columns but not the rows
             # First we find the maximum length of the index column   
             column_index_name_length_list = [len(column_index_name) for column_index_name in dataframe.columns.names]
@@ -280,8 +280,7 @@ class MSDataOutput_Excel(MSDataOutput):
 
             # Then, we concatenate this to the max of the lengths of column name and its values for each column, left to right
             return [idx_max] + max_list
-
-        if not allow_multiple_istd:
+        else:
             # Assuming multiindex is not present in both row and columns
             # First we find the maximum length of the index column
             row_index_name_length_list = [len(str(dataframe.index.name))]
@@ -318,7 +317,9 @@ class MSDataOutput_Excel(MSDataOutput):
         if self.writer is None:
             self.start_writer()
 
-        [df,output_option] = MSDataOutput.df_to_file_preparation(output_option,df,transpose,self.logger,self.ingui,allow_multiple_istd)
+        [df,output_option] = MSDataOutput.df_to_file_preparation(output_option,df,
+                                                                 transpose,self.logger,self.ingui,
+                                                                 allow_multiple_istd)
 
         #If df is empty, just leave the function, warning has been sent to df_to_file_preparation
         if df.empty:
@@ -326,17 +327,12 @@ class MSDataOutput_Excel(MSDataOutput):
 
         try:
             #It is a pity that index must be set to True for outputing df with MultiIndex on columns or rows
-            if allow_multiple_istd:
-                if transpose:
-                    df.to_excel(excel_writer=self.writer,sheet_name=output_option, 
-                                index=False, merge_cells=True)
-                else:
-                    df.to_excel(excel_writer=self.writer,sheet_name=output_option, 
+            if allow_multiple_istd and not transpose:
+                df.to_excel(excel_writer=self.writer,sheet_name=output_option, 
                                 index=True, merge_cells=True)
             else:
                 df.to_excel(excel_writer=self.writer,sheet_name=output_option, index=False)
             worksheet = self.writer.sheets[output_option]
-
             #Change the font to Consolas and set first row to bold
             #Go to openpyxl -> writer -> theme.py and change minor font to Consolas
             #if self.writer.engine=="openpyxl":
@@ -347,9 +343,8 @@ class MSDataOutput_Excel(MSDataOutput):
                 #Set the first row to bold
                 #for cell in worksheet[1:1]:
                 #     cell.font = Font(name='Consolas', bold = True)
-
-            for i, width in enumerate(MSDataOutput_Excel.__get_col_widths(df,allow_multiple_istd)):
-
+ 
+            for i, width in enumerate(MSDataOutput_Excel.__get_col_widths(df,transpose,allow_multiple_istd)):
                 if self.writer.engine=="openpyxl":
                     if allow_multiple_istd and not transpose:
                         #For this case the index needs to be displayed  
