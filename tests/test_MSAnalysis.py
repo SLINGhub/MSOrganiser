@@ -23,7 +23,8 @@ SCIEX_RESULTS_FILENAME = os.path.join(os.path.dirname(__file__),"testdata", 'Sci
 class Agilent_Test(unittest.TestCase):
 
     def setUp(self):
-        MyWideData = MS_Analysis(WIDETABLEFORM_FILENAME,'Agilent Wide Table in csv',WIDETABLEFORM_ANNOTATION,ingui=True)
+        MyWideData = MS_Analysis(WIDETABLEFORM_FILENAME,'Agilent Wide Table in csv',WIDETABLEFORM_ANNOTATION,ingui=True,
+                                 longtable = True, longtable_annot = True)
         WideDataResults = openpyxl.load_workbook(WIDETABLEFORM_RESULTS_FILENAME)
 
         MyLargeWideData = MS_Analysis(LARGE_WIDETABLEFORM_FILENAME,'Agilent Wide Table in csv',LARGE_WIDETABLEFORM_ANNOTATION,ingui=True)
@@ -38,6 +39,14 @@ class Agilent_Test(unittest.TestCase):
         self.DataList = [MyWideData,MyLargeWideData,MyCompoundData,MySciexData]
         #self.DataAnnotationList = [WIDETABLEFORM_ANNOTATION,LARGE_WIDETABLEFORM_ANNOTATION,COMPOUNDTABLEFORM_ANNOTATION,SCIEX_ANNOTATION]
         self.DataResultList = [WideDataResults,LargeWideDataResults,CompoundDataResults,SciexResults]
+
+        self.MyLongTableData = MS_Analysis(WIDETABLEFORM_FILENAME,'Agilent Wide Table in csv',
+                                           WIDETABLEFORM_ANNOTATION,ingui=True,
+                                           longtable = True, longtable_annot = False)
+
+        self.MyLongTableDataWithAnnot = MS_Analysis(WIDETABLEFORM_FILENAME,'Agilent Wide Table in csv',
+                                                    WIDETABLEFORM_ANNOTATION,ingui=True,
+                                                    longtable = True, longtable_annot = True)
 
     def test_getnormAreaTable(self):
         """Check if the software is able to calculate the normalise area using MS_Analysis.get_Normalised_Area from these datasets 
@@ -76,6 +85,16 @@ class Agilent_Test(unittest.TestCase):
                                                "Concentration_Unit"]]
 
             self.__compare_df('Sample_Annot',Sample_Annot_df,self.DataResultList[i])
+
+    def test_getLongTable(self):
+        """Check if the software is able to get the LongTable from these datasets
+
+        * WideTableForm.csv
+        """
+
+        #[norm_Area_df,ISTD_Area,Transition_Name_Annot,ISTD_Report] = self.DataList[0].get_Normalised_Area('normArea by ISTD')
+        Long_Table_df = self.DataList[0].get_Long_Table()
+        print(Long_Table_df)
       
     def tearDown(self):
         for i in range(len(self.DataResultList)):
