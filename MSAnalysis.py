@@ -88,6 +88,14 @@ class MS_Analysis():
 
         """
 
+        #Check if the Long Table has data
+        if self.LongTable_df.empty:
+            if self.logger:
+                self.logger.warning("Long Table has no data")
+            if self.ingui:
+                print("Long Table has no data",flush=True)
+            return self.LongTable_df
+
         #If we ask for the Sample Type and Transition Name ISTD to be present in the Long Table and an annotation file is given
         if self.LongTable_Annot and self.Annotation_FilePath:
             #To handle the case when no normalization is required but we still need to read the annotation file
@@ -98,7 +106,6 @@ class MS_Analysis():
             if self.Sample_Annot_df.empty:
                 self.Sample_Annot_df = ISTD_Operations.read_Sample_Annot(self.Annotation_FilePath,[os.path.basename(self.MS_FilePath)],"LongTable",
                                                                          logger = self.logger, ingui = self.ingui)
-
             #self.LongTable can never be empty as it must have at least one output option e.g "Area"
             #It could be the case that the df is empty after reading the file
             if not self.ISTD_map_df.empty:
