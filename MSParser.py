@@ -227,7 +227,8 @@ def _create_Gooey_Parser(stored_args):
                              help='Set this option to True to output the data in Long Table',
                              default=Long_Table)
     output_args.add_argument('--Long_Table_Annot', choices=['True','False'], 
-                             help='Set this option to True to add ISTD and Sample Type from Annot_File to the Long Table output',
+                             help='Set this option to True to add ISTD, Sample Type and Concentration Unit ' + 
+                                  'from Annot_File to the Long Table output',
                              default=Long_Table_Annot)
     
     #Optional Arguments 

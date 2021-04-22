@@ -15,6 +15,7 @@ class MS_Analysis():
         logger (object): logger object created by start_logger in MSOrganiser
         ingui (bool): if True, print analysis status to screen
         longtable (bool): if True, prepare a dataframe to store results in long table
+        longtable_annot (bool): if True, prepare a dataframe to store annotation details in long table
     """
 
     def __init__(self, MS_FilePath , MS_FileType ,Annotation_FilePath=None, logger=None, ingui=True,  longtable = False, longtable_annot = False):
@@ -135,11 +136,12 @@ class MS_Analysis():
 
         return self.LongTable_df
 
-    def get_from_Input_Data(self,column_name,allow_multiple_istd = False):
+    def get_from_Input_Data(self,column_name,outputdata=True,allow_multiple_istd = False):
         """Function to get a specific column from the input MRM transition name data.
 
         Args:
             column_name (str): The name of the column given in the Output_Options.
+            outputdata (bool): if True, return the results as a pandas dataframe. Else, the dataframe is stored in the class and nothing is returned
             allow_multiple_istd (bool): if True, allow normalisation of peak area by mulitple internal standards which leads to an expansion of the Output_df
 
         Returns:
@@ -171,7 +173,8 @@ class MS_Analysis():
         if self.LongTable:
             MS_Analysis._add_to_LongTable_df(self,Output_df,column_name,allow_multiple_istd)
 
-        return Output_df
+        if outputdata:
+            return(Output_df)
 
     def get_Normalised_Area(self,analysis_name,outputdata=True,allow_multiple_istd = False):
         """Function to calculate the normalised area from the input MRM transition name data and MS Template Creator annotation file.

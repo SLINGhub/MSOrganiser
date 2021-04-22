@@ -7,6 +7,8 @@ from MSAnalysis import MS_Analysis
 WIDETABLEFORM_FILENAME = os.path.join(os.path.dirname(__file__),"testdata", 'WideTableForm.csv')
 WIDETABLEFORM_ANNOTATION = os.path.join(os.path.dirname(__file__),"testdata", 'WideTableForm_Annotation.xlsm')
 WIDETABLEFORM_RESULTS_FILENAME = os.path.join(os.path.dirname(__file__),"testdata", 'WideTableForm_Results.xlsx')
+WIDETABLEFORM_LONGTABLE_FILENAME = os.path.join(os.path.dirname(__file__),"testdata", 'WideTableForm_LongTable.xlsx')
+WIDETABLEFORM_LONGTABLE_WITH_ANNOT_FILENAME = os.path.join(os.path.dirname(__file__),"testdata", 'WideTableForm_LongTable_with_Annot.xlsx')
 
 LARGE_WIDETABLEFORM_FILENAME = os.path.join(os.path.dirname(__file__),"testdata", 'LargeTestData.csv')
 LARGE_WIDETABLEFORM_ANNOTATION = os.path.join(os.path.dirname(__file__),"testdata", 'LargeTestData_Annotation.xlsm')
@@ -23,8 +25,7 @@ SCIEX_RESULTS_FILENAME = os.path.join(os.path.dirname(__file__),"testdata", 'Sci
 class Agilent_Test(unittest.TestCase):
 
     def setUp(self):
-        MyWideData = MS_Analysis(WIDETABLEFORM_FILENAME,'Agilent Wide Table in csv',WIDETABLEFORM_ANNOTATION,ingui=True,
-                                 longtable = True, longtable_annot = True)
+        MyWideData = MS_Analysis(WIDETABLEFORM_FILENAME,'Agilent Wide Table in csv',WIDETABLEFORM_ANNOTATION,ingui=True)
         WideDataResults = openpyxl.load_workbook(WIDETABLEFORM_RESULTS_FILENAME)
 
         MyLargeWideData = MS_Analysis(LARGE_WIDETABLEFORM_FILENAME,'Agilent Wide Table in csv',LARGE_WIDETABLEFORM_ANNOTATION,ingui=True)
@@ -37,16 +38,17 @@ class Agilent_Test(unittest.TestCase):
         SciexResults = openpyxl.load_workbook(SCIEX_RESULTS_FILENAME)
 
         self.DataList = [MyWideData,MyLargeWideData,MyCompoundData,MySciexData]
-        #self.DataAnnotationList = [WIDETABLEFORM_ANNOTATION,LARGE_WIDETABLEFORM_ANNOTATION,COMPOUNDTABLEFORM_ANNOTATION,SCIEX_ANNOTATION]
         self.DataResultList = [WideDataResults,LargeWideDataResults,CompoundDataResults,SciexResults]
 
         self.MyLongTableData = MS_Analysis(WIDETABLEFORM_FILENAME,'Agilent Wide Table in csv',
                                            WIDETABLEFORM_ANNOTATION,ingui=True,
                                            longtable = True, longtable_annot = False)
+        self.LongTableDataResults = openpyxl.load_workbook(WIDETABLEFORM_LONGTABLE_FILENAME)
 
         self.MyLongTableDataWithAnnot = MS_Analysis(WIDETABLEFORM_FILENAME,'Agilent Wide Table in csv',
                                                     WIDETABLEFORM_ANNOTATION,ingui=True,
                                                     longtable = True, longtable_annot = True)
+        self.LongTableDataWithAnnotResults = openpyxl.load_workbook(WIDETABLEFORM_LONGTABLE_WITH_ANNOT_FILENAME)
 
     def test_getnormAreaTable(self):
         """Check if the software is able to calculate the normalise area using MS_Analysis.get_Normalised_Area from these datasets 
@@ -83,7 +85,6 @@ class Agilent_Test(unittest.TestCase):
                                                "Sample_Amount", "Sample_Amount_Unit",
                                                "ISTD_Mixture_Volume_[uL]", "ISTD_to_Sample_Amount_Ratio",
                                                "Concentration_Unit"]]
-
             self.__compare_df('Sample_Annot',Sample_Annot_df,self.DataResultList[i])
 
     def test_getLongTable(self):
@@ -91,10 +92,15 @@ class Agilent_Test(unittest.TestCase):
 
         * WideTableForm.csv
         """
+        self.MyLongTableData.get_from_Input_Data('Area', outputdata = False)
+        Long_Table_df = self.MyLongTableData.get_Long_Table()
+        self.__compare_df('Long_Table',Long_Table_df,self.LongTableDataResults)
 
-        #[norm_Area_df,ISTD_Area,Transition_Name_Annot,ISTD_Report] = self.DataList[0].get_Normalised_Area('normArea by ISTD')
-        Long_Table_df = self.DataList[0].get_Long_Table()
-        print(Long_Table_df)
+        self.MyLongTableDataWithAnnot.get_from_Input_Data('Area', outputdata = False)
+        self.MyLongTableDataWithAnnot.get_Normalised_Area('normArea by ISTD', outputdata = False)
+        self.MyLongTableDataWithAnnot.get_Analyte_Concentration('normConc by ISTD', outputdata = False)
+        Long_Table_df = self.MyLongTableDataWithAnnot.get_Long_Table()
+        self.__compare_df('Long_Table',Long_Table_df,self.LongTableDataWithAnnotResults)
       
     def tearDown(self):
         for i in range(len(self.DataResultList)):
