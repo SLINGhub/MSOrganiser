@@ -25,29 +25,47 @@ SCIEX_RESULTS_FILENAME = os.path.join(os.path.dirname(__file__),"testdata", 'Sci
 class Agilent_Test(unittest.TestCase):
 
     def setUp(self):
-        MyWideData = MS_Analysis(WIDETABLEFORM_FILENAME,'Agilent Wide Table in csv',WIDETABLEFORM_ANNOTATION,ingui=True)
+        MyWideData = MS_Analysis(MS_FilePath = WIDETABLEFORM_FILENAME,
+                                 MS_FileType = 'Agilent Wide Table in csv',
+                                 Annotation_FilePath = WIDETABLEFORM_ANNOTATION,
+                                 ingui = True)
         WideDataResults = openpyxl.load_workbook(WIDETABLEFORM_RESULTS_FILENAME)
 
-        MyLargeWideData = MS_Analysis(LARGE_WIDETABLEFORM_FILENAME,'Agilent Wide Table in csv',LARGE_WIDETABLEFORM_ANNOTATION,ingui=True)
+        MyLargeWideData = MS_Analysis(MS_FilePath = LARGE_WIDETABLEFORM_FILENAME,
+                                      MS_FileType = 'Agilent Wide Table in csv',
+                                      Annotation_FilePath = LARGE_WIDETABLEFORM_ANNOTATION,
+                                      ingui = True)
         LargeWideDataResults = openpyxl.load_workbook(LARGE_WIDETABLEFORM_RESULTS_FILENAME)
 
-        MyCompoundData = MS_Analysis(COMPOUNDTABLEFORM_FILENAME,'Agilent Compound Table in csv',COMPOUNDTABLEFORM_ANNOTATION,ingui=True)
+        MyCompoundData = MS_Analysis(MS_FilePath = COMPOUNDTABLEFORM_FILENAME,
+                                     MS_FileType = 'Agilent Compound Table in csv',
+                                     Annotation_FilePath = COMPOUNDTABLEFORM_ANNOTATION,
+                                     ingui = True)
         CompoundDataResults = openpyxl.load_workbook(COMPOUNDTABLEFORM_RESULTS_FILENAME)
 
-        MySciexData = MS_Analysis(SCIEX_FILENAME,'Multiquant Long Table in txt',SCIEX_ANNOTATION,ingui=True)
+        MySciexData = MS_Analysis(MS_FilePath = SCIEX_FILENAME,
+                                  MS_FileType = 'Multiquant Long Table in txt',
+                                  Annotation_FilePath = SCIEX_ANNOTATION,
+                                  ingui = True)
         SciexResults = openpyxl.load_workbook(SCIEX_RESULTS_FILENAME)
 
         self.DataList = [MyWideData,MyLargeWideData,MyCompoundData,MySciexData]
         self.DataResultList = [WideDataResults,LargeWideDataResults,CompoundDataResults,SciexResults]
 
-        self.MyLongTableData = MS_Analysis(WIDETABLEFORM_FILENAME,'Agilent Wide Table in csv',
-                                           WIDETABLEFORM_ANNOTATION,ingui=True,
-                                           longtable = True, longtable_annot = False)
+        self.MyLongTableData = MS_Analysis(MS_FilePath = WIDETABLEFORM_FILENAME,
+                                           MS_FileType = 'Agilent Wide Table in csv',
+                                           Annotation_FilePath = WIDETABLEFORM_ANNOTATION,
+                                           ingui = True,
+                                           longtable = True, 
+                                           longtable_annot = False)
         self.LongTableDataResults = openpyxl.load_workbook(WIDETABLEFORM_LONGTABLE_FILENAME)
 
-        self.MyLongTableDataWithAnnot = MS_Analysis(WIDETABLEFORM_FILENAME,'Agilent Wide Table in csv',
-                                                    WIDETABLEFORM_ANNOTATION,ingui=True,
-                                                    longtable = True, longtable_annot = True)
+        self.MyLongTableDataWithAnnot = MS_Analysis(MS_FilePath = WIDETABLEFORM_FILENAME,
+                                                    MS_FileType = 'Agilent Wide Table in csv',
+                                                    Annotation_FilePath = WIDETABLEFORM_ANNOTATION,
+                                                    ingui = True,
+                                                    longtable = True, 
+                                                    longtable_annot = True)
         self.LongTableDataWithAnnotResults = openpyxl.load_workbook(WIDETABLEFORM_LONGTABLE_WITH_ANNOT_FILENAME)
 
     def test_getnormAreaTable(self):
