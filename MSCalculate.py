@@ -530,7 +530,8 @@ class ISTD_Operations():
 
     def getConc_by_ISTD(Transition_Name_df,ISTD_Annot_df,Sample_Annot_df,
                         logger=None,ingui=False,
-                        allow_multiple_istd = False):
+                        allow_multiple_istd = False,
+                        allow_multiple_data_file_path = False):
         """Perform calculation of analyte concentration using values from Transition_Name_Annot_ISTD
         
         Args:
@@ -540,6 +541,7 @@ class ISTD_Operations():
             logger (object): logger object created by start_logger in MSOrganiser
             ingui (bool): if True, print analysis status to screen
             allow_multiple_istd (bool): if True, allow normalisation of Transition_Name_df mulitple internal standards
+            allow_multiple_data_file_path (bool): if True, allow calculation of concentration using Sample_Annot_df that has more than one data file name
 
         Returns:
             (list): list containing:
@@ -625,14 +627,13 @@ class ISTD_Operations():
                                    "Concentration_Unit"]),flush=True)
             return [Conc_df,Conc_df,Conc_df]
 
-        #We cannot accept duplicated Data_File_path
-        #By right Data_File_Name should be uniquely one value since it has been filtered in ISTD_Operations.read_Sample_Annot
-        if(len(Sample_Annot_df.Data_File_Name.unique()) > 1):
+        #We cannot accept > 1 Data_File_path if we are not doing concatenation to save memory
+        if(len(Sample_Annot_df.Data_File_Name.unique()) > 1 and not allow_multiple_data_file_path):
             #Return empty data set
             if logger:
-                logger.error('Skipping step to get normConc. Sample Annotation data frame has more than one Data_File_Name.')
+                logger.error('Skipping step to get normConc. At no concatenation mode, Sample Annotation data frame has more than one Data_File_Name.')
             if ingui:
-                print('Skipping step to get normConc. Sample Annotation data frame has more than one Data_File_Name.' ,flush=True)
+                print('Skipping step to get normConc. At no concatenation mode, Sample Annotation data frame has more than one Data_File_Name.' ,flush=True)
             for things in Sample_Annot_df.Data_File_Name.unique():
                 if logger:
                     logger.warning('/"%s/"',things)

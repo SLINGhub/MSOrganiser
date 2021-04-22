@@ -11,40 +11,48 @@ class MS_Analysis():
 
     Args:
         MS_FilePath (str): File path of the input MRM transition name file
+        MS_FilePaths (str): File paths of the input MRM transition name file (multiple)
+        MS_FileType (str): File type of the input MRM transition name file
         Annotation_FilePath (str): The file path to the MS Template Creator annotation file if provided
+        Area_df (pandas DataFrame): A data frame of sample as rows and transition names as columns with area as values
         logger (object): logger object created by start_logger in MSOrganiser
         ingui (bool): if True, print analysis status to screen
         longtable (bool): if True, prepare a dataframe to store results in long table
         longtable_annot (bool): if True, prepare a dataframe to store annotation details in long table
     """
 
-    def __init__(self, MS_FilePath , MS_FileType ,Annotation_FilePath=None, logger=None, ingui=True,  longtable = False, longtable_annot = False):
+    def __init__(self, MS_FilePath = None , MS_FilePaths = [],
+                 MS_FileType = None, 
+                 Annotation_FilePath=None,
+                 logger=None, ingui=True,  
+                 longtable = False, longtable_annot = False):
         self.MS_FilePath = MS_FilePath
+        self.MS_FilePaths = MS_FilePaths
+        self.MS_FileType = MS_FileType
+        #Annotation File Path
+        self.Annotation_FilePath = Annotation_FilePath
         self.logger = logger
         self.ingui = ingui
 
         #Check if file is from Agilent or Sciex
-        if MS_FileType in ['Agilent Wide Table in csv', 'Agilent Compound Table in csv']:
-            if MS_FilePath.endswith('.csv'):
-                self.RawData = AgilentMSRawData(filepath=MS_FilePath,logger=logger)
-            else:
-                if self.ingui:
-                    print('Filepath ' + str(MS_FilePath) + ' must have a .csv extention',flush=True)
-                if self.logger:
-                    self.logger.error('Filepath %s must have a .csv extention',MS_FilePath)
-                sys.exit(-1)
-        elif MS_FileType in ['Multiquant Long Table in txt']:
-            if MS_FilePath.endswith('.txt'):
-                self.RawData = SciexMSRawData(filepath=MS_FilePath,logger=logger)
-            else:
-                if self.ingui:
-                    print('Filepath ' + str(MS_FilePath) + ' must have a .txt extention',flush=True)
-                if self.logger:
-                    self.logger.error('Filepath %s must have a .txt extention',MS_FilePath)
-                sys.exit(-1)
-
-        #Annotation File Path
-        self.Annotation_FilePath = Annotation_FilePath
+        #if MS_FileType in ['Agilent Wide Table in csv', 'Agilent Compound Table in csv']:
+        #    if MS_FilePath.endswith('.csv'):
+        #        self.RawData = AgilentMSRawData(filepath=MS_FilePath,logger=logger)
+        #    else:
+        #        if self.ingui:
+        #            print('Filepath ' + str(MS_FilePath) + ' must have a .csv extention',flush=True)
+        #        if self.logger:
+        #            self.logger.error('Filepath %s must have a .csv extention',MS_FilePath)
+        #        sys.exit(-1)
+        #elif MS_FileType in ['Multiquant Long Table in txt']:
+        #    if MS_FilePath.endswith('.txt'):
+        #        self.RawData = SciexMSRawData(filepath=MS_FilePath,logger=logger)
+        #    else:
+        #        if self.ingui:
+        #            print('Filepath ' + str(MS_FilePath) + ' must have a .txt extention',flush=True)
+        #        if self.logger:
+        #            self.logger.error('Filepath %s must have a .txt extention',MS_FilePath)
+        #        sys.exit(-1)
 
         #Initialise the data in long table starting with an empty dataframe
         self.LongTable_df = pd.DataFrame()
@@ -58,6 +66,55 @@ class MS_Analysis():
         self.norm_Area_df = pd.DataFrame()
         self.ISTD_map_df = pd.DataFrame()
         self.Sample_Annot_df = pd.DataFrame()
+
+    def _prepare_InputData(self):
+        if self.MS_FileType in ['Agilent Wide Table in csv', 'Agilent Compound Table in csv']:
+            if self.MS_FilePath.endswith('.csv'):
+                InputData = AgilentMSRawData(filepath=self.MS_FilePath,logger=self.logger)
+            else:
+                if self.ingui:
+                    print('Filepath ' + str(self.MS_FilePath) + ' must have a .csv extention',flush=True)
+                if self.logger:
+                    self.logger.error('Filepath %s must have a .csv extention',self.MS_FilePath)
+                sys.exit(-1)
+        elif self.MS_FileType in ['Multiquant Long Table in txt']:
+            if self.MS_FilePath.endswith('.txt'):
+                InputData = SciexMSRawData(filepath=self.MS_FilePath,logger=self.logger)
+            else:
+                if self.ingui:
+                    print('Filepath ' + str(self.MS_FilePath) + ' must have a .txt extention',flush=True)
+                if self.logger:
+                    self.logger.error('Filepath %s must have a .txt extention',self.MS_FilePath)
+                sys.exit(-1)
+        return(InputData)
+
+    def _get_Area_df_for_normalisation(self, allow_multiple_istd = False, using_multiple_input_files = False):
+
+        if using_multiple_input_files:
+            concatenate_Area_df = pd.DataFrame()
+            first_time = True
+
+            for MS_FilePath in self.MS_FilePaths:
+                self.MS_FilePath = MS_FilePath
+                InputData = self._prepare_InputData()
+                Area_df = InputData.get_table('Area',is_numeric=True)
+                #Concantenate Column Wise
+                if first_time:
+                    concatenate_Area_df = Area_df
+                    first_time = False
+                else:
+                    #Remove the Sample_Name column
+                    Area_df = Area_df.loc[:, Area_df.columns != 'Sample_Name']
+                    concatenate_Area_df = pd.concat([concatenate_Area_df, Area_df], 
+                                                    ignore_index=False, 
+                                                    sort=False, 
+                                                    axis = 1)
+
+            return(concatenate_Area_df)
+        else:
+            InputData = self._prepare_InputData()
+            Area_df = InputData.get_table('Area',is_numeric=True)
+            return(Area_df)
 
     def _add_to_LongTable_df(self,wide_df,column_name,allow_multiple_istd = False):
 
@@ -141,7 +198,7 @@ class MS_Analysis():
 
         Args:
             column_name (str): The name of the column given in the Output_Options.
-            outputdata (bool): if True, return the results as a pandas dataframe. Else, the dataframe is stored in the class and nothing is returned
+            outputdata (bool): if True, return the results as a pandas dataframe. Else, nothing is returned
             allow_multiple_istd (bool): if True, allow normalisation of peak area by mulitple internal standards which leads to an expansion of the Output_df
 
         Returns:
@@ -150,7 +207,8 @@ class MS_Analysis():
         """
 
         #We extract the data directly from the file and output accordingly
-        Output_df = self.RawData.get_table(column_name,is_numeric=True)
+        InputData = self._prepare_InputData()
+        Output_df = InputData.get_table(column_name,is_numeric=True)
 
         if allow_multiple_istd:
             #Get ISTD map df
@@ -176,16 +234,18 @@ class MS_Analysis():
         if outputdata:
             return(Output_df)
 
-    def get_Normalised_Area(self,analysis_name,outputdata=True,allow_multiple_istd = False):
+    def get_Normalised_Area(self,analysis_name, 
+                            outputdata=True, 
+                            allow_multiple_istd = False,
+                            using_multiple_input_files = False):
         """Function to calculate the normalised area from the input MRM transition name data and MS Template Creator annotation file.
 
         Args:
             analysis_name (str): The name of the column given in the Output_Options. Should be "normArea by ISTD"
-            outputdata (bool): if True, return the results as a pandas dataframe. Else, the dataframe is stored in the class and nothing is returned
+            outputdata (bool): if True, return the results as a pandas dataframe. Else, nothing is returned
             allow_multiple_istd (bool): if True, allow normalisation of peak area by mulitple internal standards (in development)
+            using_multiple_input_files (bool): if True, the Area df will be constructed from multiple input files, denoted in MS_FilePaths (in development)
         
-        When outputdata is set to True,
-
         Returns:
             (list): list containing:
 
@@ -198,7 +258,10 @@ class MS_Analysis():
 
         #Perform normalisation using ISTD
         ##Get Area Table
-        Area_df = self.RawData.get_table('Area',is_numeric=True)
+
+        Area_df = MS_Analysis._get_Area_df_for_normalisation(self, 
+                                                             allow_multiple_istd = allow_multiple_istd,
+                                                             using_multiple_input_files = using_multiple_input_files)
 
         #Get ISTD map df
         ISTD_map_df = ISTD_Operations.read_ISTD_map(self.Annotation_FilePath,analysis_name,
@@ -207,11 +270,9 @@ class MS_Analysis():
                                                     allow_multiple_istd = allow_multiple_istd)
         self.ISTD_map_df = ISTD_map_df
 
-
         [ISTD_report,Transition_Name_dict] = ISTD_Operations.create_Transition_Name_dict(Area_df,self.ISTD_map_df,
                                                                                          logger=self.logger,ingui=self.ingui,
                                                                                          allow_multiple_istd = allow_multiple_istd)
-
         ##Update the Area_df so that it can be normalised by multiple ISTD
         if allow_multiple_istd:
             Area_df = ISTD_Operations.expand_Transition_Name_df(Area_df,Transition_Name_dict,
@@ -230,13 +291,17 @@ class MS_Analysis():
         if outputdata:
             return([norm_Area_df,ISTD_Area,ISTD_map_df,ISTD_report])
 
-    def get_Analyte_Concentration(self,analysis_name,outputdata=True,allow_multiple_istd = False):
+    def get_Analyte_Concentration(self,analysis_name,
+                                  outputdata=True,
+                                  allow_multiple_istd = False,
+                                  using_multiple_input_files = False):
         """Function to calculate the transition names concentration from the input MRM transition name data and MS Template Creator annotation file.
 
         Args:
             analysis_name (str): The name of the column given in the Output_Options. Should be "normConc by ISTD"
-            outputdata (bool): if True, return the results as a pandas dataframe. Else, the dataframe is stored in the class and nothing is returned
+            outputdata (bool): if True, return the results as a pandas dataframe. Else, nothing is returned
             allow_multiple_istd (bool): if True, allow normalisation of peak area by mulitple internal standards
+            using_multiple_input_files (bool): if True, the Area df will be constructed from multiple input files, denoted in MS_FilePaths (in development)
         
         When outputdata is set to True,
 
@@ -253,16 +318,29 @@ class MS_Analysis():
         #Perform normalisation using ISTD if it is not done earlier
         if(self.norm_Area_df.empty or self.ISTD_map_df.empty):
             self.get_Normalised_Area(analysis_name,
-                                     outputdata=False,allow_multiple_istd = allow_multiple_istd)
+                                     outputdata=False,
+                                     allow_multiple_istd = allow_multiple_istd,
+                                     using_multiple_input_files = using_multiple_input_files)
 
-        #Perform concentration calculation, we need norm_Area_df, ISTD_map_df and Sample_Annot_df
-        Sample_Annot_df = ISTD_Operations.read_Sample_Annot(self.Annotation_FilePath,[os.path.basename(self.MS_FilePath)],analysis_name,
+        #Perform concentration calculation, we need self.norm_Area_df, self.ISTD_map_df and self.Sample_Annot_df
+        if using_multiple_input_files:
+            MS_FilePathList = [os.path.basename(MS_FilePath) for MS_FilePath in self.MS_FilePaths]
+        else:
+            MS_FilePathList = [os.path.basename(self.MS_FilePath)]
+
+
+        Sample_Annot_df = ISTD_Operations.read_Sample_Annot(self.Annotation_FilePath, 
+                                                            MS_FilePathList = MS_FilePathList, 
+                                                            column_name = analysis_name,
                                                             logger= self.logger, ingui=self.ingui)
         self.Sample_Annot_df = Sample_Annot_df
 
-        [norm_Conc_df,ISTD_Conc_df,ISTD_Samp_Ratio_df] = ISTD_Operations.getConc_by_ISTD(self.norm_Area_df,self.ISTD_map_df,self.Sample_Annot_df,
+        [norm_Conc_df,ISTD_Conc_df,ISTD_Samp_Ratio_df] = ISTD_Operations.getConc_by_ISTD(self.norm_Area_df,
+                                                                                         self.ISTD_map_df,
+                                                                                         self.Sample_Annot_df,
                                                                                          logger=self.logger,ingui=self.ingui,
-                                                                                         allow_multiple_istd = allow_multiple_istd)
+                                                                                         allow_multiple_istd = allow_multiple_istd,
+                                                                                         allow_multiple_data_file_path = using_multiple_input_files)
 
         #Create the Long Form dataframe
         if self.LongTable:
