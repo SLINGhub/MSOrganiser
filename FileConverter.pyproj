@@ -12,7 +12,7 @@
     <OutputPath>.</OutputPath>
     <Name>FileConverter</Name>
     <RootNamespace>FileConverter</RootNamespace>
-    <InterpreterId>MSBuild|testenv|$(MSBuildProjectFullPath)</InterpreterId>
+    <InterpreterId>MSBuild|testenv3.9|$(MSBuildProjectFullPath)</InterpreterId>
     <SuppressConfigureTestFrameworkPrompt>true</SuppressConfigureTestFrameworkPrompt>
     <SuppressPackageInstallationPrompt>True</SuppressPackageInstallationPrompt>
   </PropertyGroup>
@@ -325,6 +325,15 @@
     <Content Include="version.txt" />
   </ItemGroup>
   <ItemGroup>
+    <Interpreter Include="testenv3.9\">
+      <Id>testenv3.9</Id>
+      <Version>3.9</Version>
+      <Description>testenv3.9 (Python 3.9 (64-bit))</Description>
+      <InterpreterPath>Scripts\python.exe</InterpreterPath>
+      <WindowsInterpreterPath>Scripts\pythonw.exe</WindowsInterpreterPath>
+      <PathEnvironmentVariable>PYTHONPATH</PathEnvironmentVariable>
+      <Architecture>X64</Architecture>
+    </Interpreter>
     <Interpreter Include="testenv\">
       <Id>testenv</Id>
       <Version>3.7</Version>
