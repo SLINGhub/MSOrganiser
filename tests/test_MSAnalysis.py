@@ -3,6 +3,7 @@ import os
 import pandas as pd
 import openpyxl
 from MSAnalysis import MS_Analysis
+from MSOrganiser import concatenate_along_rows_workflow
 
 WIDETABLEFORM_FILENAME = os.path.join(os.path.dirname(__file__),"testdata", 'WideTableForm.csv')
 WIDETABLEFORM_ANNOTATION = os.path.join(os.path.dirname(__file__),"testdata", 'WideTableForm_Annotation.xlsm')
@@ -21,6 +22,10 @@ COMPOUNDTABLEFORM_RESULTS_FILENAME = os.path.join(os.path.dirname(__file__),"tes
 SCIEX_FILENAME = os.path.join(os.path.dirname(__file__),"testdata", 'SciExTestData.txt')
 SCIEX_ANNOTATION = os.path.join(os.path.dirname(__file__),"testdata", 'SciExTestData_Annotation.xlsm')
 SCIEX_RESULTS_FILENAME = os.path.join(os.path.dirname(__file__),"testdata", 'SciExTestData_Results.xlsx')
+
+WIDETABLEFORMROW1_FILENAME = os.path.join(os.path.dirname(__file__),"testdata", 'WideTableFormRow1.csv')
+WIDETABLEFORMROW2_FILENAME = os.path.join(os.path.dirname(__file__),"testdata", 'WideTableFormRow2.csv')
+WIDETABLEFORMROW_ANNOTATION = os.path.join(os.path.dirname(__file__),"testdata", 'WideTableFormRow_Annotation.xlsm')
 
 class Agilent_Test(unittest.TestCase):
 
@@ -119,7 +124,25 @@ class Agilent_Test(unittest.TestCase):
         self.MyLongTableDataWithAnnot.get_Analyte_Concentration('normConc by ISTD', outputdata = False)
         Long_Table_df = self.MyLongTableDataWithAnnot.get_Long_Table()
         self.__compare_df('Long_Table',Long_Table_df,self.LongTableDataWithAnnotResults)
-      
+     
+    def test_concatenate(self):
+        stored_args = {
+            'MS_Files': [WIDETABLEFORMROW1_FILENAME, WIDETABLEFORMROW2_FILENAME], 
+            'MS_FileType': 'Agilent Wide Table in csv', 
+            'Output_Directory': 'D:\\MSOrganiser', 
+            'Output_Options': ['Area', 'normArea by ISTD', 'normConc by ISTD'], 
+            'Annot_File': WIDETABLEFORMROW_ANNOTATION, 
+            'Output_Format': 'Excel', 
+            'Concatenate': 'Concatenate along Sample Name (rows)', 
+            'Transpose_Results': False, 
+            'Allow_Multiple_ISTD': True, 
+            'Long_Table': True, 
+            'Long_Table_Annot': True, 
+            'Testing': False
+            }
+        [PDFReport, concatenate_df_list, concatenate_df_sheet_name] = concatenate_along_rows_workflow(stored_args,testing = True)
+        print(concatenate_df_sheet_name)
+        
     def tearDown(self):
         for i in range(len(self.DataResultList)):
             self.DataResultList[i].close()

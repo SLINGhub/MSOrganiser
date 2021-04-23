@@ -65,7 +65,8 @@ class MSDataReport_PDF(MSDataReport):
         Make sure that the directory msreport is in the same directory as this code
     """
 
-    def __init__(self, output_directory, input_file_path, logger=None, ingui=True):
+    def __init__(self, output_directory, input_file_path, 
+                 logger=None, ingui=True, testing = False):
         #Initialise the same way as MSDataReport
         super().__init__(output_directory, input_file_path, logger, ingui)
         #But change the output file path
@@ -73,7 +74,10 @@ class MSDataReport_PDF(MSDataReport):
 
         #These variables are unique to MSDataReport_PDF
         self.__pdf_pages = []
-        report_dir = _get_report_dir('msreport')
+        if testing:
+            report_dir = _get_report_dir(os.path.join("..", "msreport"))
+        else:
+            report_dir = _get_report_dir("msreport")
         env = Environment(loader=FileSystemLoader(report_dir))
         self.__ISTD_report_template = env.get_template("ISTD_Report.html")
         self.__Parameters_report_template = env.get_template("Parameters_Report.html")

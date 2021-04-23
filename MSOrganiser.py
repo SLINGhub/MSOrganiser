@@ -111,17 +111,6 @@ def get_Parameters_df(stored_args, MS_FilePath = None,
     Parameters_df = pd.DataFrame(Parameter_list,columns=['Parameters', 'Value'])
     return Parameters_df
 
-def set_DfOutput_configuration(stored_args, MS_FilePath, result_name, logger=None, ingui = True):
-
-    if stored_args['Output_Format'] == "Excel" :
-        DfOutput = MSDataOutput_Excel(stored_args['Output_Directory'], MS_FilePath, result_name = result_name ,
-                                      logger = logger, ingui = ingui)
-    elif stored_args['Output_Format'] == "csv" :
-        DfOutput = MSDataOutput_csv(stored_args['Output_Directory'], MS_FilePath, result_name = result_name ,
-                                    logger = logger, ingui = ingui)
-
-    return DfOutput
-
 def output_concatenated_wide_data(stored_args, 
                                   concatenate_df_list, concatenate_df_sheet_name,
                                   logger=None):
@@ -215,10 +204,12 @@ def no_concatenate_workflow(stored_args, logger=None):
             result_name = "Results"
 
         #Set up the file writing configuration for Excel, or csv ...
-        DfOutput = set_DfOutput_configuration(stored_args = stored_args, 
-                                              MS_FilePath = MS_FilePath, 
-                                              result_name = result_name, 
-                                              logger = logger, ingui = True)
+        if stored_args['Output_Format'] == "Excel" :
+            DfOutput = MSDataOutput_Excel(stored_args['Output_Directory'], MS_FilePath, result_name = result_name ,
+                                          logger = logger, ingui = True)
+        elif stored_args['Output_Format'] == "csv" :
+            DfOutput = MSDataOutput_csv(stored_args['Output_Directory'], MS_FilePath, result_name = result_name ,
+                                        logger = logger, ingui = True)
         DfOutput.start_writer()
 
         for column_name in stored_args['Output_Options']:
@@ -313,14 +304,15 @@ def no_concatenate_workflow(stored_args, logger=None):
         if stored_args['Output_Format'] == "Excel" :
             DfLongOutput.end_writer()
 
-def concatenate_along_rows_workflow(stored_args, logger=None):
-
+def concatenate_along_rows_workflow(stored_args, logger=None, testing = False):
+    print("Here")
     #Initiate the pdf report file
     PDFReport = MSDataReport_PDF(output_directory = stored_args['Output_Directory'], 
                                  input_file_path = "ConcatenatedRow", 
                                  logger = logger, 
-                                 ingui = True)
-
+                                 ingui = True,
+                                 testing = testing)
+    print("There")
     #Generate the parameters report
     Parameters_df = get_Parameters_df(stored_args = stored_args,
                                       MS_FilePaths = stored_args['MS_Files'],
@@ -468,32 +460,16 @@ def concatenate_along_rows_workflow(stored_args, logger=None):
                 concatenate_df_list.extend([Long_Table_df])
                 concatenate_df_sheet_name.extend(["Long_Table"])
 
-    #Output the report to a pdf file
-    PDFReport.output_to_PDF()
+    return([PDFReport, concatenate_df_list, concatenate_df_sheet_name])
 
-    #Output concatenated wide data after going through all the files
-    output_concatenated_wide_data(stored_args, 
-                                  concatenate_df_list = concatenate_df_list, 
-                                  concatenate_df_sheet_name = concatenate_df_sheet_name,
-                                  logger = logger)
-
-    #Output concatenated long table
-    output_concatenated_long_table(stored_args, 
-                                   concatenate_df_list = concatenate_df_list, 
-                                   concatenate_df_sheet_name = concatenate_df_sheet_name,
-                                   logger = logger)
-
-    #End log on a job
-    logger.info("Job is finished.")
-    print("Job is finished",flush=True)
-
-def concatenate_along_columns_workflow(stored_args, logger=None):
+def concatenate_along_columns_workflow(stored_args, logger=None, testing = False):
 
     #Initiate the pdf report file
     PDFReport = MSDataReport_PDF(output_directory = stored_args['Output_Directory'], 
                                  input_file_path = "ConcatenatedColumn", 
                                  logger = logger, 
-                                 ingui = True)
+                                 ingui = True,
+                                 testing = testing)
 
     #Generate the parameters report
     Parameters_df = get_Parameters_df(stored_args = stored_args,
@@ -656,24 +632,7 @@ def concatenate_along_columns_workflow(stored_args, logger=None):
                 concatenate_df_list.extend([Long_Table_df])
                 concatenate_df_sheet_name.extend(["Long_Table"])
 
-    #Output the report to a pdf file
-    PDFReport.output_to_PDF()
-
-    #Output concatenated wide data after going through all the files
-    output_concatenated_wide_data(stored_args, 
-                                  concatenate_df_list = concatenate_df_list, 
-                                  concatenate_df_sheet_name = concatenate_df_sheet_name,
-                                  logger = logger)
-
-    #Output concatenated long table
-    output_concatenated_long_table(stored_args, 
-                                   concatenate_df_list = concatenate_df_list, 
-                                   concatenate_df_sheet_name = concatenate_df_sheet_name,
-                                   logger = logger)
-
-    #End log on a job
-    logger.info("Job is finished.")
-    print("Job is finished",flush=True)
+    return([PDFReport, concatenate_df_list, concatenate_df_sheet_name])
 
 if __name__ == '__main__':
 
@@ -694,6 +653,25 @@ if __name__ == '__main__':
     if stored_args['Concatenate']=="No Concatenate":
         no_concatenate_workflow(stored_args,logger)
     elif stored_args['Concatenate']=="Concatenate along Sample Name (rows)":
-        concatenate_along_rows_workflow(stored_args,logger)
+        [PDFReport, concatenate_df_list, concatenate_df_sheet_name] = concatenate_along_rows_workflow(stored_args,logger)
     elif stored_args['Concatenate']=="Concatenate along Transition Name (columns)":
-        concatenate_along_columns_workflow(stored_args, logger)
+        [PDFReport, concatenate_df_list, concatenate_df_sheet_name] = concatenate_along_columns_workflow(stored_args, logger)
+
+    if stored_args['Concatenate']!="No Concatenate":
+        #Output the report to a pdf file
+        PDFReport.output_to_PDF()
+        #Output concatenated wide data after going through all the files
+        output_concatenated_wide_data(stored_args, 
+                                       concatenate_df_list = concatenate_df_list, 
+                                       concatenate_df_sheet_name = concatenate_df_sheet_name,
+                                       logger = logger)
+
+        #Output concatenated long table
+        output_concatenated_long_table(stored_args, 
+                                       concatenate_df_list = concatenate_df_list, 
+                                       concatenate_df_sheet_name = concatenate_df_sheet_name,
+                                       logger = logger)
+
+    #End log on a job
+    logger.info("Job is finished.")
+    print("Job is finished",flush=True)
