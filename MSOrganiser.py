@@ -122,6 +122,66 @@ def set_DfOutput_configuration(stored_args, MS_FilePath, result_name, logger=Non
 
     return DfOutput
 
+def output_concatenated_wide_data(stored_args, 
+                                  concatenate_df_list, concatenate_df_sheet_name,
+                                  logger=None):
+
+    #Output concatenated wide data after going through all the files
+    if stored_args['Transpose_Results']:
+        result_name = "TransposeResults"
+    else:
+        result_name = "Results"
+
+    logger.info("Outputting concatenated file.")
+    print("Creating concatenated file.",flush=True)
+
+    #Set up the file writing configuration for Excel, or csv ...
+    if stored_args['Output_Format'] == "Excel" :
+        DfConcatenateOutput = MSDataOutput_Excel(stored_args['Output_Directory'], "Concatenated", 
+                                                 result_name ,logger=logger, ingui=True)
+    elif stored_args['Output_Format'] == "csv" :
+        DfConcatenateOutput = MSDataOutput_csv(stored_args['Output_Directory'], "Concatenated",
+                                               result_name ,logger=logger, ingui=True)
+
+    DfConcatenateOutput.start_writer()
+    for i in range(len(concatenate_df_list)):
+        if concatenate_df_sheet_name[i] != "Long_Table":
+            #Decide the appropriate table to perfrom the transpose if set to True.
+            if concatenate_df_sheet_name[i] in ["Transition_Name_Annot","Sample_Annot"]:
+                #For these two data frame, no transpose is required.
+                DfConcatenateOutput.df_to_file(concatenate_df_sheet_name[i],concatenate_df_list[i])
+            else:
+                DfConcatenateOutput.df_to_file(concatenate_df_sheet_name[i],concatenate_df_list[i],
+                                               transpose=stored_args['Transpose_Results'],
+                                               allow_multiple_istd=stored_args['Allow_Multiple_ISTD'])
+    if stored_args['Output_Format'] == "Excel" :
+        DfConcatenateOutput.end_writer()
+
+def output_concatenated_long_table(stored_args, 
+                                   concatenate_df_list, concatenate_df_sheet_name,
+                                   logger=None):
+
+    #Output concatenated long table
+    if stored_args['Long_Table']:
+        #Set up the file writing configuration for Excel, or csv ...
+        if stored_args['Output_Format'] == "Excel" :
+            if stored_args['Long_Table_Annot']:
+                result_name = "Long_Table_with_Annot"
+            else:
+                result_name = "Long_Table"
+            DfConcatenateLongOutput = MSDataOutput_Excel(stored_args['Output_Directory'], "Concatenated", 
+                                                         result_name = result_name ,logger=logger, ingui=True)
+        elif stored_args['Output_Format'] == "csv" :
+            DfConcatenateLongOutput = MSDataOutput_csv(stored_args['Output_Directory'], "Concatenated", 
+                                                       result_name = "" ,logger=logger, ingui=True)
+        DfConcatenateLongOutput.start_writer()
+        Long_Table_index = concatenate_df_sheet_name.index("Long_Table")
+        if stored_args['Output_Format'] == "csv" and stored_args['Long_Table_Annot']:
+            concatenate_df_sheet_name[Long_Table_index] = "Long_Table_with_Annot"
+        DfConcatenateLongOutput.df_to_file(concatenate_df_sheet_name[Long_Table_index],concatenate_df_list[Long_Table_index])
+        if stored_args['Output_Format'] == "Excel" :
+            DfConcatenateLongOutput.end_writer()
+
 def no_concatenate_workflow(stored_args, logger=None):
     #We do this for every mass hunter file output
     #MS_Files is no longer a long string of paths separated by ;, we split them into a list
@@ -187,7 +247,7 @@ def no_concatenate_workflow(stored_args, logger=None):
                     PDFReport.create_ISTD_report(ISTD_Report)
 
             elif column_name == 'normConc by ISTD':
-                #Perform concentration calculation
+                #Perform concentration need_full_data
                 [norm_Conc_df,ISTD_Conc_df,ISTD_Samp_Ratio_df,Sample_Annot_df] = MyData.get_Analyte_Concentration(column_name,stored_args['Annot_File'],
                                                                                                                   allow_multiple_istd=stored_args['Allow_Multiple_ISTD'])
 
@@ -269,52 +329,113 @@ def concatenate_along_rows_workflow(stored_args, logger=None):
 
     PDFReport.create_parameters_report(Parameters_df)
 
+    no_need_full_data_columns = []
+    need_full_data_columns = []
+
+    for column_name in stored_args['Output_Options']:
+        if column_name in ["Area","RT","FWHM","S/N","Symmetry",
+                           "Precursor Ion","Product Ion"]:
+            no_need_full_data_columns.append(column_name)
+        else:
+            need_full_data_columns.append(column_name)
+            if any(['normArea by ISTD' in stored_args['Output_Options'],
+                    'normConc by ISTD' in stored_args['Output_Options']
+                   ]) and 'Area' not in no_need_full_data_columns:
+                no_need_full_data_columns.append("Area")
+
     concatenate_df_list = []
     concatenate_df_sheet_name = []
 
-    #We do this for every mass hunter file output
-    #MS_Files is no longer a long string of paths separated by ;, we split them into a list
-    for MS_FilePath in stored_args['MS_Files']:
+    #We first need to concatenate Output Options that do not require full data like
+    #Area, RT, etc
+    if(len(no_need_full_data_columns) > 0):
 
-        print("Working on " + MS_FilePath,flush=True)
-        logger.info("Working on " + MS_FilePath)
+        #We do this for every mass hunter file output
+        #MS_Files is no longer a long string of paths separated by ;, we split them into a list
+        for MS_FilePath in stored_args['MS_Files']:
 
-        MyData = MS_Analysis(MS_FilePath = MS_FilePath, 
-                             MS_FileType = stored_args['MS_FileType'], 
-                             Annotation_FilePath = stored_args['Annot_File'],
-                             logger = logger, 
-                             ingui = True, 
-                             longtable = stored_args['Long_Table'], 
-                             longtable_annot = stored_args['Long_Table_Annot'])
+            MyNoCalcData = MS_Analysis(MS_FilePath = MS_FilePath, 
+                                       MS_FileType = stored_args['MS_FileType'], 
+                                       Annotation_FilePath = stored_args['Annot_File'],
+                                       logger = logger, 
+                                       ingui = True, 
+                                       longtable = stored_args['Long_Table'], 
+                                       longtable_annot = stored_args['Long_Table_Annot'])
 
-        #Initialise a list of df and sheet name
-        one_file_df_list = []
-        one_file_df_sheet_name = []
+            #Initialise a list of df and sheet name
+            one_file_df_list = []
+            one_file_df_sheet_name = []
 
-        for column_name in stored_args['Output_Options']:
+            for column_name in no_need_full_data_columns:
+                #We extract the data directly from the file and put them in the list accordingly
+                Output_df = MyNoCalcData.get_from_Input_Data(column_name,
+                                                             allow_multiple_istd=stored_args['Allow_Multiple_ISTD'])
+                one_file_df_list.extend([Output_df])
+                one_file_df_sheet_name.extend([column_name])
+
+            #Output the LongTable Data Table in another csv or excel sheet
+            if stored_args['Long_Table']:
+                Long_Table_df = MyNoCalcData.get_Long_Table(allow_multiple_istd=stored_args['Allow_Multiple_ISTD'])
+                one_file_df_list.extend([Long_Table_df])
+                one_file_df_sheet_name.extend(["Long_Table"])
+
+            #After creating the one_file_df_list and one_file_df_sheet_name
+            #Start to concatenate when we reach the second file
+            if len(concatenate_df_list) == 0:
+                concatenate_df_list = one_file_df_list
+                concatenate_df_sheet_name = one_file_df_sheet_name
+            else:
+                #When we have the second file onwards
+                for i in range(len(one_file_df_list)):
+                    #Concatenate Row Wise all df except those indicated
+                    if not one_file_df_sheet_name[i] in ["Transition_Name_Annot"]:
+                        concatenate_df_list[i] = pd.concat([concatenate_df_list[i], one_file_df_list[i]], 
+                                                           ignore_index=True, 
+                                                           sort=False, 
+                                                           axis = 0)
+
+    #We now create data frame of output options that require the full data like
+    #normArea by ISTD, normConc by ISTD, etc
+
+    if(len(need_full_data_columns) > 0):
+
+        MyCalcData = MS_Analysis(MS_FilePaths = stored_args['MS_Files'], 
+                                 MS_FileType = stored_args['MS_FileType'], 
+                                 Annotation_FilePath = stored_args['Annot_File'],
+                                 logger = logger, 
+                                 ingui = True, 
+                                 longtable = stored_args['Long_Table'], 
+                                 longtable_annot = stored_args['Long_Table_Annot'])
+
+
+        #print("Working on Output options that needs to be calculated",flush=True)
+        for column_name in need_full_data_columns:
             if column_name == 'normArea by ISTD':
+
                 #Perform normalisation using ISTD
-                [norm_Area_df,ISTD_Area,ISTD_map_df,ISTD_Report] = MyData.get_Normalised_Area(column_name,stored_args['Annot_File'],
-                                                                                              allow_multiple_istd = stored_args['Allow_Multiple_ISTD'])
+                [norm_Area_df,ISTD_Area,ISTD_map_df,ISTD_Report] = MyCalcData.get_Normalised_Area(column_name,stored_args['Annot_File'],
+                                                                                                  allow_multiple_istd = stored_args['Allow_Multiple_ISTD'],
+                                                                                                  using_multiple_input_files = True,
+                                                                                                  concatenation_type = "rows")
 
-                #Put the normalised area results in the list
-
-                #If testing, output the ISTD_Area results in the list
+                #If testing, output the ISTD_Area results in the concatenate_df list
                 if stored_args['Testing']:
-                    one_file_df_list.extend([ISTD_Area])
-                    one_file_df_sheet_name.extend(["ISTD_Area"])
+                    concatenate_df_list.extend([ISTD_Area])
+                    concatenate_df_sheet_name.extend(["ISTD_Area"])
 
-                #Put the normalised area and transition annotation results list
-                one_file_df_list.extend([ISTD_map_df,norm_Area_df])
-                one_file_df_sheet_name.extend(["Transition_Name_Annot","normArea_by_ISTD"])
-           
+                #Put the normalised area and transition annotation results in the concatenate_df list
+                concatenate_df_list.extend([ISTD_map_df,norm_Area_df])
+                concatenate_df_sheet_name.extend(["Transition_Name_Annot","normArea_by_ISTD"])
+
                 #Generate the ISTD normalisation report
                 PDFReport.create_ISTD_report(ISTD_Report)
 
             elif column_name == 'normConc by ISTD':
-                #Perform concentration calculation
-                [norm_Conc_df,ISTD_Conc_df,ISTD_Samp_Ratio_df,Sample_Annot_df] = MyData.get_Analyte_Concentration(column_name,stored_args['Annot_File'],
-                                                                                                                  allow_multiple_istd=stored_args['Allow_Multiple_ISTD'])
+                #Perform concentration calculation using ISTD
+                [norm_Conc_df,ISTD_Conc_df,ISTD_Samp_Ratio_df,Sample_Annot_df] = MyCalcData.get_Analyte_Concentration(column_name,stored_args['Annot_File'],
+                                                                                                                      allow_multiple_istd=stored_args['Allow_Multiple_ISTD'],
+                                                                                                                      using_multiple_input_files = True,
+                                                                                                                      concatenation_type = "rows")
 
                 #Remove the column "Merge_Status" as it is not relevant
                 #Reorder the column such that "Concentration_Unit" is at the last column
@@ -322,102 +443,45 @@ def concatenate_along_rows_workflow(stored_args, logger=None):
                                                    "Sample_Amount", "Sample_Amount_Unit",
                                                    "ISTD_Mixture_Volume_[uL]", "ISTD_to_Sample_Amount_Ratio",
                                                    "Concentration_Unit"]]
-
-                #Put the concentration results in the list
-
+                
                 #If testing, output the ISTD_Conc and ISTD_to_Samp_Amt_Ratio results in the list
                 if stored_args['Testing']:
-                    one_file_df_list.extend([ISTD_Conc_df,ISTD_Samp_Ratio_df])
-                    one_file_df_sheet_name.extend(["ISTD_Conc","ISTD_to_Samp_Amt_Ratio"])
+                    concatenate_df_list.extend([ISTD_Conc_df,ISTD_Samp_Ratio_df])
+                    concatenate_df_sheet_name.extend(["ISTD_Conc","ISTD_to_Samp_Amt_Ratio"])
 
                 #Output the concentration data and sample annotation results in the list
-                one_file_df_list.extend([Sample_Annot_df,norm_Conc_df])
-                one_file_df_sheet_name.extend(["Sample_Annot","normConc_by_ISTD"])
+                concatenate_df_list.extend([Sample_Annot_df,norm_Conc_df])
+                concatenate_df_sheet_name.extend(["Sample_Annot","normConc_by_ISTD"])
 
-
-            else:
-                #We extract the data directly from the file and put them in the list accordingly
-                Output_df = MyData.get_from_Input_Data(column_name,
-                                                       allow_multiple_istd=stored_args['Allow_Multiple_ISTD'])
-
-                one_file_df_list.extend([Output_df])
-                one_file_df_sheet_name.extend([column_name])
-
-        #Output the report to a pdf file
-        PDFReport.output_to_PDF()
-
-        #Put the LongTable Data Table in the list if required
+        #Merge the Long_Table created from calculation_columns to the Long_Table created from no_need_full_data_columns
         if stored_args['Long_Table']:
-            Long_Table_df = MyData.get_Long_Table(allow_multiple_istd=stored_args['Allow_Multiple_ISTD'])
-            one_file_df_list.extend([Long_Table_df])
-            one_file_df_sheet_name.extend(["Long_Table"])
+            Long_Table_df = MyCalcData.get_Long_Table(allow_multiple_istd=stored_args['Allow_Multiple_ISTD'])
+            if "Long_Table" in concatenate_df_sheet_name:
+                Long_Table_index = concatenate_df_sheet_name.index("Long_Table")
+                common_columns = list(set(concatenate_df_list[Long_Table_index].columns).intersection(Long_Table_df.columns))
+                Long_Table_df.columns
+                concatenate_df_list[Long_Table_index] = pd.merge(concatenate_df_list[Long_Table_index], 
+                                                                 Long_Table_df,
+                                                                 how='inner',
+                                                                 on = common_columns)
+            else:
+                concatenate_df_list.extend([Long_Table_df])
+                concatenate_df_sheet_name.extend(["Long_Table"])
 
-        #After creating the one_file_df_list and one_file_df_sheet_name
-        #Start to concatenate when we reach the second file
-        if len(concatenate_df_list) == 0:
-            concatenate_df_list = one_file_df_list
-            concatenate_df_sheet_name = one_file_df_sheet_name
-        else:
-            #When we have the second file onwards
-            for i in range(len(one_file_df_list)):
-                #Concatenate all df except those indicated
-                if not one_file_df_sheet_name[i] in ["Transition_Name_Annot"]:
-                    concatenate_df_list[i] = pd.concat([concatenate_df_list[i], one_file_df_list[i]], 
-                                                       ignore_index=True, 
-                                                       sort=False, 
-                                                       axis = 0)
+    #Output the report to a pdf file
+    PDFReport.output_to_PDF()
 
     #Output concatenated wide data after going through all the files
-    if stored_args['Transpose_Results']:
-        result_name = "TransposeResults"
-    else:
-        result_name = "Results"
-
-    logger.info("Outputting concatenated file.")
-    print("Creating concatenated file.",flush=True)
-
-    #Set up the file writing configuration for Excel, or csv ...
-    if stored_args['Output_Format'] == "Excel" :
-        DfConcatenateOutput = MSDataOutput_Excel(stored_args['Output_Directory'], "Concatenated", 
-                                                 result_name ,logger=logger, ingui=True)
-    elif stored_args['Output_Format'] == "csv" :
-        DfConcatenateOutput = MSDataOutput_csv(stored_args['Output_Directory'], "Concatenated",
-                                               result_name ,logger=logger, ingui=True)
-
-    DfConcatenateOutput.start_writer()
-    for i in range(len(concatenate_df_list)):
-        if concatenate_df_sheet_name[i] != "Long_Table":
-            #Decide the appropriate table to perfrom the transpose if set to True.
-            if concatenate_df_sheet_name[i] in ["Transition_Name_Annot","Sample_Annot"]:
-                #For these two data frame, no transpose is required.
-                DfConcatenateOutput.df_to_file(concatenate_df_sheet_name[i],concatenate_df_list[i])
-            else:
-                DfConcatenateOutput.df_to_file(concatenate_df_sheet_name[i],concatenate_df_list[i],
-                                               transpose=stored_args['Transpose_Results'],
-                                               allow_multiple_istd=stored_args['Allow_Multiple_ISTD'])
-    if stored_args['Output_Format'] == "Excel" :
-        DfConcatenateOutput.end_writer()
+    output_concatenated_wide_data(stored_args, 
+                                  concatenate_df_list = concatenate_df_list, 
+                                  concatenate_df_sheet_name = concatenate_df_sheet_name,
+                                  logger = logger)
 
     #Output concatenated long table
-    if stored_args['Long_Table']:
-        #Set up the file writing configuration for Excel, or csv ...
-        if stored_args['Output_Format'] == "Excel" :
-            if stored_args['Long_Table_Annot']:
-                result_name = "Long_Table_with_Annot"
-            else:
-                result_name = "Long_Table"
-            DfConcatenateLongOutput = MSDataOutput_Excel(stored_args['Output_Directory'], "Concatenated", 
-                                                         result_name = result_name ,logger=logger, ingui=True)
-        elif stored_args['Output_Format'] == "csv" :
-            DfConcatenateLongOutput = MSDataOutput_csv(stored_args['Output_Directory'], "Concatenated", 
-                                                       result_name = "" ,logger=logger, ingui=True)
-        DfConcatenateLongOutput.start_writer()
-        Long_Table_index = concatenate_df_sheet_name.index("Long_Table")
-        if stored_args['Output_Format'] == "csv" and stored_args['Long_Table_Annot']:
-            concatenate_df_sheet_name[Long_Table_index] = "Long_Table_with_Annot"
-        DfConcatenateLongOutput.df_to_file(concatenate_df_sheet_name[Long_Table_index],concatenate_df_list[Long_Table_index])
-        if stored_args['Output_Format'] == "Excel" :
-            DfConcatenateLongOutput.end_writer()
+    output_concatenated_long_table(stored_args, 
+                                   concatenate_df_list = concatenate_df_list, 
+                                   concatenate_df_sheet_name = concatenate_df_sheet_name,
+                                   logger = logger)
 
     #End log on a job
     logger.info("Job is finished.")
@@ -438,27 +502,27 @@ def concatenate_along_columns_workflow(stored_args, logger=None):
                                       )
     PDFReport.create_parameters_report(Parameters_df)
 
-    no_calculation_columns = []
-    calculation_columns = []
+    no_need_full_data_columns = []
+    need_full_data_columns = []
 
     for column_name in stored_args['Output_Options']:
         if column_name in ["Area","RT","FWHM","S/N","Symmetry",
                            "Precursor Ion","Product Ion"]:
-            no_calculation_columns.append(column_name)
+            no_need_full_data_columns.append(column_name)
         else:
-            calculation_columns.append(column_name)
+            need_full_data_columns.append(column_name)
             if any(['normArea by ISTD' in stored_args['Output_Options'],
                     'normConc by ISTD' in stored_args['Output_Options']
-                   ]) and 'Area' not in no_calculation_columns:
-                no_calculation_columns.append("Area")
+                   ]) and 'Area' not in no_need_full_data_columns:
+                no_need_full_data_columns.append("Area")
     
     concatenate_df_list = []
     concatenate_df_sheet_name = []
 
-    #We first need to concatenate Output Options that do not require calculation like
+    #We first need to concatenate Output Options that do not require full data like
     #Area, RT, etc
-    if(len(no_calculation_columns) > 0):
-        print("Working on Output options that do not need to be calculated",flush=True)
+    if(len(no_need_full_data_columns) > 0):
+        #print("Working on Output options that do not need to be calculated",flush=True)
 
         #We do this for every mass hunter file output
         #MS_Files is no longer a long string of paths separated by ;, we split them into a list
@@ -476,7 +540,7 @@ def concatenate_along_columns_workflow(stored_args, logger=None):
             one_file_df_list = []
             one_file_df_sheet_name = []
 
-            for column_name in no_calculation_columns:
+            for column_name in no_need_full_data_columns:
                 #We extract the data directly from the file and put them in the list accordingly
                 Output_df = MyNoCalcData.get_from_Input_Data(column_name,
                                                              allow_multiple_istd=stored_args['Allow_Multiple_ISTD'])
@@ -518,10 +582,10 @@ def concatenate_along_columns_workflow(stored_args, logger=None):
                                                                sort=False, 
                                                                axis = 1)
 
-    #We now create data frame of output options that require calculation like
+    #We now create data frame of output options that require the full data like
     #normArea by ISTD, normConc by ISTD, etc
 
-    if(len(calculation_columns) > 0):
+    if(len(need_full_data_columns) > 0):
 
         MyCalcData = MS_Analysis(MS_FilePaths = stored_args['MS_Files'], 
                                  MS_FileType = stored_args['MS_FileType'], 
@@ -532,14 +596,15 @@ def concatenate_along_columns_workflow(stored_args, logger=None):
                                  longtable_annot = stored_args['Long_Table_Annot'])
 
 
-        print("Working on Output options that needs to be calculated",flush=True)
-        for column_name in calculation_columns:
+        #print("Working on Output options that needs to be calculated",flush=True)
+        for column_name in need_full_data_columns:
             if column_name == 'normArea by ISTD':
 
                 #Perform normalisation using ISTD
                 [norm_Area_df,ISTD_Area,ISTD_map_df,ISTD_Report] = MyCalcData.get_Normalised_Area(column_name,stored_args['Annot_File'],
                                                                                                   allow_multiple_istd = stored_args['Allow_Multiple_ISTD'],
-                                                                                                  using_multiple_input_files = True)
+                                                                                                  using_multiple_input_files = True,
+                                                                                                  concatenation_type = "columns")
 
                 #If testing, output the ISTD_Area results in the concatenate_df list
                 if stored_args['Testing']:
@@ -554,10 +619,11 @@ def concatenate_along_columns_workflow(stored_args, logger=None):
                 PDFReport.create_ISTD_report(ISTD_Report)
 
             elif column_name == 'normConc by ISTD':
-                #Perform concentration calculation
+                #Perform concentration calculation using ISTD
                 [norm_Conc_df,ISTD_Conc_df,ISTD_Samp_Ratio_df,Sample_Annot_df] = MyCalcData.get_Analyte_Concentration(column_name,stored_args['Annot_File'],
                                                                                                                       allow_multiple_istd=stored_args['Allow_Multiple_ISTD'],
-                                                                                                                      using_multiple_input_files = True)
+                                                                                                                      using_multiple_input_files = True,
+                                                                                                                      concatenation_type = "columns")
 
                 #Remove the column "Merge_Status" as it is not relevant
                 #Reorder the column such that "Concentration_Unit" is at the last column
@@ -575,7 +641,7 @@ def concatenate_along_columns_workflow(stored_args, logger=None):
                 concatenate_df_list.extend([Sample_Annot_df,norm_Conc_df])
                 concatenate_df_sheet_name.extend(["Sample_Annot","normConc_by_ISTD"])
 
-        #Merge the Long_Table created from calculation_columns to the Long_Table created from no_calculation_columns
+        #Merge the Long_Table created from calculation_columns to the Long_Table created from no_need_full_data_columns
         if stored_args['Long_Table']:
             Long_Table_df = MyCalcData.get_Long_Table(allow_multiple_istd=stored_args['Allow_Multiple_ISTD'])
             if "Long_Table" in concatenate_df_sheet_name:
@@ -594,57 +660,16 @@ def concatenate_along_columns_workflow(stored_args, logger=None):
     PDFReport.output_to_PDF()
 
     #Output concatenated wide data after going through all the files
-    if stored_args['Transpose_Results']:
-        result_name = "TransposeResults"
-    else:
-        result_name = "Results"
-
-    logger.info("Outputting concatenated file.")
-    print("Creating concatenated file.",flush=True)
-
-    #Set up the file writing configuration for Excel, or csv ...
-    if stored_args['Output_Format'] == "Excel" :
-        DfConcatenateOutput = MSDataOutput_Excel(stored_args['Output_Directory'], "Concatenated", 
-                                                 result_name ,logger=logger, ingui=True)
-    elif stored_args['Output_Format'] == "csv" :
-        DfConcatenateOutput = MSDataOutput_csv(stored_args['Output_Directory'], "Concatenated",
-                                               result_name ,logger=logger, ingui=True)
-
-    DfConcatenateOutput.start_writer()
-    for i in range(len(concatenate_df_list)):
-        if concatenate_df_sheet_name[i] != "Long_Table":
-            #Decide the appropriate table to perfrom the transpose if set to True.
-            if concatenate_df_sheet_name[i] in ["Transition_Name_Annot","Sample_Annot"]:
-                #For these two data frame, no transpose is required.
-                DfConcatenateOutput.df_to_file(concatenate_df_sheet_name[i],concatenate_df_list[i])
-            else:
-                DfConcatenateOutput.df_to_file(concatenate_df_sheet_name[i],concatenate_df_list[i],
-                                               transpose=stored_args['Transpose_Results'],
-                                               allow_multiple_istd=stored_args['Allow_Multiple_ISTD'])
-    if stored_args['Output_Format'] == "Excel" :
-        DfConcatenateOutput.end_writer()
-
+    output_concatenated_wide_data(stored_args, 
+                                  concatenate_df_list = concatenate_df_list, 
+                                  concatenate_df_sheet_name = concatenate_df_sheet_name,
+                                  logger = logger)
 
     #Output concatenated long table
-    if stored_args['Long_Table']:
-        #Set up the file writing configuration for Excel, or csv ...
-        if stored_args['Output_Format'] == "Excel" :
-            if stored_args['Long_Table_Annot']:
-                result_name = "Long_Table_with_Annot"
-            else:
-                result_name = "Long_Table"
-            DfConcatenateLongOutput = MSDataOutput_Excel(stored_args['Output_Directory'], "Concatenated", 
-                                                         result_name = result_name ,logger=logger, ingui=True)
-        elif stored_args['Output_Format'] == "csv" :
-            DfConcatenateLongOutput = MSDataOutput_csv(stored_args['Output_Directory'], "Concatenated", 
-                                                       result_name = "" ,logger=logger, ingui=True)
-        DfConcatenateLongOutput.start_writer()
-        Long_Table_index = concatenate_df_sheet_name.index("Long_Table")
-        if stored_args['Output_Format'] == "csv" and stored_args['Long_Table_Annot']:
-            concatenate_df_sheet_name[Long_Table_index] = "Long_Table_with_Annot"
-        DfConcatenateLongOutput.df_to_file(concatenate_df_sheet_name[Long_Table_index],concatenate_df_list[Long_Table_index])
-        if stored_args['Output_Format'] == "Excel" :
-            DfConcatenateLongOutput.end_writer()
+    output_concatenated_long_table(stored_args, 
+                                   concatenate_df_list = concatenate_df_list, 
+                                   concatenate_df_sheet_name = concatenate_df_sheet_name,
+                                   logger = logger)
 
     #End log on a job
     logger.info("Job is finished.")

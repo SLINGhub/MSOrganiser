@@ -34,26 +34,6 @@ class MS_Analysis():
         self.logger = logger
         self.ingui = ingui
 
-        #Check if file is from Agilent or Sciex
-        #if MS_FileType in ['Agilent Wide Table in csv', 'Agilent Compound Table in csv']:
-        #    if MS_FilePath.endswith('.csv'):
-        #        self.RawData = AgilentMSRawData(filepath=MS_FilePath,logger=logger)
-        #    else:
-        #        if self.ingui:
-        #            print('Filepath ' + str(MS_FilePath) + ' must have a .csv extention',flush=True)
-        #        if self.logger:
-        #            self.logger.error('Filepath %s must have a .csv extention',MS_FilePath)
-        #        sys.exit(-1)
-        #elif MS_FileType in ['Multiquant Long Table in txt']:
-        #    if MS_FilePath.endswith('.txt'):
-        #        self.RawData = SciexMSRawData(filepath=MS_FilePath,logger=logger)
-        #    else:
-        #        if self.ingui:
-        #            print('Filepath ' + str(MS_FilePath) + ' must have a .txt extention',flush=True)
-        #        if self.logger:
-        #            self.logger.error('Filepath %s must have a .txt extention',MS_FilePath)
-        #        sys.exit(-1)
-
         #Initialise the data in long table starting with an empty dataframe
         self.LongTable_df = pd.DataFrame()
 
@@ -88,7 +68,9 @@ class MS_Analysis():
                 sys.exit(-1)
         return(InputData)
 
-    def _get_Area_df_for_normalisation(self, allow_multiple_istd = False, using_multiple_input_files = False):
+    def _get_Area_df_for_normalisation(self, allow_multiple_istd = False, 
+                                       using_multiple_input_files = False,
+                                       concatenation_type = "rows"):
 
         if using_multiple_input_files:
             concatenate_Area_df = pd.DataFrame()
@@ -103,12 +85,24 @@ class MS_Analysis():
                     concatenate_Area_df = Area_df
                     first_time = False
                 else:
-                    #Remove the Sample_Name column
-                    Area_df = Area_df.loc[:, Area_df.columns != 'Sample_Name']
-                    concatenate_Area_df = pd.concat([concatenate_Area_df, Area_df], 
-                                                    ignore_index=False, 
-                                                    sort=False, 
-                                                    axis = 1)
+                    if concatenation_type == "rows":
+                        concatenate_Area_df = pd.concat([concatenate_Area_df, Area_df], 
+                                                        ignore_index=True, 
+                                                        sort=False, 
+                                                        axis = 0)
+                    elif concatenation_type == "columns":
+                        #Remove the Sample_Name column
+                        Area_df = Area_df.loc[:, Area_df.columns != 'Sample_Name']
+                        concatenate_Area_df = pd.concat([concatenate_Area_df, Area_df], 
+                                                        ignore_index=False, 
+                                                        sort=False, 
+                                                        axis = 1)
+                    else:
+                        if self.ingui:
+                            print('Input concatenation type must be "rows" or "columns". Current input is ' + concatenation_type ,flush=True)
+                        if self.logger:
+                            self.logger.error('Input concatenation type must be "rows" or "columns". Current input is %s', concatenation_type)
+                        sys.exit(-1)
 
             return(concatenate_Area_df)
         else:
@@ -237,7 +231,8 @@ class MS_Analysis():
     def get_Normalised_Area(self,analysis_name, 
                             outputdata=True, 
                             allow_multiple_istd = False,
-                            using_multiple_input_files = False):
+                            using_multiple_input_files = False,
+                            concatenation_type = "rows"):
         """Function to calculate the normalised area from the input MRM transition name data and MS Template Creator annotation file.
 
         Args:
@@ -245,6 +240,7 @@ class MS_Analysis():
             outputdata (bool): if True, return the results as a pandas dataframe. Else, nothing is returned
             allow_multiple_istd (bool): if True, allow normalisation of peak area by mulitple internal standards (in development)
             using_multiple_input_files (bool): if True, the Area df will be constructed from multiple input files, denoted in MS_FilePaths (in development)
+            concatenation_type (str): "rows or columns" to indicate if the Area_df is to be concatenated by row wise or column wise respectively
         
         Returns:
             (list): list containing:
@@ -261,7 +257,8 @@ class MS_Analysis():
 
         Area_df = MS_Analysis._get_Area_df_for_normalisation(self, 
                                                              allow_multiple_istd = allow_multiple_istd,
-                                                             using_multiple_input_files = using_multiple_input_files)
+                                                             using_multiple_input_files = using_multiple_input_files,
+                                                             concatenation_type = concatenation_type)
 
         #Get ISTD map df
         ISTD_map_df = ISTD_Operations.read_ISTD_map(self.Annotation_FilePath,analysis_name,
@@ -294,7 +291,8 @@ class MS_Analysis():
     def get_Analyte_Concentration(self,analysis_name,
                                   outputdata=True,
                                   allow_multiple_istd = False,
-                                  using_multiple_input_files = False):
+                                  using_multiple_input_files = False,
+                                  concatenation_type = "rows"):
         """Function to calculate the transition names concentration from the input MRM transition name data and MS Template Creator annotation file.
 
         Args:
@@ -302,8 +300,7 @@ class MS_Analysis():
             outputdata (bool): if True, return the results as a pandas dataframe. Else, nothing is returned
             allow_multiple_istd (bool): if True, allow normalisation of peak area by mulitple internal standards
             using_multiple_input_files (bool): if True, the Area df will be constructed from multiple input files, denoted in MS_FilePaths (in development)
-        
-        When outputdata is set to True,
+            concatenation_type (str): "rows or columns" to indicate if the Area_df is to be concatenated by row wise or column wise respectively
 
         Returns:
             (list): list containing:
@@ -320,7 +317,8 @@ class MS_Analysis():
             self.get_Normalised_Area(analysis_name,
                                      outputdata=False,
                                      allow_multiple_istd = allow_multiple_istd,
-                                     using_multiple_input_files = using_multiple_input_files)
+                                     using_multiple_input_files = using_multiple_input_files,
+                                     concatenation_type = concatenation_type)
 
         #Perform concentration calculation, we need self.norm_Area_df, self.ISTD_map_df and self.Sample_Annot_df
         if using_multiple_input_files:
