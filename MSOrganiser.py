@@ -553,7 +553,9 @@ def concatenate_along_columns_workflow(stored_args, logger=None, testing = False
                                                                sort=False, 
                                                                axis = 1)
                         else:
-                            concatenate_df_list[i] = pd.concat([concatenate_df_list[i], one_file_df_list[i]], 
+                            #Remove the Sample_Name column
+                            appending_df = one_file_df_list[i].loc[:, one_file_df_list[i].columns != 'Sample_Name']
+                            concatenate_df_list[i] = pd.concat([concatenate_df_list[i], appending_df], 
                                                                ignore_index=False, 
                                                                sort=False, 
                                                                axis = 1)
