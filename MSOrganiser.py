@@ -276,13 +276,12 @@ def no_concatenate_workflow(stored_args, logger=None):
                 DfOutput.df_to_file(column_name,Output_df,
                                     transpose=stored_args['Transpose_Results'],
                                     allow_multiple_istd=stored_args['Allow_Multiple_ISTD'])
+        #End the writing configuration for Excel, ...
+        if stored_args['Output_Format'] == "Excel":
+            DfOutput.end_writer()
 
-    #End the writing configuration for Excel, ...
-    if stored_args['Output_Format'] == "Excel":
-        DfOutput.end_writer()
-
-    #Output the report to a pdf file
-    PDFReport.output_to_PDF()
+        #Output the report to a pdf file
+        PDFReport.output_to_PDF()
 
     #Output the LongTable Data Table in another csv or excel sheet
     if stored_args['Long_Table']:
