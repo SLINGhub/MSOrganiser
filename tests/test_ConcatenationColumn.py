@@ -2,68 +2,75 @@ import unittest
 import os
 import pandas as pd
 import openpyxl
-from MSOrganiser import concatenate_along_rows_workflow
+from MSOrganiser import concatenate_along_columns_workflow
 from MSDataOutput import MSDataOutput
 
-WIDETABLEFORMROW1_FILENAME = os.path.join(os.path.dirname(__file__),"testdata", 
-                                          "test_concatenate_row_multipleISTD", "WideTableFormRow1.csv")
-WIDETABLEFORMROW2_FILENAME = os.path.join(os.path.dirname(__file__),"testdata", 
-                                          "test_concatenate_row_multipleISTD", "WideTableFormRow2.csv")
-WIDETABLEFORMROW_ANNOTATION = os.path.join(os.path.dirname(__file__),"testdata", 
-                                           "test_concatenate_row_multipleISTD", "WideTableFormRow_Annotation.xlsm")
-WIDETABLEFORMROW_CONCATENATERESULTS_FILENAME = os.path.join(os.path.dirname(__file__),"testdata", 
-                                                            "test_concatenate_row_multipleISTD", "WideTableFormRow_ConcatenateResults.xlsx")
-WIDETABLEFORMROW_CONCATENATERESULTS_TRANSPOSE_FILENAME = os.path.join(os.path.dirname(__file__),"testdata", 
-                                                                      "test_concatenate_row_multipleISTD", "WideTableFormRow_Concatenate_TransposeResults.xlsx")
-WIDETABLEFORMROW_CONCATENATERESULTS_LONGTABLE_FILENAME = os.path.join(os.path.dirname(__file__),"testdata", 
-                                                                      "test_concatenate_row_multipleISTD", "WideTableFormRow_Concatenate_LongTable.xlsx")
-WIDETABLEFORMROW_CONCATENATERESULTS_LONGTABLE_WITH_ANNOT_FILENAME = os.path.join(os.path.dirname(__file__),"testdata", 
-                                                                                 "test_concatenate_row_multipleISTD", "WideTableFormRow_Concatenate_LongTable_with_Annot.xlsx")
+# Note that for these widetableform column files, each column file may not necessarily have the ISTD
+# Example, some transition in file 2 have their ISTD Area in file 1.
+# Normalisation by ISTD must be done on the whole dataset and not one file at a time.
+WIDETABLEFORMCOLUMN1_FILENAME = os.path.join(os.path.dirname(__file__),"testdata", 
+                                             "test_concatenate_column_multipleISTD", "WideTableFormColumn1.csv")
+WIDETABLEFORMCOLUMN2_FILENAME = os.path.join(os.path.dirname(__file__),"testdata", 
+                                             "test_concatenate_column_multipleISTD", "WideTableFormColumn2.csv")
+WIDETABLEFORMCOLUMN_ANNOTATION = os.path.join(os.path.dirname(__file__),"testdata", 
+                                              "test_concatenate_column_multipleISTD", "WideTableFormColumn_Annotation.xlsm")
+WIDETABLEFORMCOLUMN_CONCATENATERESULTS_FILENAME = os.path.join(os.path.dirname(__file__),"testdata", 
+                                                               "test_concatenate_column_multipleISTD", 
+                                                               "WideTableFormColumn_ConcatenateResults.xlsx")
+WIDETABLEFORMCOLUMN_CONCATENATERESULTS_TRANSPOSE_FILENAME = os.path.join(os.path.dirname(__file__),"testdata", 
+                                                                         "test_concatenate_column_multipleISTD", 
+                                                                         "WideTableFormColumn_Concatenate_TransposeResults.xlsx")
+WIDETABLEFORMCOLUMN_CONCATENATERESULTS_LONGTABLE_FILENAME = os.path.join(os.path.dirname(__file__),"testdata", 
+                                                                         "test_concatenate_column_multipleISTD", 
+                                                                         "WideTableFormColumn_Concatenate_LongTable.xlsx")
+WIDETABLEFORMCOLUMN_CONCATENATERESULTS_LONGTABLE_WITH_ANNOT_FILENAME = os.path.join(os.path.dirname(__file__),"testdata", 
+                                                                                    "test_concatenate_column_multipleISTD", 
+                                                                                    "WideTableFormColumn_Concatenate_LongTable_with_Annot.xlsx")
 
-class Concatenation_By_Row_Test(unittest.TestCase):
-    def test_concatenate_by_rows_multiple_ISTD(self):
+class Concatenation_By_Column_Test(unittest.TestCase):
+    def test_concatenate_by_columns_multiple_ISTD(self):
         stored_args = {
-            'MS_Files': [WIDETABLEFORMROW1_FILENAME, WIDETABLEFORMROW2_FILENAME], 
+            'MS_Files': [WIDETABLEFORMCOLUMN1_FILENAME, WIDETABLEFORMCOLUMN2_FILENAME], 
             'MS_FileType': 'Agilent Wide Table in csv', 
             'Output_Directory': 'D:\\MSOrganiser', 
             'Output_Options': ['Area', 'normArea by ISTD', 'normConc by ISTD'], 
-            'Annot_File': WIDETABLEFORMROW_ANNOTATION, 
+            'Annot_File': WIDETABLEFORMCOLUMN_ANNOTATION, 
             'Output_Format': 'Excel', 
-            'Concatenate': 'Concatenate along Sample Name (rows)', 
+            'Concatenate': 'Concatenate along Transition Name (columns)', 
             'Transpose_Results': False, 
             'Allow_Multiple_ISTD': True, 
             'Long_Table': False, 
             'Long_Table_Annot': False, 
             'Testing': False
             }
-        [PDFReport, concatenate_df_list, concatenate_df_sheet_name] = concatenate_along_rows_workflow(stored_args,testing = True)
+        [PDFReport, concatenate_df_list, concatenate_df_sheet_name] = concatenate_along_columns_workflow(stored_args,testing = True)
         #print(concatenate_df_sheet_name)
         for sheet_name in concatenate_df_sheet_name:
             if sheet_name != "Long_Table":
                 data_index = concatenate_df_sheet_name.index(sheet_name)
-                ExcelData_df = self.__sheet_to_df(workbook = WIDETABLEFORMROW_CONCATENATERESULTS_FILENAME,
+                ExcelData_df = self.__sheet_to_df(workbook = WIDETABLEFORMCOLUMN_CONCATENATERESULTS_FILENAME,
                                                   sheet_name = sheet_name,
                                                   allow_multiple_istd = True)
                 self.__compare_df(concatenate_df_list[data_index],ExcelData_df)
 
-    def test_concatenate_by_rows_multiple_ISTD_LongTable(self):
+    def test_concatenate_by_columns_multiple_ISTD_LongTable(self):
         stored_args = {
-            'MS_Files': [WIDETABLEFORMROW1_FILENAME, WIDETABLEFORMROW2_FILENAME], 
+            'MS_Files': [WIDETABLEFORMCOLUMN1_FILENAME, WIDETABLEFORMCOLUMN2_FILENAME], 
             'MS_FileType': 'Agilent Wide Table in csv', 
             'Output_Directory': 'D:\\MSOrganiser', 
             'Output_Options': ['Area', 'normArea by ISTD', 'normConc by ISTD'], 
-            'Annot_File': WIDETABLEFORMROW_ANNOTATION, 
+            'Annot_File': WIDETABLEFORMCOLUMN_ANNOTATION, 
             'Output_Format': 'Excel', 
-            'Concatenate': 'Concatenate along Sample Name (rows)', 
+            'Concatenate': 'Concatenate along Transition Name (columns)', 
             'Transpose_Results': False, 
             'Allow_Multiple_ISTD': True, 
             'Long_Table': True, 
             'Long_Table_Annot': False, 
             'Testing': False
             }
-        [PDFReport, concatenate_df_list, concatenate_df_sheet_name] = concatenate_along_rows_workflow(stored_args,testing = True)
+        [PDFReport, concatenate_df_list, concatenate_df_sheet_name] = concatenate_along_columns_workflow(stored_args,testing = True)
         data_index = concatenate_df_sheet_name.index("Long_Table")
-        ExcelData_df = self.__sheet_to_df(workbook = WIDETABLEFORMROW_CONCATENATERESULTS_LONGTABLE_FILENAME,
+        ExcelData_df = self.__sheet_to_df(workbook = WIDETABLEFORMCOLUMN_CONCATENATERESULTS_LONGTABLE_FILENAME,
                                           sheet_name = "Long_Table",
                                           allow_multiple_istd = True)
         ExcelData_df = ExcelData_df.fillna('')
@@ -71,22 +78,22 @@ class Concatenation_By_Row_Test(unittest.TestCase):
 
     def test_concatenate_by_rows_multiple_ISTD_LongTable_with_Annot(self):
         stored_args = {
-            'MS_Files': [WIDETABLEFORMROW1_FILENAME, WIDETABLEFORMROW2_FILENAME], 
+            'MS_Files': [WIDETABLEFORMCOLUMN1_FILENAME, WIDETABLEFORMCOLUMN2_FILENAME], 
             'MS_FileType': 'Agilent Wide Table in csv', 
             'Output_Directory': 'D:\\MSOrganiser', 
             'Output_Options': ['Area', 'normArea by ISTD', 'normConc by ISTD'], 
-            'Annot_File': WIDETABLEFORMROW_ANNOTATION, 
+            'Annot_File': WIDETABLEFORMCOLUMN_ANNOTATION, 
             'Output_Format': 'Excel', 
-            'Concatenate': 'Concatenate along Sample Name (rows)', 
+            'Concatenate': 'Concatenate along Transition Name (columns)', 
             'Transpose_Results': False, 
             'Allow_Multiple_ISTD': True, 
             'Long_Table': True, 
             'Long_Table_Annot': True, 
             'Testing': False
             }
-        [PDFReport, concatenate_df_list, concatenate_df_sheet_name] = concatenate_along_rows_workflow(stored_args,testing = True)
+        [PDFReport, concatenate_df_list, concatenate_df_sheet_name] = concatenate_along_columns_workflow(stored_args,testing = True)
         data_index = concatenate_df_sheet_name.index("Long_Table")
-        ExcelData_df = self.__sheet_to_df(workbook = WIDETABLEFORMROW_CONCATENATERESULTS_LONGTABLE_WITH_ANNOT_FILENAME,
+        ExcelData_df = self.__sheet_to_df(workbook = WIDETABLEFORMCOLUMN_CONCATENATERESULTS_LONGTABLE_WITH_ANNOT_FILENAME,
                                           sheet_name = "Long_Table",
                                           allow_multiple_istd = True)
         ExcelData_df = ExcelData_df.fillna('')
@@ -94,20 +101,20 @@ class Concatenation_By_Row_Test(unittest.TestCase):
 
     def test_concatenate_by_rows_multiple_ISTD_transpose(self):
         stored_args = {
-            'MS_Files': [WIDETABLEFORMROW1_FILENAME, WIDETABLEFORMROW2_FILENAME], 
+            'MS_Files': [WIDETABLEFORMCOLUMN1_FILENAME, WIDETABLEFORMCOLUMN2_FILENAME], 
             'MS_FileType': 'Agilent Wide Table in csv', 
             'Output_Directory': 'D:\\MSOrganiser', 
             'Output_Options': ['Area', 'normArea by ISTD', 'normConc by ISTD'], 
-            'Annot_File': WIDETABLEFORMROW_ANNOTATION, 
+            'Annot_File': WIDETABLEFORMCOLUMN_ANNOTATION, 
             'Output_Format': 'Excel', 
-            'Concatenate': 'Concatenate along Sample Name (rows)', 
+            'Concatenate': 'Concatenate along Transition Name (columns)', 
             'Transpose_Results': True, 
             'Allow_Multiple_ISTD': True, 
             'Long_Table': False, 
             'Long_Table_Annot': False, 
             'Testing': False
             }
-        [PDFReport, concatenate_df_list, concatenate_df_sheet_name] = concatenate_along_rows_workflow(stored_args,testing = True)
+        [PDFReport, concatenate_df_list, concatenate_df_sheet_name] = concatenate_along_columns_workflow(stored_args,testing = True)
         for sheet_name in concatenate_df_sheet_name:
             if sheet_name != "Long_Table":
                 data_index = concatenate_df_sheet_name.index(sheet_name)
@@ -118,7 +125,7 @@ class Concatenation_By_Row_Test(unittest.TestCase):
                                                                                     allow_multiple_istd = True)
                 concatenate_df_list[data_index] = concatenate_df_list[data_index].fillna('')
 
-                ExcelData_df = self.__sheet_to_df(workbook = WIDETABLEFORMROW_CONCATENATERESULTS_TRANSPOSE_FILENAME,
+                ExcelData_df = self.__sheet_to_df(workbook = WIDETABLEFORMCOLUMN_CONCATENATERESULTS_TRANSPOSE_FILENAME,
                                                   sheet_name = sheet_name,
                                                   allow_multiple_istd = True,
                                                   transpose = True)
@@ -171,9 +178,6 @@ class Concatenation_By_Row_Test(unittest.TestCase):
                 #print(unique)
 
         return ExcelData_df
-
-#class Concatenation_By_Row_Test(unittest.TestCase):
-#    print("Here")
 
 if __name__ == '__main__':
     unittest.main()

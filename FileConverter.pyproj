@@ -43,6 +43,7 @@
     </Compile>
     <Compile Include="MSRawData.py" />
     <Compile Include="tests\testdata\test_ConcatenationRow.py" />
+    <Compile Include="tests\test_ConcatenationColumn.py" />
     <Compile Include="tests\test_ConcatenationRow.py" />
     <Compile Include="tests\test_MSAnalysis.py" />
     <Compile Include="tests\test_MSRawData.py" />
