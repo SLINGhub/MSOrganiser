@@ -305,14 +305,14 @@ def no_concatenate_workflow(stored_args, logger=None):
             DfLongOutput.end_writer()
 
 def concatenate_along_rows_workflow(stored_args, logger=None, testing = False):
-    print("Here")
+
     #Initiate the pdf report file
     PDFReport = MSDataReport_PDF(output_directory = stored_args['Output_Directory'], 
                                  input_file_path = "ConcatenatedRow", 
                                  logger = logger, 
                                  ingui = True,
                                  testing = testing)
-    print("There")
+
     #Generate the parameters report
     Parameters_df = get_Parameters_df(stored_args = stored_args,
                                       MS_FilePaths = stored_args['MS_Files'],
