@@ -138,7 +138,14 @@ def output_concatenated_wide_data(stored_args,
             #Decide the appropriate table to perfrom the transpose if set to True.
             if concatenate_df_sheet_name[i] in ["Transition_Name_Annot","Sample_Annot"]:
                 #For these two data frame, no transpose is required.
-                DfConcatenateOutput.df_to_file(concatenate_df_sheet_name[i],concatenate_df_list[i])
+                DfConcatenateOutput.df_to_file(concatenate_df_sheet_name[i],concatenate_df_list[i],
+                                               transpose = False,
+                                               allow_multiple_istd = False)
+            elif concatenate_df_sheet_name[i] in ["Area", "RT", "FWHM", "S/N", "Symmetry",
+                                                  "Precursor Ion", "Product Ion"]:
+                DfConcatenateOutput.df_to_file(concatenate_df_sheet_name[i],concatenate_df_list[i],
+                                               transpose=stored_args['Transpose_Results'],
+                                               allow_multiple_istd = False)
             else:
                 DfConcatenateOutput.df_to_file(concatenate_df_sheet_name[i],concatenate_df_list[i],
                                                transpose=stored_args['Transpose_Results'],
@@ -285,7 +292,8 @@ def no_concatenate_workflow(stored_args, logger=None):
 
     #Output the LongTable Data Table in another csv or excel sheet
     if stored_args['Long_Table']:
-        Long_Table_df = MyData.get_Long_Table(allow_multiple_istd=stored_args['Allow_Multiple_ISTD'])
+        Long_Table_df = MyData.get_Long_Table(allow_multiple_istd=stored_args['Allow_Multiple_ISTD'],
+                                              concatenation_type = None)
 
         result_name = "Long_Table" 
         if stored_args['Long_Table_Annot']:
@@ -360,13 +368,14 @@ def concatenate_along_rows_workflow(stored_args, logger=None, testing = False):
             for column_name in no_need_full_data_columns:
                 #We extract the data directly from the file and put them in the list accordingly
                 Output_df = MyNoCalcData.get_from_Input_Data(column_name,
-                                                             allow_multiple_istd=stored_args['Allow_Multiple_ISTD'])
+                                                             allow_multiple_istd= False)
                 one_file_df_list.extend([Output_df])
                 one_file_df_sheet_name.extend([column_name])
 
             #Output the LongTable Data Table in another csv or excel sheet
             if stored_args['Long_Table']:
-                Long_Table_df = MyNoCalcData.get_Long_Table(allow_multiple_istd=stored_args['Allow_Multiple_ISTD'])
+                Long_Table_df = MyNoCalcData.get_Long_Table(allow_multiple_istd=stored_args['Allow_Multiple_ISTD'],
+                                                            concatenation_type = None)
                 one_file_df_list.extend([Long_Table_df])
                 one_file_df_sheet_name.extend(["Long_Table"])
 
@@ -446,7 +455,8 @@ def concatenate_along_rows_workflow(stored_args, logger=None, testing = False):
 
         #Merge the Long_Table created from calculation_columns to the Long_Table created from no_need_full_data_columns
         if stored_args['Long_Table']:
-            Long_Table_df = MyCalcData.get_Long_Table(allow_multiple_istd=stored_args['Allow_Multiple_ISTD'])
+            Long_Table_df = MyCalcData.get_Long_Table(allow_multiple_istd=stored_args['Allow_Multiple_ISTD'],
+                                                      concatenation_type = "rows")
             if "Long_Table" in concatenate_df_sheet_name:
                 Long_Table_index = concatenate_df_sheet_name.index("Long_Table")
                 common_columns = list(set(concatenate_df_list[Long_Table_index].columns).intersection(Long_Table_df.columns))
@@ -485,6 +495,8 @@ def concatenate_along_columns_workflow(stored_args, logger=None, testing = False
                            "Precursor Ion","Product Ion"]:
             no_need_full_data_columns.append(column_name)
         else:
+            if column_name == 'normConc by ISTD' and 'normArea by ISTD' not in need_full_data_columns:
+                need_full_data_columns.append("normArea by ISTD")
             need_full_data_columns.append(column_name)
             if any(['normArea by ISTD' in stored_args['Output_Options'],
                     'normConc by ISTD' in stored_args['Output_Options']
@@ -518,13 +530,14 @@ def concatenate_along_columns_workflow(stored_args, logger=None, testing = False
             for column_name in no_need_full_data_columns:
                 #We extract the data directly from the file and put them in the list accordingly
                 Output_df = MyNoCalcData.get_from_Input_Data(column_name,
-                                                             allow_multiple_istd=stored_args['Allow_Multiple_ISTD'])
+                                                             allow_multiple_istd = False)
                 one_file_df_list.extend([Output_df])
                 one_file_df_sheet_name.extend([column_name])
 
             #Output the LongTable Data Table in another csv or excel sheet
             if stored_args['Long_Table']:
-                Long_Table_df = MyNoCalcData.get_Long_Table(allow_multiple_istd=stored_args['Allow_Multiple_ISTD'])
+                Long_Table_df = MyNoCalcData.get_Long_Table(allow_multiple_istd=stored_args['Allow_Multiple_ISTD'],
+                                                            concatenation_type = None)
                 one_file_df_list.extend([Long_Table_df])
                 one_file_df_sheet_name.extend(["Long_Table"])
 
@@ -544,15 +557,7 @@ def concatenate_along_columns_workflow(stored_args, logger=None, testing = False
                                                            axis = 0)
                     else:
                         #Concantenate Column Wise
-                        if stored_args['Allow_Multiple_ISTD']:
-                            #Remove the Sample_Name column
-                            appending_df = one_file_df_list[i].loc[:, one_file_df_list[i].columns != ('Sample_Name','')]
-                            concatenate_df_list[i] = pd.concat([concatenate_df_list[i], appending_df], 
-                                                               ignore_index=False, 
-                                                               sort=False, 
-                                                               axis = 1)
-                        else:
-                            #Remove the Sample_Name column
+                        #Remove the Sample_Name column
                             appending_df = one_file_df_list[i].loc[:, one_file_df_list[i].columns != 'Sample_Name']
                             concatenate_df_list[i] = pd.concat([concatenate_df_list[i], appending_df], 
                                                                ignore_index=False, 
@@ -620,15 +625,24 @@ def concatenate_along_columns_workflow(stored_args, logger=None, testing = False
 
         #Merge the Long_Table created from calculation_columns to the Long_Table created from no_need_full_data_columns
         if stored_args['Long_Table']:
-            Long_Table_df = MyCalcData.get_Long_Table(allow_multiple_istd=stored_args['Allow_Multiple_ISTD'])
+            for index, column_name in enumerate(need_full_data_columns):
+                if column_name == 'normArea by ISTD':
+                    need_full_data_columns[index] = 'normArea'
+                if column_name == 'normConc by ISTD':
+                    need_full_data_columns[index] = 'normConc'
+            #need_full_data_columns
+            Long_Table_df = MyCalcData.get_Long_Table(allow_multiple_istd=stored_args['Allow_Multiple_ISTD'],
+                                                      concatenation_type = "columns")
             if "Long_Table" in concatenate_df_sheet_name:
                 Long_Table_index = concatenate_df_sheet_name.index("Long_Table")
                 common_columns = list(set(concatenate_df_list[Long_Table_index].columns).intersection(Long_Table_df.columns))
-                Long_Table_df.columns
-                concatenate_df_list[Long_Table_index] = pd.merge(concatenate_df_list[Long_Table_index], 
-                                                                 Long_Table_df,
-                                                                 how='inner',
-                                                                 on = common_columns)
+                front_columns = [x for x in Long_Table_df.columns if x not in need_full_data_columns]
+                concatenate_df_list[Long_Table_index] = pd.merge(Long_Table_df,
+                                                                 concatenate_df_list[Long_Table_index], 
+                                                                 how = 'inner',
+                                                                 on = common_columns )
+                col_order = front_columns + no_need_full_data_columns + need_full_data_columns
+                concatenate_df_list[Long_Table_index] = concatenate_df_list[Long_Table_index][col_order]
             else:
                 concatenate_df_list.extend([Long_Table_df])
                 concatenate_df_sheet_name.extend(["Long_Table"])

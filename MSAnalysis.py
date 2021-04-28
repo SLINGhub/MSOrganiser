@@ -121,7 +121,9 @@ class MS_Analysis():
             else:
                 self.LongTable_df = pd.merge(self.LongTable_df, wide_df , 
                                              on=["Sample_Name","Transition_Name","Transition_Name_ISTD"], 
-                                             how='left')
+                                             how = 'left')
+                #print(self.LongTable_df)
+                self.LongTable_df = self.LongTable_df.drop_duplicates()
         else:
             wide_df = pd.melt(wide_df,id_vars=["Sample_Name"],var_name="Transition_Name", value_name=column_name)
             if self.LongTable_df.empty:
@@ -129,11 +131,12 @@ class MS_Analysis():
             else:
                 self.LongTable_df = pd.merge(self.LongTable_df, wide_df , on=["Sample_Name","Transition_Name"], how='left')
 
-    def get_Long_Table(self, allow_multiple_istd = False):
+    def get_Long_Table(self, allow_multiple_istd = False, concatenation_type = None):
         """Function to get the long table of the extracted or calculated MRM transition name data.
 
         Args:
             allow_multiple_istd (bool): if True, allow Transition_Annot data by to have mulitple internal standards (in development)
+            concatenation_type (str): "rows or columns or None" to indicate if how Sample_Annot should be cleaned before merging with the Long_Table.
 
         Returns:
             Output_df (pandas DataFrame): A long data frame of with column name Sample_Name, Transition_Name and other relevant data
@@ -165,13 +168,22 @@ class MS_Analysis():
                 #if allow_multiple_istd:
                 if not allow_multiple_istd:
                     merge_column = ["Transition_Name","Transition_Name_ISTD"]
-                    self.LongTable_df = pd.merge(self.LongTable_df, self.ISTD_map_df[[item for item in merge_column if item in self.ISTD_map_df.columns.tolist()]] , 
-                                                 on=["Transition_Name"], how='left')
+                    self.LongTable_df = pd.merge(self.LongTable_df, 
+                                                 self.ISTD_map_df[[item for item in merge_column if item in self.ISTD_map_df.columns.tolist()]] , 
+                                                 on=["Transition_Name"], 
+                                                 how='left')
             if not self.Sample_Annot_df.empty:
                 merge_column = ["Sample_Name","Sample_Type","Concentration_Unit"]
-                self.LongTable_df = pd.merge(self.LongTable_df, self.Sample_Annot_df[[item for item in merge_column if item in self.Sample_Annot_df.columns.tolist()]] , 
-                                             on=["Sample_Name"], how='left')
-
+                merged_df = self.Sample_Annot_df[[item for item in merge_column if item in self.Sample_Annot_df.columns.tolist()]]
+                if concatenation_type == "columns":
+                    # When concatenating by column, the Sample_Name will be the same for each input file -> The Sample Annot file is sure to have duplicated Sample Names
+                    merged_df = merged_df.drop_duplicates()
+                #common_columns = list(set(self.LongTable_df.columns).intersection(merged_df.columns))
+                #print(common_columns)
+                self.LongTable_df = pd.merge(self.LongTable_df, 
+                                             merged_df, 
+                                             on=["Sample_Name"], 
+                                             how='left')
         #Reorder the columns
         col_order = self.LongTable_df.columns.tolist()
         if self.LongTable_Annot and self.Annotation_FilePath:
