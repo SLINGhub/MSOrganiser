@@ -278,11 +278,11 @@ def no_concatenate_workflow(stored_args, logger=None):
             else:
                 #We extract the data directly from the file and output accordingly
                 Output_df = MyData.get_from_Input_Data(column_name,
-                                                       allow_multiple_istd=stored_args['Allow_Multiple_ISTD'])
+                                                       allow_multiple_istd=False)
 
                 DfOutput.df_to_file(column_name,Output_df,
                                     transpose=stored_args['Transpose_Results'],
-                                    allow_multiple_istd=stored_args['Allow_Multiple_ISTD'])
+                                    allow_multiple_istd=False)
         #End the writing configuration for Excel, ...
         if stored_args['Output_Format'] == "Excel":
             DfOutput.end_writer()
@@ -336,6 +336,8 @@ def concatenate_along_rows_workflow(stored_args, logger=None, testing = False):
                            "Precursor Ion","Product Ion"]:
             no_need_full_data_columns.append(column_name)
         else:
+            if column_name == 'normConc by ISTD' and 'normArea by ISTD' not in need_full_data_columns:
+                need_full_data_columns.append("normArea by ISTD")
             need_full_data_columns.append(column_name)
             if any(['normArea by ISTD' in stored_args['Output_Options'],
                     'normConc by ISTD' in stored_args['Output_Options']
@@ -455,16 +457,23 @@ def concatenate_along_rows_workflow(stored_args, logger=None, testing = False):
 
         #Merge the Long_Table created from calculation_columns to the Long_Table created from no_need_full_data_columns
         if stored_args['Long_Table']:
+            for index, column_name in enumerate(need_full_data_columns):
+                if column_name == 'normArea by ISTD':
+                    need_full_data_columns[index] = 'normArea'
+                if column_name == 'normConc by ISTD':
+                    need_full_data_columns[index] = 'normConc'
             Long_Table_df = MyCalcData.get_Long_Table(allow_multiple_istd=stored_args['Allow_Multiple_ISTD'],
                                                       concatenation_type = "rows")
             if "Long_Table" in concatenate_df_sheet_name:
                 Long_Table_index = concatenate_df_sheet_name.index("Long_Table")
                 common_columns = list(set(concatenate_df_list[Long_Table_index].columns).intersection(Long_Table_df.columns))
-                Long_Table_df.columns
+                front_columns = [x for x in Long_Table_df.columns if x not in need_full_data_columns]
                 concatenate_df_list[Long_Table_index] = pd.merge(concatenate_df_list[Long_Table_index], 
                                                                  Long_Table_df,
                                                                  how='inner',
                                                                  on = common_columns)
+                col_order = front_columns + no_need_full_data_columns + need_full_data_columns
+                concatenate_df_list[Long_Table_index] = concatenate_df_list[Long_Table_index][col_order]
             else:
                 concatenate_df_list.extend([Long_Table_df])
                 concatenate_df_sheet_name.extend(["Long_Table"])
@@ -630,7 +639,6 @@ def concatenate_along_columns_workflow(stored_args, logger=None, testing = False
                     need_full_data_columns[index] = 'normArea'
                 if column_name == 'normConc by ISTD':
                     need_full_data_columns[index] = 'normConc'
-            #need_full_data_columns
             Long_Table_df = MyCalcData.get_Long_Table(allow_multiple_istd=stored_args['Allow_Multiple_ISTD'],
                                                       concatenation_type = "columns")
             if "Long_Table" in concatenate_df_sheet_name:

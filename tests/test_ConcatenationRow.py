@@ -235,8 +235,15 @@ class Concatenation_By_Row_Test(unittest.TestCase):
 
                 # Not every sheet_name needs to be transposed.
                 if sheet_name in ["Area", "normArea_by_ISTD", "normConc_by_ISTD"]:
-                    concatenate_df_list[data_index] = MSDataOutput.transpose_MSdata(concatenate_df_list[data_index],
-                                                                                    allow_multiple_istd = True)
+                    if sheet_name in ["normArea_by_ISTD", "normConc_by_ISTD"]:
+                        concatenate_df_list[data_index] = MSDataOutput.transpose_MSdata(concatenate_df_list[data_index],
+                                                                                        allow_multiple_istd = True)
+                    elif sheet_name in ["Area"]:
+                        concatenate_df_list[data_index] = MSDataOutput.transpose_MSdata(concatenate_df_list[data_index],
+                                                                                        allow_multiple_istd = False)
+                    else:
+                        print("We have a non-existing sheet_name")
+                        exit(-1)
                 concatenate_df_list[data_index] = concatenate_df_list[data_index].fillna('')
 
                 ExcelData_df = self.__sheet_to_df(workbook = WIDETABLEFORMROW_MULTIPLEISTD_CONCATENATERESULTS_TRANSPOSE_FILENAME,
@@ -260,7 +267,7 @@ class Concatenation_By_Row_Test(unittest.TestCase):
         # Assume that there is no index column
         index_col = None
 
-        if allow_multiple_istd and not transpose and sheet_name in ["Area", "normArea_by_ISTD", "normConc_by_ISTD"]:
+        if allow_multiple_istd and not transpose and sheet_name in ["normArea_by_ISTD", "normConc_by_ISTD"]:
             # Assume that the header is at the first two row of the sheet.
             header_col = [0,1]
             # Assume that the first column is the index column 
@@ -276,7 +283,7 @@ class Concatenation_By_Row_Test(unittest.TestCase):
 
         # We need to update the column names as the second level column name can be blank
         # But pandas will fill it in as "Unnamed: {Level position}"
-        if allow_multiple_istd and not transpose and sheet_name in ["Area", "normArea_by_ISTD", "normConc_by_ISTD"]:
+        if allow_multiple_istd and not transpose and sheet_name in ["normArea_by_ISTD", "normConc_by_ISTD"]:
             tuples=[]
             for index, column_tuple in enumerate(ExcelData_df.columns.values):
                 if("Unnamed:" in column_tuple[1]):
