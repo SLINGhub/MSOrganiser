@@ -6,21 +6,168 @@ from MSOrganiser import no_concatenate_workflow
 from MSDataOutput import MSDataOutput
 
 WIDETABLEFORMROW1_MULTIPLEISTD_FILENAME = os.path.join(os.path.dirname(__file__),"testdata", 
-                                          "test_multipleISTD", "WideTableFormRow1.csv")
+                                          "test_no_concatenate_multipleISTD", "WideTableFormRow1.csv")
 WIDETABLEFORMROW2_MULTIPLEISTD_FILENAME = os.path.join(os.path.dirname(__file__),"testdata", 
-                                          "test_multipleISTD", "WideTableFormRow2.csv")
+                                          "test_no_concatenate_multipleISTD", "WideTableFormRow2.csv")
 WIDETABLEFORMROW_MULTIPLEISTD_ANNOTATION = os.path.join(os.path.dirname(__file__),"testdata", 
-                                           "test_multipleISTD", "WideTableFormRow_Annotation.xlsm")
+                                           "test_no_concatenate_multipleISTD", "WideTableFormRow_Annotation.xlsm")
 WIDETABLEFORMROW1_MULTIPLEISTD_RESULTS_FILENAME = os.path.join(os.path.dirname(__file__),"testdata", 
-                                                               "test_multipleISTD", "WideTableFormRow1_Results.xlsx")
+                                                               "test_no_concatenate_multipleISTD", "WideTableFormRow1_Results.xlsx")
 WIDETABLEFORMROW1_MULTIPLEISTD_RESULTS_TRANSPOSE_FILENAME = os.path.join(os.path.dirname(__file__),"testdata", 
-                                                                         "test_multipleISTD", "WideTableFormRow1_TransposeResults.xlsx")
+                                                                         "test_no_concatenate_multipleISTD", "WideTableFormRow1_TransposeResults.xlsx")
 WIDETABLEFORMROW1_MULTIPLEISTD_RESULTS_LONGTABLE_FILENAME = os.path.join(os.path.dirname(__file__),"testdata", 
-                                                                         "test_multipleISTD", "WideTableFormRow1_LongTable.xlsx")
+                                                                         "test_no_concatenate_multipleISTD", "WideTableFormRow1_LongTable.xlsx")
 WIDETABLEFORMROW1_MULTIPLEISTD_RESULTS_LONGTABLE_WITH_ANNOT_FILENAME = os.path.join(os.path.dirname(__file__),"testdata", 
-                                                                                    "test_multipleISTD", "WideTableFormRow1_LongTable_with_Annot.xlsx")
+                                                                                    "test_no_concatenate_multipleISTD", 
+                                                                                    "WideTableFormRow1_LongTable_with_Annot.xlsx")
 
+WIDETABLEFORMROW1_FILENAME = os.path.join(os.path.dirname(__file__),"testdata", 
+                                          "test_no_concatenate", "WideTableFormRow1.csv")
+WIDETABLEFORMROW2_FILENAME = os.path.join(os.path.dirname(__file__),"testdata", 
+                                          "test_no_concatenate", "WideTableFormRow2.csv")
+WIDETABLEFORMROW_ANNOTATION = os.path.join(os.path.dirname(__file__),"testdata", 
+                                           "test_no_concatenate", "WideTableFormRow_Annotation.xlsm")
+WIDETABLEFORMROW1_RESULTS_FILENAME = os.path.join(os.path.dirname(__file__),"testdata", 
+                                                  "test_no_concatenate", "WideTableFormRow1_Results.xlsx")
+WIDETABLEFORMROW1_RESULTS_TRANSPOSE_FILENAME = os.path.join(os.path.dirname(__file__),"testdata", 
+                                                            "test_no_concatenate", "WideTableFormRow1_TransposeResults.xlsx")
+WIDETABLEFORMROW1_RESULTS_LONGTABLE_FILENAME = os.path.join(os.path.dirname(__file__),"testdata", 
+                                                            "test_no_concatenate", "WideTableFormRow1_LongTable.xlsx")
+WIDETABLEFORMROW1_RESULTS_LONGTABLE_WITH_ANNOT_FILENAME = os.path.join(os.path.dirname(__file__),"testdata", 
+                                                                       "test_no_concatenate", "WideTableFormRow1_LongTable_with_Annot.xlsx")
 class NoConcatenation_Test(unittest.TestCase):
+    def test_no_concatenate(self):
+        stored_args = {
+            'MS_Files': [WIDETABLEFORMROW1_FILENAME, WIDETABLEFORMROW2_FILENAME], 
+            'MS_FileType': 'Agilent Wide Table in csv', 
+            'Output_Directory': 'D:\\MSOrganiser', 
+            'Output_Options': ['Area', 'normArea by ISTD', 'normConc by ISTD'], 
+            'Annot_File': WIDETABLEFORMROW_ANNOTATION, 
+            'Output_Format': 'Excel', 
+            'Concatenate': 'No Concatenate', 
+            'Transpose_Results': False, 
+            'Allow_Multiple_ISTD': False, 
+            'Long_Table': False, 
+            'Long_Table_Annot': False, 
+            'Testing': False
+        }
+
+        # We just check the results of the first file input 
+        [file_data_list, file_name] = no_concatenate_workflow(stored_args,testing = True)
+        file_name_index = file_name.index(WIDETABLEFORMROW1_FILENAME)
+        [file_data,sheet_names] = file_data_list[file_name_index]
+
+        for sheet_name in sheet_names:
+            if sheet_name != "Long_Table":
+                data_index = sheet_names.index(sheet_name)
+                ExcelData_df = self.__sheet_to_df(workbook = WIDETABLEFORMROW1_RESULTS_FILENAME,
+                                                  sheet_name = sheet_name,
+                                                  allow_multiple_istd = False)
+                self.__compare_df(file_data[data_index],ExcelData_df)
+
+    def test_no_concatenate_LongTable(self):
+        stored_args = {
+            'MS_Files': [WIDETABLEFORMROW1_FILENAME, WIDETABLEFORMROW2_FILENAME], 
+            'MS_FileType': 'Agilent Wide Table in csv', 
+            'Output_Directory': 'D:\\MSOrganiser', 
+            'Output_Options': ['Area', 'normArea by ISTD', 'normConc by ISTD'], 
+            'Annot_File': WIDETABLEFORMROW_ANNOTATION, 
+            'Output_Format': 'Excel', 
+            'Concatenate': 'No Concatenate', 
+            'Transpose_Results': False, 
+            'Allow_Multiple_ISTD': False, 
+            'Long_Table': True, 
+            'Long_Table_Annot': False, 
+            'Testing': False
+        }
+
+        # We just check the results of the first file input 
+        [file_data_list, file_name] = no_concatenate_workflow(stored_args,testing = True)
+        file_name_index = file_name.index(WIDETABLEFORMROW1_FILENAME)
+        [file_data,sheet_names] = file_data_list[file_name_index]
+
+        data_index = sheet_names.index("Long_Table")
+        ExcelData_df = self.__sheet_to_df(workbook = WIDETABLEFORMROW1_RESULTS_LONGTABLE_FILENAME,
+                                          sheet_name = "Long_Table",
+                                          allow_multiple_istd = True)
+        ExcelData_df = ExcelData_df.fillna('')
+        self.__compare_df(file_data[data_index],ExcelData_df)
+
+    def test_no_concatenate_LongTable_with_Annot(self):
+        stored_args = {
+            'MS_Files': [WIDETABLEFORMROW1_FILENAME, WIDETABLEFORMROW2_FILENAME], 
+            'MS_FileType': 'Agilent Wide Table in csv', 
+            'Output_Directory': 'D:\\MSOrganiser', 
+            'Output_Options': ['Area', 'normArea by ISTD', 'normConc by ISTD'], 
+            'Annot_File': WIDETABLEFORMROW_ANNOTATION, 
+            'Output_Format': 'Excel', 
+            'Concatenate': 'No Concatenate', 
+            'Transpose_Results': False, 
+            'Allow_Multiple_ISTD': False, 
+            'Long_Table': True, 
+            'Long_Table_Annot': True, 
+            'Testing': False
+        }
+
+        # We just check the results of the first file input 
+        [file_data_list, file_name] = no_concatenate_workflow(stored_args,testing = True)
+        file_name_index = file_name.index(WIDETABLEFORMROW1_FILENAME)
+        [file_data,sheet_names] = file_data_list[file_name_index]
+
+        data_index = sheet_names.index("Long_Table")
+        ExcelData_df = self.__sheet_to_df(workbook = WIDETABLEFORMROW1_RESULTS_LONGTABLE_WITH_ANNOT_FILENAME,
+                                          sheet_name = "Long_Table",
+                                          allow_multiple_istd = True)
+        ExcelData_df = ExcelData_df.fillna('')
+        self.__compare_df(file_data[data_index],ExcelData_df)
+
+    def test_no_concatenate_transpose(self):
+        stored_args = {
+            'MS_Files': [WIDETABLEFORMROW1_FILENAME, WIDETABLEFORMROW2_FILENAME], 
+            'MS_FileType': 'Agilent Wide Table in csv', 
+            'Output_Directory': 'D:\\MSOrganiser', 
+            'Output_Options': ['Area', 'normArea by ISTD', 'normConc by ISTD'], 
+            'Annot_File': WIDETABLEFORMROW_ANNOTATION, 
+            'Output_Format': 'Excel', 
+            'Concatenate': 'No Concatenate', 
+            'Transpose_Results': True, 
+            'Allow_Multiple_ISTD': False, 
+            'Long_Table': False, 
+            'Long_Table_Annot': False, 
+            'Testing': False
+        }
+
+        # We just check the results of the first file input 
+        [file_data_list, file_name] = no_concatenate_workflow(stored_args,testing = True)
+        file_name_index = file_name.index(WIDETABLEFORMROW1_FILENAME)
+        [file_data,sheet_names] = file_data_list[file_name_index]
+
+        for sheet_name in sheet_names:
+            if sheet_name != "Long_Table":
+                data_index = sheet_names.index(sheet_name)
+
+                # Not every sheet_name needs to be transposed.
+                if sheet_name in ["Area", "normArea_by_ISTD", "normConc_by_ISTD"]:
+                    if sheet_name in ["normArea_by_ISTD", "normConc_by_ISTD"]:
+                        file_data[data_index] = MSDataOutput.transpose_MSdata(file_data[data_index],
+                                                                              allow_multiple_istd = False)
+                    elif sheet_name in ["Area"]:
+                        file_data[data_index] = MSDataOutput.transpose_MSdata(file_data[data_index],
+                                                                              allow_multiple_istd = False)
+                    else:
+                        print("We have a non-existing sheet_name")
+                        exit(-1)
+
+                file_data[data_index] = file_data[data_index].fillna('')
+
+                ExcelData_df = self.__sheet_to_df(workbook = WIDETABLEFORMROW1_RESULTS_TRANSPOSE_FILENAME,
+                                                  sheet_name = sheet_name,
+                                                  allow_multiple_istd = False,
+                                                  transpose = True)
+                ExcelData_df = ExcelData_df.fillna('')
+
+                self.__compare_df(file_data[data_index],ExcelData_df)
+
     def test_no_concatenate_multiple_ISTD(self):
         stored_args = {
             'MS_Files': [WIDETABLEFORMROW1_MULTIPLEISTD_FILENAME, WIDETABLEFORMROW2_MULTIPLEISTD_FILENAME], 

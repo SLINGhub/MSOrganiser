@@ -188,7 +188,8 @@ def no_concatenate_workflow(stored_args, logger=None, testing = False):
     #MS_Files is no longer a long string of paths separated by ;, we split them into a list
     for MS_FilePath in stored_args['MS_Files']:
 
-        print("Working on " + MS_FilePath,flush=True)
+        if not testing:
+            print("Working on " + MS_FilePath,flush=True)
         if logger:
             logger.info("Working on " + MS_FilePath)
 
@@ -342,7 +343,8 @@ def no_concatenate_workflow(stored_args, logger=None, testing = False):
             DfOutput.end_writer()
 
         #Output the report to a pdf file
-        PDFReport.output_to_PDF()
+        if not testing:
+            PDFReport.output_to_PDF()
 
         #Output the LongTable Data Table in another csv or excel sheet
         if stored_args['Long_Table']:
