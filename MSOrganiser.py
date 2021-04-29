@@ -180,18 +180,17 @@ def output_concatenated_long_table(stored_args,
 
 def no_concatenate_workflow(stored_args, logger=None, testing = False):
 
-    concatenate_df_list = []
-    concatenate_df_sheet_name = []
+    #Use during unit testing
+    file_data_list = []
+    file_name = []
 
     #We do this for every mass hunter file output
     #MS_Files is no longer a long string of paths separated by ;, we split them into a list
-    concatenate_df_list = []
-    concatenate_df_sheet_name = []
-
     for MS_FilePath in stored_args['MS_Files']:
 
         print("Working on " + MS_FilePath,flush=True)
-        logger.info("Working on " + MS_FilePath)
+        if logger:
+            logger.info("Working on " + MS_FilePath)
 
         MyData = MS_Analysis(MS_FilePath = MS_FilePath, 
                              MS_FileType = stored_args['MS_FileType'], 
@@ -205,7 +204,8 @@ def no_concatenate_workflow(stored_args, logger=None, testing = False):
         PDFReport = MSDataReport_PDF(output_directory = stored_args['Output_Directory'], 
                                      input_file_path = MS_FilePath, 
                                      logger = logger, 
-                                     ingui = True)
+                                     ingui = True,
+                                     testing = testing)
 
         #Generate the parameters report
         Parameters_df = get_Parameters_df(stored_args = stored_args,
@@ -217,41 +217,62 @@ def no_concatenate_workflow(stored_args, logger=None, testing = False):
         else:
             result_name = "Results"
 
-        #Set up the file writing configuration for Excel, or csv ...
-        if stored_args['Output_Format'] == "Excel" :
-            DfOutput = MSDataOutput_Excel(stored_args['Output_Directory'], MS_FilePath, 
-                                          result_name = result_name ,
-                                          logger = logger, ingui = True)
-        elif stored_args['Output_Format'] == "csv" :
-            DfOutput = MSDataOutput_csv(stored_args['Output_Directory'], MS_FilePath, 
-                                        result_name = result_name ,
-                                        logger = logger, ingui = True)
-        DfOutput.start_writer()
+        if not testing:
+            #Set up the file writing configuration for Excel, or csv ...
+            if stored_args['Output_Format'] == "Excel":
+                DfOutput = MSDataOutput_Excel(stored_args['Output_Directory'], MS_FilePath, 
+                                              result_name = result_name ,
+                                              logger = logger, ingui = True)
+            elif stored_args['Output_Format'] == "csv":
+                DfOutput = MSDataOutput_csv(stored_args['Output_Directory'], MS_FilePath, 
+                                            result_name = result_name ,
+                                            logger = logger, ingui = True)
+        if not testing:
+            DfOutput.start_writer()
+
+        #Use during unit testing
+        file_data = []
+        sheet_name = []
 
         for column_name in stored_args['Output_Options']:
             #Start the data extraction or analysis and output them straight away
             if column_name == 'normArea by ISTD':
-                    #Perform normalisation using ISTD
-                    [norm_Area_df,ISTD_Area,ISTD_map_df,ISTD_Report] = MyData.get_Normalised_Area(column_name,stored_args['Annot_File'],
-                                                                                                  allow_multiple_istd = stored_args['Allow_Multiple_ISTD'])
+                #Perform normalisation using ISTD
+                [norm_Area_df,ISTD_Area,ISTD_map_df,ISTD_Report] = MyData.get_Normalised_Area(column_name,stored_args['Annot_File'],
+                                                                                              allow_multiple_istd = stored_args['Allow_Multiple_ISTD'])
 
-                    #Output the normalised area results
+                #Output the normalised area results
 
-                    #If testing, output the ISTD_Area results
-                    if stored_args['Testing']:
-                        DfOutput.df_to_file("ISTD_Area",ISTD_Area,
-                                            transpose=stored_args['Transpose_Results'],
-                                            allow_multiple_istd=stored_args['Allow_Multiple_ISTD']
-                                            )
+                #If testing check box is checked and not doing unit testing, 
+                #output the ISTD_Area results
+                if stored_args['Testing'] and not testing:
+                    DfOutput.df_to_file("ISTD_Area",ISTD_Area,
+                                        transpose=stored_args['Transpose_Results'],
+                                        allow_multiple_istd=stored_args['Allow_Multiple_ISTD']
+                                       )
 
-                    #Output the normalised area and transition annotation results
+                #If testing check box is checked and doing unit testing, 
+                #output the ISTD_Area in the file_data list
+                if stored_args['Testing'] and testing:
+                    file_data.append(ISTD_Area)
+                    sheet_name.append("ISTD_Area")
+
+                #If not doing unit testing,
+                #Output the normalised area and transition annotation results
+                if not testing:
                     DfOutput.df_to_file("Transition_Name_Annot",ISTD_map_df)
                     DfOutput.df_to_file("normArea_by_ISTD",norm_Area_df,
                                         transpose=stored_args['Transpose_Results'],
                                         allow_multiple_istd=stored_args['Allow_Multiple_ISTD'])
+
+                #If doing unit testing, output the normalised area and 
+                #transition annotation results in the file_data list
+                if testing:
+                    file_data.extend([ISTD_map_df,norm_Area_df])
+                    sheet_name.extend(["Transition_Name_Annot", "normArea_by_ISTD"])
                
-                    #Generate the ISTD normalisation report
-                    PDFReport.create_ISTD_report(ISTD_Report)
+                #Generate the ISTD normalisation report
+                PDFReport.create_ISTD_report(ISTD_Report)
 
             elif column_name == 'normConc by ISTD':
                 #Perform concentration need_full_data
@@ -267,8 +288,9 @@ def no_concatenate_workflow(stored_args, logger=None, testing = False):
 
                 #Output the concentration results
 
-                #If testing, output the ISTD_Conc and ISTD_to_Samp_Amt_Ratio results
-                if stored_args['Testing']:
+                #If testing check box is checked and not doing unit testing, 
+                #output the ISTD_Conc and ISTD_to_Samp_Amt_Ratio results
+                if stored_args['Testing'] and not testing:
                     DfOutput.df_to_file("ISTD_Conc",ISTD_Conc_df,
                                         transpose=stored_args['Transpose_Results'],
                                         allow_multiple_istd=stored_args['Allow_Multiple_ISTD'])
@@ -276,12 +298,25 @@ def no_concatenate_workflow(stored_args, logger=None, testing = False):
                                         transpose=stored_args['Transpose_Results'],
                                         allow_multiple_istd=stored_args['Allow_Multiple_ISTD'])
 
-                #Output the concentration data and sample annotation results
-                DfOutput.df_to_file("Sample_Annot",Sample_Annot_df)
-                DfOutput.df_to_file("normConc_by_ISTD",norm_Conc_df,
-                                    transpose=stored_args['Transpose_Results'],
-                                    allow_multiple_istd=stored_args['Allow_Multiple_ISTD'])
+                #If testing check box is checked and doing unit testing, 
+                #output the ISTD_Conc and ISTD_to_Samp_Amt_Ratio in the file_data list
+                if stored_args['Testing'] and testing:
+                    file_data.extend([ISTD_Conc_df,ISTD_Samp_Ratio_df])
+                    sheet_name.extend(["ISTD_Conc", "ISTD_to_Samp_Amt_Ratio"])
 
+                #If not doing unit testing,
+                #Output the concentration data and sample annotation results
+                if not testing:
+                    DfOutput.df_to_file("Sample_Annot",Sample_Annot_df)
+                    DfOutput.df_to_file("normConc_by_ISTD",norm_Conc_df,
+                                        transpose=stored_args['Transpose_Results'],
+                                        allow_multiple_istd=stored_args['Allow_Multiple_ISTD'])
+
+                #If doing unit testing, output the Sample_Annot_df and
+                #norm_Conc_df results in the file_data list
+                if testing:
+                    file_data.extend([Sample_Annot_df, norm_Conc_df])
+                    sheet_name.extend(["Sample_Annot", "normConc_by_ISTD"])
 
 
             else:
@@ -289,17 +324,27 @@ def no_concatenate_workflow(stored_args, logger=None, testing = False):
                 Output_df = MyData.get_from_Input_Data(column_name,
                                                        allow_multiple_istd=False)
 
-                DfOutput.df_to_file(column_name,Output_df,
-                                    transpose=stored_args['Transpose_Results'],
-                                    allow_multiple_istd=False)
+                #If not doing unit testing,
+                #Output the Output_df results
+                if not testing:
+                    DfOutput.df_to_file(column_name,Output_df,
+                                        transpose=stored_args['Transpose_Results'],
+                                        allow_multiple_istd=False)
+
+                #If doing unit testing, output the Output_df
+                #in the file_data list
+                if testing:
+                    file_data.append(Output_df)
+                    sheet_name.append(column_name)
+
         #End the writing configuration for Excel, ...
-        if stored_args['Output_Format'] == "Excel":
+        if stored_args['Output_Format'] == "Excel" and not testing:
             DfOutput.end_writer()
 
         #Output the report to a pdf file
         PDFReport.output_to_PDF()
 
-       #Output the LongTable Data Table in another csv or excel sheet
+        #Output the LongTable Data Table in another csv or excel sheet
         if stored_args['Long_Table']:
             Long_Table_df = MyData.get_Long_Table(allow_multiple_istd=stored_args['Allow_Multiple_ISTD'],
                                                   concatenation_type = None)
@@ -308,17 +353,34 @@ def no_concatenate_workflow(stored_args, logger=None, testing = False):
             if stored_args['Long_Table_Annot']:
                 result_name = "Long_Table_with_Annot"
 
-            #Set up the file writing configuration for Excel, or csv ...
-            if stored_args['Output_Format'] == "Excel" :
-                DfLongOutput = MSDataOutput_Excel(stored_args['Output_Directory'], MS_FilePath, 
-                                                  result_name = result_name ,logger=logger, ingui=True)
-            elif stored_args['Output_Format'] == "csv" :
-                DfLongOutput = MSDataOutput_csv(stored_args['Output_Directory'], MS_FilePath, 
-                                                result_name = "" ,logger=logger, ingui=True)
-            DfLongOutput.start_writer()
-            DfLongOutput.df_to_file("Long_Table",Long_Table_df)
-            if stored_args['Output_Format'] == "Excel" :
-                DfLongOutput.end_writer()
+            #If doing unit testing, output the Long_Table_df
+            #in the file_data list
+            if testing:
+                file_data.append(Long_Table_df)
+                sheet_name.append("Long_Table")
+
+            if not testing:
+                #Set up the file writing configuration for Excel, or csv ...
+                if stored_args['Output_Format'] == "Excel":
+                    DfLongOutput = MSDataOutput_Excel(stored_args['Output_Directory'], MS_FilePath, 
+                                                      result_name = result_name ,logger=logger, ingui=True)
+                elif stored_args['Output_Format'] == "csv":
+                    DfLongOutput = MSDataOutput_csv(stored_args['Output_Directory'], MS_FilePath, 
+                                                    result_name = "" ,logger=logger, ingui=True)
+                DfLongOutput.start_writer()
+                DfLongOutput.df_to_file("Long_Table",Long_Table_df)
+
+                if stored_args['Output_Format'] == "Excel" :
+                    DfLongOutput.end_writer()
+
+        #Use during unit testing
+        if testing:
+            file_name.append(MS_FilePath)
+            file_data_list.append([file_data,sheet_name])
+
+    #Use during unit testing
+    if testing:
+        return([file_data_list, file_name])
 
 def concatenate_along_rows_workflow(stored_args, logger=None, testing = False):
 
