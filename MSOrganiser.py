@@ -178,9 +178,16 @@ def output_concatenated_long_table(stored_args,
         if stored_args['Output_Format'] == "Excel" :
             DfConcatenateLongOutput.end_writer()
 
-def no_concatenate_workflow(stored_args, logger=None):
+def no_concatenate_workflow(stored_args, logger=None, testing = False):
+
+    concatenate_df_list = []
+    concatenate_df_sheet_name = []
+
     #We do this for every mass hunter file output
     #MS_Files is no longer a long string of paths separated by ;, we split them into a list
+    concatenate_df_list = []
+    concatenate_df_sheet_name = []
+
     for MS_FilePath in stored_args['MS_Files']:
 
         print("Working on " + MS_FilePath,flush=True)
@@ -212,10 +219,12 @@ def no_concatenate_workflow(stored_args, logger=None):
 
         #Set up the file writing configuration for Excel, or csv ...
         if stored_args['Output_Format'] == "Excel" :
-            DfOutput = MSDataOutput_Excel(stored_args['Output_Directory'], MS_FilePath, result_name = result_name ,
+            DfOutput = MSDataOutput_Excel(stored_args['Output_Directory'], MS_FilePath, 
+                                          result_name = result_name ,
                                           logger = logger, ingui = True)
         elif stored_args['Output_Format'] == "csv" :
-            DfOutput = MSDataOutput_csv(stored_args['Output_Directory'], MS_FilePath, result_name = result_name ,
+            DfOutput = MSDataOutput_csv(stored_args['Output_Directory'], MS_FilePath, 
+                                        result_name = result_name ,
                                         logger = logger, ingui = True)
         DfOutput.start_writer()
 
@@ -290,26 +299,26 @@ def no_concatenate_workflow(stored_args, logger=None):
         #Output the report to a pdf file
         PDFReport.output_to_PDF()
 
-    #Output the LongTable Data Table in another csv or excel sheet
-    if stored_args['Long_Table']:
-        Long_Table_df = MyData.get_Long_Table(allow_multiple_istd=stored_args['Allow_Multiple_ISTD'],
-                                              concatenation_type = None)
+       #Output the LongTable Data Table in another csv or excel sheet
+        if stored_args['Long_Table']:
+            Long_Table_df = MyData.get_Long_Table(allow_multiple_istd=stored_args['Allow_Multiple_ISTD'],
+                                                  concatenation_type = None)
 
-        result_name = "Long_Table" 
-        if stored_args['Long_Table_Annot']:
-            result_name = "Long_Table_with_Annot"
+            result_name = "Long_Table" 
+            if stored_args['Long_Table_Annot']:
+                result_name = "Long_Table_with_Annot"
 
-        #Set up the file writing configuration for Excel, or csv ...
-        if stored_args['Output_Format'] == "Excel" :
-            DfLongOutput = MSDataOutput_Excel(stored_args['Output_Directory'], MS_FilePath, 
-                                              result_name = result_name ,logger=logger, ingui=True)
-        elif stored_args['Output_Format'] == "csv" :
-            DfLongOutput = MSDataOutput_csv(stored_args['Output_Directory'], MS_FilePath, 
-                                            result_name = "" ,logger=logger, ingui=True)
-        DfLongOutput.start_writer()
-        DfLongOutput.df_to_file("Long_Table",Long_Table_df)
-        if stored_args['Output_Format'] == "Excel" :
-            DfLongOutput.end_writer()
+            #Set up the file writing configuration for Excel, or csv ...
+            if stored_args['Output_Format'] == "Excel" :
+                DfLongOutput = MSDataOutput_Excel(stored_args['Output_Directory'], MS_FilePath, 
+                                                  result_name = result_name ,logger=logger, ingui=True)
+            elif stored_args['Output_Format'] == "csv" :
+                DfLongOutput = MSDataOutput_csv(stored_args['Output_Directory'], MS_FilePath, 
+                                                result_name = "" ,logger=logger, ingui=True)
+            DfLongOutput.start_writer()
+            DfLongOutput.df_to_file("Long_Table",Long_Table_df)
+            if stored_args['Output_Format'] == "Excel" :
+                DfLongOutput.end_writer()
 
 def concatenate_along_rows_workflow(stored_args, logger=None, testing = False):
 

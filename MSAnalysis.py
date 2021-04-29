@@ -119,9 +119,17 @@ class MS_Analysis():
             if self.LongTable_df.empty:
                 self.LongTable_df = wide_df
             else:
-                self.LongTable_df = pd.merge(self.LongTable_df, wide_df , 
-                                             on=["Sample_Name","Transition_Name","Transition_Name_ISTD"], 
-                                             how = 'left')
+                # This is handle the case when the LongTable contains 
+                # only columns that do not need calculation like Area
+                # Hence this,LongTable will not have the column "Transition_Name_ISTD"
+                if "Transition_Name_ISTD" not in self.LongTable_df.columns:
+                    self.LongTable_df = pd.merge(self.LongTable_df, wide_df , 
+                                                 on=["Sample_Name","Transition_Name"], 
+                                                 how = 'left')
+                else:
+                    self.LongTable_df = pd.merge(self.LongTable_df, wide_df , 
+                                                 on=["Sample_Name","Transition_Name","Transition_Name_ISTD"], 
+                                                 how = 'left')
                 #print(self.LongTable_df)
                 self.LongTable_df = self.LongTable_df.drop_duplicates()
         else:
