@@ -54,7 +54,7 @@ extras_toc = Tree(os.path.join(os.getcwd(),'msreport'), prefix = 'msreport' )
 #print(extras_toc)
 
 a = Analysis(['MSOrganiser.py'],
-             pathex=['.\\testenv\\Scripts'],
+             pathex=['.\\testenv3.9\\Scripts'],
              hiddenimports=[],
              hookspath=None,
              runtime_hooks=None,
