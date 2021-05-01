@@ -79,7 +79,7 @@ def get_Parameters_df(stored_args, MS_FilePath = None,
             i +=1
     else:
         if MS_FilePath is not None:
-            Parameter_list.append(("Input_File",os.path.basename(MS_FilePath)))
+            Parameter_list.append(("Input_File",str(os.path.basename(MS_FilePath))))
 
     Parameter_list.append(("Input_File_Type",stored_args['MS_FileType']))
 
