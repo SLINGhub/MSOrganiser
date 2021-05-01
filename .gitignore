@@ -259,8 +259,6 @@ paket-files/
 # Python Tools for Visual Studio (PTVS)
 __pycache__/
 *.pyc
-/testenv
-/testenv/.ptvs
 /logfiles
 /build
 /dist
@@ -268,4 +266,15 @@ __pycache__/
 /RequiredFolders
 /docs/build/
 /cairo_dll/var
+
+# Python Virtual Environment
 /testenv3.9
+
+# R project to create README.md
+.Rproj.user
+.Rhistory
+renv
+.Rprofile
+renv.lock
+
+
