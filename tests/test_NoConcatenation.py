@@ -37,6 +37,12 @@ WIDETABLEFORMROW1_RESULTS_LONGTABLE_WITH_ANNOT_FILENAME = os.path.join(os.path.d
                                                                        "test_no_concatenate", "WideTableFormRow1_LongTable_with_Annot.xlsx")
 class NoConcatenation_Test(unittest.TestCase):
     def test_no_concatenate(self):
+        """Check if the software is able to from the two input raw data
+
+        * Extract the Area
+        * Calculate the normalised Area and concentation
+
+        """
         stored_args = {
             'MS_Files': [WIDETABLEFORMROW1_FILENAME, WIDETABLEFORMROW2_FILENAME], 
             'MS_FileType': 'Agilent Wide Table in csv', 
@@ -66,6 +72,13 @@ class NoConcatenation_Test(unittest.TestCase):
                 self.__compare_df(file_data[data_index],ExcelData_df)
 
     def test_no_concatenate_LongTable(self):
+        """Check if the software is able to from the two input raw data
+
+        * Extract the Area
+        * Calculate the normalised Area and concentation
+        * Create a Long Table without Annotation
+
+        """
         stored_args = {
             'MS_Files': [WIDETABLEFORMROW1_FILENAME, WIDETABLEFORMROW2_FILENAME], 
             'MS_FileType': 'Agilent Wide Table in csv', 
@@ -94,6 +107,13 @@ class NoConcatenation_Test(unittest.TestCase):
         self.__compare_df(file_data[data_index],ExcelData_df)
 
     def test_no_concatenate_LongTable_with_Annot(self):
+        """Check if the software is able to from the two input raw data
+
+        * Extract the Area
+        * Calculate the normalised Area and concentation
+        * Create a Long Table with Annotation
+
+        """
         stored_args = {
             'MS_Files': [WIDETABLEFORMROW1_FILENAME, WIDETABLEFORMROW2_FILENAME], 
             'MS_FileType': 'Agilent Wide Table in csv', 
@@ -122,6 +142,13 @@ class NoConcatenation_Test(unittest.TestCase):
         self.__compare_df(file_data[data_index],ExcelData_df)
 
     def test_no_concatenate_transpose(self):
+        """Check if the software is able to from the two input raw data
+
+        * Extract the Area
+        * Calculate the normalised Area and concentation
+        * Transpose the results correctly
+
+        """
         stored_args = {
             'MS_Files': [WIDETABLEFORMROW1_FILENAME, WIDETABLEFORMROW2_FILENAME], 
             'MS_FileType': 'Agilent Wide Table in csv', 
@@ -169,6 +196,12 @@ class NoConcatenation_Test(unittest.TestCase):
                 self.__compare_df(file_data[data_index],ExcelData_df)
 
     def test_no_concatenate_multiple_ISTD(self):
+        """Check if the software is able to from the two input raw data
+
+        * Extract the Area
+        * Calculate the normalised Area and concentation using multiple ISTD
+
+        """
         stored_args = {
             'MS_Files': [WIDETABLEFORMROW1_MULTIPLEISTD_FILENAME, WIDETABLEFORMROW2_MULTIPLEISTD_FILENAME], 
             'MS_FileType': 'Agilent Wide Table in csv', 
@@ -200,6 +233,13 @@ class NoConcatenation_Test(unittest.TestCase):
                 self.__compare_df(file_data[data_index],ExcelData_df)
 
     def test_no_concatenate_multiple_ISTD_LongTable(self):
+        """Check if the software is able to from the two input raw data
+
+        * Extract the Area
+        * Calculate the normalised Area and concentation using multiple ISTD
+        * Create a Long Table without Annotation
+
+        """
         stored_args = {
             'MS_Files': [WIDETABLEFORMROW1_MULTIPLEISTD_FILENAME, WIDETABLEFORMROW2_MULTIPLEISTD_FILENAME], 
             'MS_FileType': 'Agilent Wide Table in csv', 
@@ -228,6 +268,13 @@ class NoConcatenation_Test(unittest.TestCase):
         self.__compare_df(file_data[data_index],ExcelData_df)
 
     def test_no_concatenate_multiple_ISTD_LongTable_with_Annot(self):
+        """Check if the software is able to from the two input raw data
+
+        * Extract the Area
+        * Calculate the normalised Area and concentation using multiple ISTD
+        * Create a Long Table with Annotation
+
+        """
         stored_args = {
             'MS_Files': [WIDETABLEFORMROW1_MULTIPLEISTD_FILENAME, WIDETABLEFORMROW2_MULTIPLEISTD_FILENAME], 
             'MS_FileType': 'Agilent Wide Table in csv', 
@@ -256,6 +303,13 @@ class NoConcatenation_Test(unittest.TestCase):
         self.__compare_df(file_data[data_index],ExcelData_df)
 
     def test_no_concatenate_multiple_ISTD_transpose(self):
+        """Check if the software is able to from the two input raw data
+
+        * Extract the Area
+        * Calculate the normalised Area and concentation using multiple ISTD
+        * Transpose the results correctly
+
+        """
         stored_args = {
             'MS_Files': [WIDETABLEFORMROW1_MULTIPLEISTD_FILENAME, WIDETABLEFORMROW2_MULTIPLEISTD_FILENAME], 
             'MS_FileType': 'Agilent Wide Table in csv', 

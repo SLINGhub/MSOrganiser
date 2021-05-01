@@ -38,6 +38,12 @@ WIDETABLEFORMROW_CONCATENATERESULTS_LONGTABLE_WITH_ANNOT_FILENAME = os.path.join
 
 class Concatenation_By_Row_Test(unittest.TestCase):
     def test_concatenate_by_rows(self):
+        """Check if the software is able to from the two input raw data with different samples but same transitions
+
+        * Extract the Area and concatenate by row
+        * Calculate the normalised Area and concentation using the concatenated Area
+
+        """
         stored_args = {
             'MS_Files': [WIDETABLEFORMROW1_FILENAME, WIDETABLEFORMROW2_FILENAME], 
             'MS_FileType': 'Agilent Wide Table in csv', 
@@ -63,6 +69,13 @@ class Concatenation_By_Row_Test(unittest.TestCase):
                 self.__compare_df(concatenate_df_list[data_index],ExcelData_df)
 
     def test_concatenate_by_rows_LongTable(self):
+        """Check if the software is able to from the two input raw data with different samples but same transitions
+
+        * Extract the Area and concatenate by row
+        * Calculate the normalised Area and concentation using the concatenated Area
+        * Create a Long Table without Annotation
+
+        """
         stored_args = {
             'MS_Files': [WIDETABLEFORMROW1_FILENAME, WIDETABLEFORMROW2_FILENAME], 
             'MS_FileType': 'Agilent Wide Table in csv', 
@@ -86,6 +99,13 @@ class Concatenation_By_Row_Test(unittest.TestCase):
         self.__compare_df(concatenate_df_list[data_index],ExcelData_df)
 
     def test_concatenate_by_rows_LongTable_with_Annot(self):
+        """Check if the software is able to from the two input raw data with different samples but same transitions
+
+        * Extract the Area and concatenate by row
+        * Calculate the normalised Area and concentation using the concatenated Area
+        * Create a Long Table with Annotation
+
+        """
         stored_args = {
             'MS_Files': [WIDETABLEFORMROW1_FILENAME, WIDETABLEFORMROW2_FILENAME], 
             'MS_FileType': 'Agilent Wide Table in csv', 
@@ -109,6 +129,13 @@ class Concatenation_By_Row_Test(unittest.TestCase):
         self.__compare_df(concatenate_df_list[data_index],ExcelData_df)
 
     def test_concatenate_by_rows_transpose(self):
+        """Check if the software is able to from the two input raw data with different samples but same transitions
+
+        * Extract the Area and concatenate by row
+        * Calculate the normalised Area and concentation using the concatenated Area
+        * Transpose the results correctly
+
+        """
         stored_args = {
             'MS_Files': [WIDETABLEFORMROW1_FILENAME, WIDETABLEFORMROW2_FILENAME], 
             'MS_FileType': 'Agilent Wide Table in csv', 
@@ -143,6 +170,12 @@ class Concatenation_By_Row_Test(unittest.TestCase):
                 self.__compare_df(concatenate_df_list[data_index],ExcelData_df)
 
     def test_concatenate_by_rows_multiple_ISTD(self):
+        """Check if the software is able to from the two input raw data with different samples but same transitions
+
+        * Extract the Area and concatenate by row
+        * Calculate the normalised Area and concentation using the concatenated Area and multiple ISTD
+
+        """
         stored_args = {
             'MS_Files': [WIDETABLEFORMROW1_MULTIPLEISTD_FILENAME, WIDETABLEFORMROW2_MULTIPLEISTD_FILENAME], 
             'MS_FileType': 'Agilent Wide Table in csv', 
@@ -168,6 +201,13 @@ class Concatenation_By_Row_Test(unittest.TestCase):
                 self.__compare_df(concatenate_df_list[data_index],ExcelData_df)
 
     def test_concatenate_by_rows_multiple_ISTD_LongTable(self):
+        """Check if the software is able to from the two input raw data with different samples but same transitions
+
+        * Extract the Area and concatenate by row
+        * Calculate the normalised Area and concentation using the concatenated Area and multiple ISTD
+        * Create a Long Table without Annotation
+
+        """
         stored_args = {
             'MS_Files': [WIDETABLEFORMROW1_MULTIPLEISTD_FILENAME, WIDETABLEFORMROW2_MULTIPLEISTD_FILENAME], 
             'MS_FileType': 'Agilent Wide Table in csv', 
@@ -191,6 +231,13 @@ class Concatenation_By_Row_Test(unittest.TestCase):
         self.__compare_df(concatenate_df_list[data_index],ExcelData_df)
 
     def test_concatenate_by_rows_multiple_ISTD_LongTable_with_Annot(self):
+        """Check if the software is able to from the two input raw data with different samples but same transitions
+
+        * Extract the Area and concatenate by row
+        * Calculate the normalised Area and concentation using the concatenated Area and multiple ISTD
+        * Create a Long Table with Annotation
+
+        """
         stored_args = {
             'MS_Files': [WIDETABLEFORMROW1_MULTIPLEISTD_FILENAME, WIDETABLEFORMROW2_MULTIPLEISTD_FILENAME], 
             'MS_FileType': 'Agilent Wide Table in csv', 
@@ -214,6 +261,13 @@ class Concatenation_By_Row_Test(unittest.TestCase):
         self.__compare_df(concatenate_df_list[data_index],ExcelData_df)
 
     def test_concatenate_by_rows_multiple_ISTD_transpose(self):
+        """Check if the software is able to from the two input raw data with different samples but same transitions
+
+        * Extract the Area and concatenate by row
+        * Calculate the normalised Area and concentation using the concatenated Area and multiple ISTD
+        * Transpose the results correctly
+
+        """
         stored_args = {
             'MS_Files': [WIDETABLEFORMROW1_MULTIPLEISTD_FILENAME, WIDETABLEFORMROW2_MULTIPLEISTD_FILENAME], 
             'MS_FileType': 'Agilent Wide Table in csv', 

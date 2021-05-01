@@ -9,3 +9,6 @@ Contains functions and codes related to:
 
    test_MSRawData
    test_MSAnalysis
+   test_NoConcatenation
+   test_ConcatenationRow
+   test_ConcatenationColumn

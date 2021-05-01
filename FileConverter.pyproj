@@ -304,8 +304,11 @@
     <Content Include="docs\source\parser\index.rst" />
     <Content Include="docs\source\parser\MSParser.rst" />
     <Content Include="docs\source\testunits\index.rst" />
+    <Content Include="docs\source\testunits\test_ConcatenationColumn.rst" />
+    <Content Include="docs\source\testunits\test_ConcatenationRow.rst" />
     <Content Include="docs\source\testunits\test_MSAnalysis.rst" />
     <Content Include="docs\source\testunits\test_MSRawData.rst" />
+    <Content Include="docs\source\testunits\test_NoConcatenation.rst" />
     <Content Include="docs\source\wrapper\index.rst" />
     <Content Include="docs\source\wrapper\MSOrganiser.rst" />
     <Content Include="docs\~%24Organiser_Developer_Documentation.docx" />
