@@ -21,6 +21,11 @@ folder, double click on the file `MSOrganiser.exe` to start
 
 ## Extracting Area and RT
 
+The test csv data file is exported via Agilent MassHunter Quantitative
+Analysis in wide table form.
+
+![WideTableForm](docs/figures/README-WideTableForm.PNG)
+
 Fill in the `Required Input` section such as the `MS_Files`,
 `MS_FileType` and `Output_Directory`.
 
@@ -37,3 +42,38 @@ Ensure the `Output_Settings` is as follows.
 Click on `Start` and let the program run
 
 ![ProgramRun](docs/figures/README-ProgramRun.gif)
+
+Results files are as follows
+
+![ResultsAreaRTFiles](docs/figures/README-ResultsAreaRTFiles.PNG)
+
+![ResultsArea](docs/figures/README-ResultsArea.PNG)
+
+![ResultsRT](docs/figures/README-ResultsRT.PNG)
+
+![ResultsAreaRTPDF](docs/figures/README-ResultsAreaRTPDF.PNG)
+
+## Calculating normalised Area and Concentration
+
+To do this, a corresponding annotation file is required.
+
+The content in the annotation file are as follows:
+
+![Annotation](docs/figures/README-Annotation.gif)
+
+In the `Data_extraction` section, click on `normArea by ISTD` and
+`normConc by ISTD`. Load the annotation file onto `Annot_File` and press
+`Start` to let the program run.
+
+![OutputOptions\_normArea\_and\_normConc](docs/figures/README-OutputOptions_normArea_and_normConc.PNG)
+
+When the program has finished running, the results will contain the
+following sheets including the normalised area and concentration.
+
+![ResultsTransitionAnnot](docs/figures/README-ResultsTransitionAnnot.PNG)
+
+![ResultsnormArea](docs/figures/README-ResultsnormArea.PNG)
+
+![ResultsSampleAnnot](docs/figures/README-ResultsSampleAnnot.PNG)
+
+![ResultsnormConc](docs/figures/README-ResultsnormConc.PNG)
