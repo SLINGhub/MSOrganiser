@@ -77,3 +77,19 @@ following sheets including the normalised area and concentration.
 ![ResultsSampleAnnot](docs/figures/README-ResultsSampleAnnot.PNG)
 
 ![ResultsnormConc](docs/figures/README-ResultsnormConc.PNG)
+
+![ResultsnormAreaPDF](docs/figures/README-ResultsnormAreaPDF.PNG)
+
+## Transpose Output
+
+By default, the results are represented in a wide table form with Sample
+Name as the first columns followed by the Transitions. To make the
+Transition Name as the first column followed by the Sample Names, go to
+the `Output Settings` section and change the `Transpose_Results` from
+`False` to `True` and click `Start`
+
+![TransposeSettings](docs/figures/README-TransposeSettings.PNG)
+
+The results file will now look like this
+
+![TransposeSettings](docs/figures/README-TransposeResultsArea.PNG)
