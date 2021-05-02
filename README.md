@@ -19,7 +19,7 @@ folder, double click on the file `MSOrganiser.exe` to start
 ![FindMSOrganiser](docs/figures/README-FindMSOrganiser.PNG)
 ![OpenMSOrganiser](docs/figures/README-OpenMSOrganiser.PNG)
 
-## Extracting Area and RT
+## Extracting Area And RT
 
 The test csv data file is exported via Agilent MassHunter Quantitative
 Analysis in wide table form.
@@ -35,10 +35,6 @@ Next, under the `Output_Options` click on `Area` and `RT`
 
 ![OutputOptionsArea](docs/figures/README-OutputOptionsArea.PNG)
 
-Ensure the `Output_Settings` is as follows.
-
-![OutputOptionsArea](docs/figures/README-DefaultOutputSettings.PNG)
-
 Click on `Start` and let the program run
 
 ![ProgramRun](docs/figures/README-ProgramRun.gif)
@@ -53,7 +49,7 @@ Results files are as follows
 
 ![ResultsAreaRTPDF](docs/figures/README-ResultsAreaRTPDF.PNG)
 
-## Calculating normalised Area and Concentration
+## Calculate Normalised Area And Concentration
 
 To do this, a corresponding annotation file is required.
 
@@ -80,6 +76,13 @@ following sheets including the normalised area and concentration.
 
 ![ResultsnormAreaPDF](docs/figures/README-ResultsnormAreaPDF.PNG)
 
+## Output Format
+
+The results are output as an Excel file. User can change the output type
+to as follows
+
+![OutputFormat](docs/figures/README-OutputFormat.PNG)
+
 ## Transpose Output
 
 By default, the results are represented in a wide table form with Sample
@@ -93,3 +96,58 @@ the `Output Settings` section and change the `Transpose_Results` from
 The results file will now look like this
 
 ![TransposeSettings](docs/figures/README-TransposeResultsArea.PNG)
+
+## Long Table Output
+
+There is also an option to output the results in the form of a long
+table.
+
+![LongTableOption](docs/figures/README-LongTableOption.PNG)
+
+![ResultsLongTable](docs/figures/README-ResultsLongTable.PNG)
+
+![LongTableAnnotOption](docs/figures/README-LongTableAnnotOption.PNG)
+
+![ResultsLongTableAnnot](docs/figures/README-ResultsLongTableAnnot.PNG)
+
+## Concatenation Option
+
+When there are several input data file with the same transitions but
+different sample names in each file, the results can be concatenated by
+setting the `Concatenate` settings to
+`Concatenate along Sample Name (rows)`
+
+![ConcatenateRowOption](docs/figures/README-ConcatenateRowOption.PNG)
+
+When there are several input data file with the same sample name but
+different transitions in each file, the results can be concatenated by
+setting the `Concatenate` settings to
+`Concatenate along Transition Name (columns)`
+
+Concatenated results are as follows
+
+![ResultsConcatenateRow](docs/figures/README-ResultsConcatenateRow.gif)
+
+## Allow Normalisation With Multiple ISTD
+
+By default, the software will only allow one transition to be normalised
+by one ISTD. However, during method development, there may be a need for
+one transition to be normalised by multiple ISTD to see which one is the
+best one to use. To relax this restriction, ensure that
+`Allow_Multiple_ISTD` is set to `True`
+
+![MultipleISTDOption](docs/figures/README-MultipleISTDOption.PNG)
+
+In this example, the following annotation file will be used
+
+![AnnotationMultipleISTD](docs/figures/README-AnnotationMultipleISTD.gif)
+
+Load the annotation file onto `Annot_File` and press `Start`
+
+![OutputOptions\_normArea\_and\_normConc\_MultipleISTD](docs/figures/README-OutputOptions_normArea_and_normConc_MultipleISTD.PNG)
+
+The main changes in the results are as follows
+
+![ResultsnormAreaMultipleISTD](docs/figures/README-ResultsnormAreaMultipleISTD.PNG)
+
+![ResultsnormConcMultipleISTD](docs/figures/README-ResultsnormConcMultipleISTD.PNG)
