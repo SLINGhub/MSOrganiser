@@ -19,7 +19,7 @@ the MIT license.
 
 ## Starting Up
 
-Go to the ![Releases](https://github.com/SLINGhub/MSOrganiser/releases)
+Go to the [Releases](https://github.com/SLINGhub/MSOrganiser/releases)
 section in GitHub.
 
 Download the zip folder. Unzip the folder, double click on the file
