@@ -54,12 +54,11 @@ We try to follow the [GitHub flow](https://guides.github.com/introduction/flow/)
 
 1. Fork [this repo](https://github.com/SLINGhub/MSTemplate_Creator) and clone it to your computer. To learn more about this process, see [this guide](https://guides.github.com/activities/forking/).
 2. If you have forked and cloned the project before and it has been a while since you worked on it, [pull changes from the original repo](https://help.github.com/articles/merging-an-upstream-repository-into-your-fork/) to your clone by using `git pull upstream master`.
-3. Open the Excel file and open the vba editor. Ensure that [RubberDuck](http://rubberduckvba.com/) is installed.
-4. Make your changes:
+3. Make your changes:
     * Write your code.
     * Test your code (bonus points for adding unit tests) .
     * Document your code so that others can understand.
-    * Run the vba source code in the `Integration Test module` and aim for no errors. Refer to this [link](https://spreadsheeto.com/vba-editor/) to know how to run a macro
-5. Commit and push your changes.
-6. Submit a [pull request](https://guides.github.com/activities/forking/#making-a-pull-request).
+    * Run the unit test in Python
+4. Commit and push your changes.
+5. Submit a [pull request](https://guides.github.com/activities/forking/#making-a-pull-request).
 
