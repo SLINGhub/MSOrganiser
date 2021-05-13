@@ -15,17 +15,20 @@ knitr::opts_chunk$set(
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/SLINGhub/MSOrganiser/blob/master/LICENSE.md)
 <!-- badges: end -->
 
-MSOrganiser is created to provide users a convenient way to extract 
+`MSOrganiser` is created to provide users a convenient way to extract 
 and organise MRM transition names data exported from mass spectrometry 
 software into an Excel or csv file in a few button clicks.
 
-With the addition of the MSTemplate_Creator, the software is also able to 
+With the addition of the [`MSTemplate_Creator`](https://github.com/SLINGhub/MSTemplate_Creator), the software is also able to 
 normalize the peak area with respect to the internal standard’s peak area 
 as well as calculate the concentration of the analytes. 
 
-It is currently distributed as platform independent source code under
-the MIT license.
+## Meta
 
+* We welcome [contributions](CONTRIBUTING.md) including bug reports.
+* License: MIT
+* Think `MSOrganiser` is useful? Let others discover it, by telling them in person, via Twitter or a blog post.
+* Please note that this project is released with a [Contributor Code of Conduct](CODE_OF_CONDUCT.md). By participating in this project you agree to abide by its terms.
 
 ## Starting Up
 
