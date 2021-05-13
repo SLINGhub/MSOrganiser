@@ -275,6 +275,5 @@ __pycache__/
 .Rhistory
 renv
 .Rprofile
-renv.lock
 
 
