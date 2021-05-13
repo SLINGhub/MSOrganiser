@@ -26,15 +26,31 @@ If you need a step by step guide, use the User Documentation file.
 
 If you need to understand the source code organisation and details, the Developer Documentation file will be useful.
 
-We apologise that function documentation is not available at this moment and is still a work in progress. Do help us if you can. I manage to create a source folder for [Sphinx](https://www.sphinx-doc.org/en/master/) to create a function documentation.
+We apologise that function documentation is not available at this moment and is still a work in progress. Do help us if you can. I manage to create a source folder for [Sphinx](https://www.sphinx-doc.org/en/master/) to create a function documentation. Refer to the Developer Documentation to see how to turn it to a html document.
 
-I understand that some may prefer to have online documentation. Unfortunately, I do not have the expertise to do that..
+I understand that some may prefer to have online documentation. Unfortunately, I do not have the expertise to do that...
 
 ## Contribute code 📝
 
 Care to fix bugs 🐛 or implement new functionality for `MSOrganiser`? Great👏! Thank you for volunteering your time to help out. Have a look at the [issue list](https://github.com/SLINGhub/MSOrganiser/issues) and leave a comment on the things you want to work on. See also the development guidelines below.
 
 ## Development guidelines 👨‍💻
+
+### Python Codes
+
+The code is written in [Python 3](https://www.python.org/downloads/) in a 64 bit Windows 10 Environment via [Microsoft Visual Studio](https://visualstudio.microsoft.com/). Here is a [link](https://docs.microsoft.com/en-sg/visualstudio/python/getting-started) to work with Python in Visual Studio.
+
+We unfortunately have a lack of experience if the code works in Python 2 or a different Operating System.
+
+Nevertheless, here are some summarized tips to manage the software
+
+1. Ensure that a virtual environment is used.
+    * Via [command line](https://docs.python.org/3/tutorial/venv.html)
+    * Via [Visual Studio](https://docs.microsoft.com/en-us/visualstudio/python/python-environments)
+2. Ensure [cairo](https://www.cairographics.org/) is installed
+    * In a Windows environment, install the [GTK3 software](https://github.com/tschoonj/GTK-for-Windows-Runtime-Environment-Installer) as the cairo software comes with it.
+3. [Gooey](https://github.com/chriskiehl/Gooey) is used to create the user interface.
+4. [Pyinstaller](https://github.com/pyinstaller/pyinstaller) is used to convert Python script to a Windows executable file. Here is a small [tutorial](https://chriskiehl.com/article/packaging-gooey-with-pyinstaller). The build.spec and version.txt files are the script for Pyinstaller to run and convert the Python scripts to a Windows executable file.  
 
 ### README Documentation
 
@@ -56,9 +72,9 @@ We try to follow the [GitHub flow](https://guides.github.com/introduction/flow/)
 2. If you have forked and cloned the project before and it has been a while since you worked on it, [pull changes from the original repo](https://help.github.com/articles/merging-an-upstream-repository-into-your-fork/) to your clone by using `git pull upstream master`.
 3. Make your changes:
     * Write your code.
-    * Test your code (bonus points for adding unit tests) .
+    * Test your code (bonus points for adding unit tests).
     * Document your code so that others can understand.
-    * Run the unit test in Python
+    * Run the unit test in Python. Refer to the Developer Documentation to see how this is done. 
 4. Commit and push your changes.
 5. Submit a [pull request](https://guides.github.com/activities/forking/#making-a-pull-request).
 
