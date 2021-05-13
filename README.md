@@ -19,8 +19,11 @@ the MIT license.
 
 ## Starting Up
 
-Download the repository and open the dist folder. Inside the dist
-folder, double click on the file `MSOrganiser.exe` to start
+Go to the ![Releases](https://github.com/SLINGhub/MSOrganiser/releases)
+section in GitHub.
+
+Download the zip folder. Unzip the folder, double click on the file
+`MSOrganiser.exe` to start
 
 ![FindMSOrganiser](docs/figures/README-FindMSOrganiser.PNG)
 ![OpenMSOrganiser](docs/figures/README-OpenMSOrganiser.PNG)
