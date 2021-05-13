@@ -11,6 +11,10 @@ knitr::opts_chunk$set(
 
 # MSOrganiser
 
+<!-- badges: start -->
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/SLINGhub/MSOrganiser/blob/master/LICENSE.md)
+<!-- badges: end -->
+
 MSOrganiser is created to provide users a convenient way to extract 
 and organise MRM transition names data exported from mass spectrometry 
 software into an Excel or csv file in a few button clicks.
