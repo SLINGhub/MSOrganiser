@@ -472,6 +472,10 @@ class ISTD_Operations():
         ISTD_data = ISTD_data.apply(pd.to_numeric,errors='ignore')
         norm_Transition_Name_df = norm_Transition_Name_df.apply(pd.to_numeric,errors='ignore')
 
+        #Convert positive and negative infinity to NaN
+        ISTD_data = ISTD_data.replace([np.inf, -np.inf], np.nan)
+        norm_Transition_Name_df = norm_Transition_Name_df.replace([np.inf, -np.inf], np.nan)
+
         return [norm_Transition_Name_df,ISTD_data]
 
     def _create_ISTD_Conc_from_Transition_Name_Annot(Transition_Name_df,ISTD_Annot_df,ISTD_column,
@@ -655,7 +659,8 @@ class ISTD_Operations():
 
         #Calculate the dilution factor or "ISTD_to_Sample_Amount_Ratio"
         Sample_Annot_df["ISTD_to_Sample_Amount_Ratio"] = Sample_Annot_df["ISTD_Mixture_Volume_[uL]"].astype('float64') / Sample_Annot_df["Sample_Amount"].astype('float64')
-        #Sample_Annot_df["ISTD_to_Sample_Amount_Ratio"] = Sample_Annot_df["ISTD_to_Sample_Amount_Ratio"].replace([np.inf, -np.inf], np.nan)
+        #Convert positive and negative infinity to NaN
+        Sample_Annot_df["ISTD_to_Sample_Amount_Ratio"] = Sample_Annot_df["ISTD_to_Sample_Amount_Ratio"].replace([np.inf, -np.inf], np.nan)
 
         #Filter the Transition_Name_df to get the Sample_Name column
         if allow_multiple_istd :
@@ -678,5 +683,10 @@ class ISTD_Operations():
 
         #Perform an elementwise multiplication so that it is easy to debug.
         Conc_df.iloc[:,1:] = Transition_Name_df.iloc[:,1:].astype('float64') * ISTD_Conc_df.iloc[:,1:].astype('float64') * ISTD_Samp_Ratio_df.iloc[:,1:].astype('float64')
+
+        #Convert positive and negative infinity to NaN
+        Conc_df = Conc_df.replace([np.inf, -np.inf], np.nan)
+        ISTD_Conc_df = ISTD_Conc_df.replace([np.inf, -np.inf], np.nan)
+        ISTD_Samp_Ratio_df = ISTD_Samp_Ratio_df.replace([np.inf, -np.inf], np.nan)
 
         return [Conc_df,ISTD_Conc_df,ISTD_Samp_Ratio_df]
