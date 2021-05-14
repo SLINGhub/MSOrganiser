@@ -6,7 +6,7 @@ First of all, thanks for considering contributing to `MSOrganiser` 😄! We hope
 
 ## Code of conduct 👩‍🏫
 
-Please note that this project is released with a [Contributor Code of Conduct](CODE_OF_CONDUCT.md). By participating in this project you agree to abide by its terms.
+Please note that this project is released with a [Contributor Code of Conduct](https://www.contributor-covenant.org/version/2/0/code_of_conduct/). By participating in this project you agree to abide by its terms.
 
 ## Ask a question ❓️
 
@@ -40,15 +40,15 @@ Care to fix bugs 🐛 or implement new functionality for `MSOrganiser`? Great�
 
 The code is written in [Python 3](https://www.python.org/downloads/) in a 64 bit Windows 10 Environment via [Microsoft Visual Studio](https://visualstudio.microsoft.com/). Here is a [link](https://docs.microsoft.com/en-sg/visualstudio/python/getting-started) to work with Python in Visual Studio.
 
-We unfortunately have a lack of experience if the code works in Python 2 or a different Operating System.
+We unfortunately have a lack of experience if the code works in Python 2, a 32 bit Windows 10 Environment or a different Operating System.
 
 Nevertheless, here are some summarized tips to manage the software
 
 1. Ensure that a virtual environment is used.
     * Via [command line](https://docs.python.org/3/tutorial/venv.html)
     * Via [Visual Studio](https://docs.microsoft.com/en-us/visualstudio/python/python-environments)
-2. Ensure [cairo](https://www.cairographics.org/) is installed
-    * In a Windows environment, install the [GTK3 software](https://github.com/tschoonj/GTK-for-Windows-Runtime-Environment-Installer) as the cairo software comes with it.
+2. Ensure [cairo](https://www.cairographics.org/) is installed. The version used is cairo 1.17.2. This is because cairo 1.17.4 does not work well with the python package [WeasyPrint](https://github.com/Kozea/WeasyPrint). More information can be found [here](https://github.com/Kozea/WeasyPrint/issues/1292). 
+    * In a Windows environment, install the [GTK3 software](https://github.com/tschoonj/GTK-for-Windows-Runtime-Environment-Installer) as the cairo software comes with it. The version used is [3.24.23-2020-11-22](https://github.com/tschoonj/GTK-for-Windows-Runtime-Environment-Installer/releases/tag/2020-11-22)
 3. [Gooey](https://github.com/chriskiehl/Gooey) is used to create the user interface.
 4. [Pyinstaller](https://github.com/pyinstaller/pyinstaller) is used to convert Python script to a Windows executable file. Here is a small [tutorial](https://chriskiehl.com/article/packaging-gooey-with-pyinstaller). The build.spec and version.txt files are the script for Pyinstaller to run and convert the Python scripts to a Windows executable file.  
 
