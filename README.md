@@ -16,17 +16,35 @@ the software is also able to normalize the peak area with respect to the
 internal standard’s peak area as well as calculate the concentration of
 the analytes.
 
-## Meta
+# Table of Content
+
+-   [MSOrganiser](#msorganiser)
+-   [Table of Content](#table-of-content)
+-   [Meta](#meta)
+-   [Starting Up](#starting-up)
+-   [Extracting Area And RT](#extracting-area-and-rt)
+-   [Calculating Normalised Area And
+    Concentration](#calculating-normalised-area-and-concentration)
+-   [Output Format](#output-format)
+-   [Transpose Output](#transpose-output)
+-   [Long Table Output](#long-table-output)
+-   [Concatenation Option](#concatenation-option)
+-   [Allow Normalisation With Multiple
+    ISTD](#allow-normalisation-with-multiple-istd)
+-   [Testing Mode](#testing-mode)
+
+# Meta
 
 -   We welcome [contributions](CONTRIBUTING.md) including bug reports.
 -   License: MIT
 -   Think `MSOrganiser` is useful? Let others discover it, by telling
     them in person, via Twitter or a blog post.
 -   Please note that this project is released with a [Contributor Code
-    of Conduct](CODE_OF_CONDUCT.md). By participating in this project
-    you agree to abide by its terms.
+    of
+    Conduct](https://www.contributor-covenant.org/version/2/0/code_of_conduct/).
+    By participating in this project you agree to abide by its terms.
 
-## Starting Up
+# Starting Up
 
 Go to the [Releases](https://github.com/SLINGhub/MSOrganiser/releases)
 section in GitHub.
@@ -39,7 +57,7 @@ Download the zip folder. Unzip the folder, double click on the file
 ![FindMSOrganiser](docs/figures/README-FindMSOrganiser.PNG)
 ![OpenMSOrganiser](docs/figures/README-OpenMSOrganiser.PNG)
 
-## Extracting Area And RT
+# Extracting Area And RT
 
 The test csv data file is exported via Agilent MassHunter Quantitative
 Analysis in wide table form.
@@ -69,7 +87,7 @@ Results files are as follows
 
 ![ResultsAreaRTPDF](docs/figures/README-ResultsAreaRTPDF.PNG)
 
-## Calculate Normalised Area And Concentration
+# Calculating Normalised Area And Concentration
 
 To do this, a corresponding annotation file is required.
 
@@ -96,14 +114,14 @@ following sheets including the normalised area and concentration.
 
 ![ResultsnormAreaPDF](docs/figures/README-ResultsnormAreaPDF.PNG)
 
-## Output Format
+# Output Format
 
 The results are output as an Excel file. User can change the output type
 to as follows
 
 ![OutputFormat](docs/figures/README-OutputFormat.PNG)
 
-## Transpose Output
+# Transpose Output
 
 By default, the results are represented in a wide table form with Sample
 Name as the first columns followed by the Transitions. To make the
@@ -117,7 +135,7 @@ The results file will now look like this
 
 ![TransposeSettings](docs/figures/README-TransposeResultsArea.PNG)
 
-## Long Table Output
+# Long Table Output
 
 There is also an option to output the results in the form of a long
 table.
@@ -130,7 +148,7 @@ table.
 
 ![ResultsLongTableAnnot](docs/figures/README-ResultsLongTableAnnot.PNG)
 
-## Concatenation Option
+# Concatenation Option
 
 When there are several input data file with the same transitions but
 different sample names in each file, the results can be concatenated by
@@ -148,7 +166,7 @@ Concatenated results are as follows
 
 ![ResultsConcatenateRow](docs/figures/README-ResultsConcatenateRow.gif)
 
-## Allow Normalisation With Multiple ISTD
+# Allow Normalisation With Multiple ISTD
 
 By default, the software will only allow one transition to be normalised
 by one ISTD. However, during method development, there may be a need for
@@ -171,3 +189,45 @@ The main changes in the results are as follows
 ![ResultsnormAreaMultipleISTD](docs/figures/README-ResultsnormAreaMultipleISTD.PNG)
 
 ![ResultsnormConcMultipleISTD](docs/figures/README-ResultsnormConcMultipleISTD.PNG)
+
+The output can be transposed to make it suited to be read by a
+statistical software.
+
+![TransposeSettings](docs/figures/README-TransposeSettings.PNG)
+
+Here are the transposed output
+
+![ResultsnormAreaMultipleISTDTranspose](docs/figures/README-ResultsnormAreaMultipleISTDTranspose.PNG)
+
+![ResultsnormConcMultipleISTDTranspose](docs/figures/README-ResultsnormConcMultipleISTDTranspose.PNG)
+
+# Testing Mode
+
+`MSOrganiser` by default turns positive and negative infinity to missing
+values. However, it is challenging to trace back the reason behind a
+missing value in the concentration because of many possibilities.
+
+Below are a list of possible reasons.
+
+-   The peak area of the transition is a missing value.
+-   The peak area of the internal standard is a missing value or zero.
+-   The sample amount of the sample is a missing value or zero.
+-   The volume of the internal standard mixture is a missing value.
+-   The concentration of the internal standard is a missing value.
+
+It is harder when there is a need to explain how the concentration
+values are calculated to a collaborator who is unfamiliar with your
+work. More so when explaining the reason behind the missing values.
+
+The testing mode when activated will provide additional sheets in Excel
+or csv files such as `ISTD_Area`, `ISTD_Conc` and
+`ISTD_to_Samp_Amt_Ratio` to assist in the explanation.
+
+![TestingMode](docs/figures/README-TestingMode.PNG)
+
+It is easier to explain how the values in `ISTD_Area` and
+`ISTD_to_Samp_Amt_Ratio` are created. With these additional info, we can
+simply tell others that the concentration values is calculated as
+follows:
+
+(`Area` / `ISTD_Area`) \* `ISTD_to_Samp_Amt_Ratio` \* `ISTD_Conc`
