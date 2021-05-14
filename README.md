@@ -89,6 +89,10 @@ Results files are as follows
 
 # Calculating Normalised Area And Concentration
 
+The concentration value are calculated as follows:
+
+![ConcentrationCalculation](docs/figures/README-ConcentrationCalculation.PNG)
+
 To do this, a corresponding annotation file is required.
 
 The content in the annotation file are as follows:
@@ -225,7 +229,13 @@ or csv files such as `ISTD_Area`, `ISTD_Conc` and
 
 ![TestingMode](docs/figures/README-TestingMode.PNG)
 
-It is easier to explain how the values in `ISTD_Area` and
+![ResultsISTD\_Area](docs/figures/README-ResultsISTD_Area.PNG)
+
+![ResultsISTD\_Conc](docs/figures/README-ResultsISTD_Conc.PNG)
+
+![ResultsISTD\_to\_Samp\_Amt\_Ratio](docs/figures/README-ResultsISTD_to_Samp_Amt_Ratio.PNG)
+
+It is easier to explain how the values in `ISTD_Area`, `ISTD_Conc` and
 `ISTD_to_Samp_Amt_Ratio` are created. With these additional info, we can
 simply tell others that the concentration values is calculated as
 follows:
