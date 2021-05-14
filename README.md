@@ -240,4 +240,7 @@ It is easier to explain how the values in `ISTD_Area`, `ISTD_Conc` and
 simply tell others that the concentration values is calculated as
 follows:
 
-(`Area` / `ISTD_Area`) \* `ISTD_to_Samp_Amt_Ratio` \* `ISTD_Conc`
+-   `normArea by ISTD` = (`Area` / `ISTD_Area`)
+
+-   `normConc by ISTD` = (`Area` / `ISTD_Area`) \*
+    `ISTD_to_Samp_Amt_Ratio` \* `ISTD_Conc`
