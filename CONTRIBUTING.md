@@ -4,9 +4,29 @@ First of all, thanks for considering contributing to `MSOrganiser` 😄! We hope
 
 `MSOrganiser` is an open source project, maintained by people who care.
 
+## Acknowledgements 😌
+
+This contributing file is based on a [template](https://gist.github.com/peterdesmet/e90a1b0dc17af6c12daf6e8b2f044e7c) from Peter Desmet released under CC0.
+
 ## Code of conduct 👩‍🏫
 
 Please note that this project is released with a [Contributor Code of Conduct](https://www.contributor-covenant.org/version/2/0/code_of_conduct/). By participating in this project you agree to abide by its terms.
+
+## Versioning 🔢
+
+Refer to the [NEW.md file](https://github.com/SLINGhub/MSOrganiser/blob/master/NEWS.md) to see what is being worked on as well as update to changes between back to back versions.
+
+Software version numbers indicate following: `MAJOR.MINOR.PATCH.DEVELOPMENT`. 
+
+Here are key steps to keep in mind:
+
+-   The **major** version number generally do not increase unless the changes made affect a large group. Examples are moving the software to a new repository, changes to API.
+
+-   When new features are added or (re)moved, we typically increase the **minor** version number.
+
+-   Minimal, non breaking changes or bug fixes only are indicated by increasing the **patch** version number. Examples of minimal changes are are updating of documentations, fixing of typo in the software output and so on
+
+-   Current development versions of our packages (i.e. master/main branch from GitHub) additionally have a **development** version number. The **development** version number is typically `9000`
 
 ## Ask a question ❓️
 
