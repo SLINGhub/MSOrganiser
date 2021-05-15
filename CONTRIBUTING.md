@@ -14,13 +14,13 @@ Please note that this project is released with a [Contributor Code of Conduct](h
 
 ## Versioning 🔢
 
-Refer to the [NEW.md file](https://github.com/SLINGhub/MSOrganiser/blob/master/NEWS.md) to see what is being worked on as well as update to changes between back to back versions.
+Refer to the [NEWS.md file](https://github.com/SLINGhub/MSOrganiser/blob/master/NEWS.md) to see what is being worked on as well as update to changes between back to back versions.
 
 Software version numbers indicate following: `MAJOR.MINOR.PATCH.DEVELOPMENT`. 
 
 Here are key steps to keep in mind:
 
--   The **major** version number generally do not increase unless the changes made affect a large group. Examples are moving the software to a new repository, changes to API.
+-   The **major** version number generally do not increase unless the changes made affect a large group. Examples are moving the software to a new repository, changes to API, etc...
 
 -   When new features are added or (re)moved, we typically increase the **minor** version number.
 
