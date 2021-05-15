@@ -39,6 +39,11 @@ the analytes.
 -   License: MIT
 -   Think `MSOrganiser` is useful? Let others discover it, by telling
     them in person, via Twitter or a blog post.
+-   If you wish to acknowledge the use of this software in a journal
+    paper, please include the version number. For reproducibility, it is
+    advisable to use the software from the
+    [Releases](https://github.com/SLINGhub/MSOrganiser/releases) section
+    in GitHub rather than from the master branch.
 -   Please note that this project is released with a [Contributor Code
     of
     Conduct](https://www.contributor-covenant.org/version/2/0/code_of_conduct/).
