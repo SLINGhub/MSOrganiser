@@ -36,18 +36,24 @@ the analytes.
 # Meta
 
 -   We welcome [contributions](CONTRIBUTING.md) including bug reports.
--   License: MIT
+    Please note that this project is released with a [Contributor Code
+    of
+    Conduct](https://www.contributor-covenant.org/version/2/0/code_of_conduct/).
+    By participating in this project you agree to abide by its terms.
+-   License:
+    [MIT](https://github.com/SLINGhub/MSOrganiser/blob/master/LICENSE.md)
 -   Think `MSOrganiser` is useful? Let others discover it, by telling
-    them in person, via Twitter or a blog post.
+    them in person, via Twitter
+    [![Tweet](https://img.shields.io/twitter/url/http/shields.io.svg?style=social)](https://twitter.com/LOGIN)
+    or a blog post. Do give this repository a star as well.
+
+![GitHubStar](docs/figures/README-GitHubStar.PNG)
+
 -   If you wish to acknowledge the use of this software in a journal
     paper, please include the version number. For reproducibility, it is
     advisable to use the software from the
     [Releases](https://github.com/SLINGhub/MSOrganiser/releases) section
     in GitHub rather than from the master branch.
--   Please note that this project is released with a [Contributor Code
-    of
-    Conduct](https://www.contributor-covenant.org/version/2/0/code_of_conduct/).
-    By participating in this project you agree to abide by its terms.
 
 # Starting Up
 

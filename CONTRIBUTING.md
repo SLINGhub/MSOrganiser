@@ -58,9 +58,9 @@ Care to fix bugs üêõ or implement new functionality for `MSOrganiser`? Greatüë
 
 ### Python Codes
 
-The code is written in [Python 3](https://www.python.org/downloads/) in a 64 bit Windows 10 Environment via [Microsoft Visual Studio](https://visualstudio.microsoft.com/). Here is a [link](https://docs.microsoft.com/en-sg/visualstudio/python/getting-started) to work with Python in Visual Studio.
+The code is written in [Python 3](https://www.python.org/downloads/) in a 64-bit Windows 10 Environment via [Microsoft Visual Studio](https://visualstudio.microsoft.com/). Here is a [link](https://docs.microsoft.com/en-sg/visualstudio/python/getting-started) to work with Python in Visual Studio.
 
-We unfortunately have a lack of experience if the code works in Python 2, a 32 bit Windows 10 Environment or a different Operating System.
+We unfortunately have a lack of experience if the code works in Python 2, a 32-bit Windows 10 Environment or a different Operating System.
 
 Nevertheless, here are some summarized tips to manage the software
 
