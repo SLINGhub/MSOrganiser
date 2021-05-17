@@ -6,7 +6,7 @@ First of all, thanks for considering contributing to `MSOrganiser` 😄! We hope
 
 ## Acknowledgements 😌
 
-This contributing file is based on a [template](https://gist.github.com/peterdesmet/e90a1b0dc17af6c12daf6e8b2f044e7c) from Peter Desmet released under CC0.
+This contributing file is based on a [template](https://gist.github.com/peterdesmet/e90a1b0dc17af6c12daf6e8b2f044e7c) from Peter Desmet released under CC0. [![License: CC0-1.0](https://licensebuttons.net/l/zero/1.0/80x15.png)](http://creativecommons.org/publicdomain/zero/1.0/)
 
 ## Code of conduct 👩‍🏫
 
@@ -49,6 +49,10 @@ If you need to understand the source code organisation and details, the Develope
 We apologise that function documentation is not available at this moment and is still a work in progress. Do help us if you can. I manage to create a source folder for [Sphinx](https://www.sphinx-doc.org/en/master/) to create a function documentation. Refer to the Developer Documentation to see how to turn it to a html document.
 
 I understand that some may prefer to have online documentation. Unfortunately, I do not have the expertise to do that...
+
+## Input data 📊
+
+We understand that the types of input data `MSOrganiser` can accept is limited. If there are other data, you believe the software could potentially expand. Do let us know and send us a shareable sample of this dataset. This is so that we can put this test data in our unit test and others who wish to contribute on this can have something to test on. We seek your understanding if the progress is slow as we have limited manpower and expertise. 
 
 ## Contribute code 📝
 

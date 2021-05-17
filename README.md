@@ -54,6 +54,10 @@ the analytes.
     advisable to use the software from the
     [Releases](https://github.com/SLINGhub/MSOrganiser/releases) section
     in GitHub rather than from the master branch.
+-   To date, the software is only able to take in the following files
+    exported from the following software.
+    -   csv files from [Agilent MassHunter Quantitative Analysis
+        Software](https://www.agilent.com/en/product/software-informatics/mass-spectrometry-software/data-analysis/quantitative-analysis)
 
 # Starting Up
 
