@@ -33,9 +33,9 @@ Here are key steps to keep in mind:
 Using `MSOrganiser` and got stuck? 
 Browse the [Summary and User Documentation](https://github.com/SLINGhub/MSOrganiser/tree/master/docs) to see if you can find a solution. 
 
-Still stuck? Post your question as an [issue on GitHub](https://github.com/SLINGhub/MSOrganiser/issues). While we cannot offer quick user support, we'll try to do our best to address it, as questions often lead to better documentation 📜 or the discovery of bugs 🐛.
+Still stuck? Post your question as an [issue on GitHub](https://github.com/SLINGhub/MSOrganiser/issues). While we cannot offer quick user support, we'll try to do our best to address it, as questions often lead to better documentation 📚 or the discovery of bugs 🐛.
 
-## Improve the documentation 📜
+## Improve the documentation 📚
 
 Noticed a typo ? 
 Have a better example or dataset to explain a function? Good [documentation](https://github.com/SLINGhub/MSOrganiser/tree/master/docs) makes all the difference, so your help to improve it is very welcome!
