@@ -19,6 +19,7 @@ assignees: 'JauntyJJS'
 * Screenshots or error messages will be helpful.
 
 ## Steps to Reproduce
+* If required, indicate the release version of the software used.
 * If a dataset is required to reproduce the bug, please attach a shareable one.
 * List down the steps needed to reproduce the behaviour:
 1. Go to '...'
