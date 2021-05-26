@@ -1,6 +1,10 @@
-# MSOrganiser 0.0.2.9000 (development version)
+# MSOrganiser 1.0.0.9000 (development version)
 
 ## TODO
+
+## MSOrganiser 1.0.0
+
+* Added some Github related markdown files like issue templates, contributing guidelines and code of conduct.
 
 ## MSOrganiser 0.0.2
 
