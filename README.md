@@ -45,7 +45,9 @@ the analytes.
 -   Think `MSOrganiser` is useful? Let others discover it, by telling
     them in person, via Twitter
     [![Tweet](https://img.shields.io/twitter/url/http/shields.io.svg?style=social)](https://twitter.com/LOGIN)
-    or a blog post. Do give this repository a star as well.
+    or a blog post. Do use the `🙌 Show and tell` under the [GitHub
+    Discussions](https://github.com/SLINGhub/MSOrganiser/discussions)
+    and give this repository a star as well.
 
 ![GitHubStar](docs/figures/README-GitHubStar.PNG)
 
@@ -58,6 +60,10 @@ the analytes.
     exported from the following software.
     -   csv files from [Agilent MassHunter Quantitative Analysis
         Software](https://www.agilent.com/en/product/software-informatics/mass-spectrometry-software/data-analysis/quantitative-analysis)
+-   Refer to the [NEWS.md
+    file](https://github.com/SLINGhub/MSOrganiser/blob/master/NEWS.md)
+    to see what is being worked on as well as update to changes between
+    back to back versions.
 
 # Starting Up
 
