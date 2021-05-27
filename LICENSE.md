@@ -1,6 +1,6 @@
 # MIT License
 
-Copyright (c) 2021 Jeremy Selva
+Copyright (c) 2021 Singapore Lipidomics Incubator, National University of Singapore
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
