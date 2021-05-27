@@ -110,7 +110,11 @@ Results files are as follows
 
 # Calculating Normalised Area And Concentration
 
-The concentration value are calculated as follows:
+The normalised area is calculated as follows:
+
+![NormAreaCalculation](docs/figures/README-NormAreaCalculation.PNG)
+
+The concentration value is calculated as follows:
 
 ![ConcentrationCalculation](docs/figures/README-ConcentrationCalculation.PNG)
 
