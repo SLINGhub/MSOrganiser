@@ -14,7 +14,7 @@ Please note that this project is released with a [Contributor Code of Conduct](h
 
 ## Versioning 🔢
 
-Refer to the [NEWS.md file](https://github.com/SLINGhub/MSOrganiser/blob/master/NEWS.md) to see what is being worked on as well as update to changes between back to back versions.
+Refer to the [NEWS.md file](https://github.com/SLINGhub/MSOrganiser/blob/main/NEWS.md) to see what is being worked on as well as update to changes between back to back versions.
 
 Software version numbers indicate following: `MAJOR.MINOR.PATCH.DEVELOPMENT`. 
 
@@ -26,19 +26,19 @@ Here are key steps to keep in mind:
 
 -   Minimal, non breaking changes or bug fixes only are indicated by increasing the **patch** version number. Examples of minimal changes are are updating of documentations, fixing of typo in the software output and so on
 
--   Current development versions of our packages (i.e. master/main branch from GitHub) additionally have a **development** version number. The **development** version number is typically `9000`
+-   Current development versions of our packages (i.e. main branch from GitHub) additionally have a **development** version number. The **development** version number is typically `9000`
 
 ## Ask a question ❓️
 
 Using `MSOrganiser` and got stuck? 
-Browse the [Summary and User Documentation](https://github.com/SLINGhub/MSOrganiser/tree/master/docs) to see if you can find a solution.
+Browse the [Summary and User Documentation](https://github.com/SLINGhub/MSOrganiser/tree/main/docs) to see if you can find a solution.
 
 Still stuck? Post your questions as an [issue](https://github.com/SLINGhub/MSOrganiser/issues) or [discussion](https://github.com/SLINGhub/MSOrganiser/discussions) on GitHub. While we cannot offer quick user support, we'll try to do our best to address it, as questions often lead to better documentation 📚 or the discovery of bugs 🐛.
 
 ## Improve the documentation 📚
 
 Noticed a typo ? 
-Have a better example or dataset to explain a function? Good [documentation](https://github.com/SLINGhub/MSOrganiser/tree/master/docs) makes all the difference, so your help to improve it is very welcome!
+Have a better example or dataset to explain a function? Good [documentation](https://github.com/SLINGhub/MSOrganiser/tree/main/docs) makes all the difference, so your help to improve it is very welcome!
 
 If you are just started on it, look at the Summary file. 
 
@@ -93,7 +93,7 @@ With the efforts made by the [R for Data Science Online Learning Community](http
 We try to follow the [GitHub flow](https://guides.github.com/introduction/flow/) for development.
 
 1. Fork [this repo](https://github.com/SLINGhub/MSTemplate_Creator) and clone it to your computer. To learn more about this process, see [this guide](https://guides.github.com/activities/forking/).
-2. If you have forked and cloned the project before and it has been a while since you worked on it, [pull changes from the original repo](https://help.github.com/articles/merging-an-upstream-repository-into-your-fork/) to your clone by using `git pull upstream master`.
+2. If you have forked and cloned the project before and it has been a while since you worked on it, [pull changes from the original repo](https://help.github.com/articles/merging-an-upstream-repository-into-your-fork/) to your clone by using `git pull upstream main`.
 3. Make your changes:
     * Write your code.
     * Test your code (bonus points for adding unit tests).
