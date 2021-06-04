@@ -50,6 +50,8 @@ With the addition of the [`MSTemplate_Creator`](https://github.com/SLINGhub/MSTe
   * csv files from [Agilent MassHunter Quantitative Analysis Software](https://www.agilent.com/en/product/software-informatics/mass-spectrometry-software/data-analysis/quantitative-analysis)
 * Refer to the [NEWS.md file](https://github.com/SLINGhub/MSOrganiser/blob/main/NEWS.md) to see what is being worked on as well as update to changes between back to back versions.
 
+[Back to top](https://github.com/SLINGhub/MSOrganiser#msorganiser)
+
 # Starting Up
 
 Go to the [Releases](https://github.com/SLINGhub/MSOrganiser/releases) section in GitHub.
@@ -60,6 +62,8 @@ Download the zip folder. Unzip the folder, double click on the file `MSOrganiser
 
 ![FindMSOrganiser](docs/figures/README-FindMSOrganiser.PNG)
 ![OpenMSOrganiser](docs/figures/README-OpenMSOrganiser.PNG)
+
+[Back to top](https://github.com/SLINGhub/MSOrganiser#msorganiser)
 
 # Extracting Area And RT
 
@@ -88,6 +92,8 @@ Results files are as follows
 ![ResultsRT](docs/figures/README-ResultsRT.PNG)
 
 ![ResultsAreaRTPDF](docs/figures/README-ResultsAreaRTPDF.PNG)
+
+[Back to top](https://github.com/SLINGhub/MSOrganiser#msorganiser)
 
 # Calculating Normalised Area And Concentration
 
@@ -121,11 +127,15 @@ When the program has finished running, the results will contain the following sh
 
 ![ResultsnormAreaPDF](docs/figures/README-ResultsnormAreaPDF.PNG)
 
+[Back to top](https://github.com/SLINGhub/MSOrganiser#msorganiser)
+
 # Output Format
 
 The results are output as an Excel file. User can change the output type to as follows
 
 ![OutputFormat](docs/figures/README-OutputFormat.PNG)
+
+[Back to top](https://github.com/SLINGhub/MSOrganiser#msorganiser)
 
 # Transpose Output
 
@@ -136,6 +146,8 @@ By default, the results are represented in a wide table form with Sample Name as
 The results file will now look like this
 
 ![TransposeSettings](docs/figures/README-TransposeResultsArea.PNG)
+
+[Back to top](https://github.com/SLINGhub/MSOrganiser#msorganiser)
 
 # Long Table Output
 
@@ -149,6 +161,8 @@ There is also an option to output the results in the form of a long table.
 
 ![ResultsLongTableAnnot](docs/figures/README-ResultsLongTableAnnot.PNG)
 
+[Back to top](https://github.com/SLINGhub/MSOrganiser#msorganiser)
+
 # Concatenation Option
 
 When there are several input data file with the same transitions but different sample names in each file, the results can be concatenated by setting the `Concatenate` settings to `Concatenate along Sample Name (rows)`
@@ -160,6 +174,7 @@ When there are several input data file with the same sample name but different t
 Concatenated results are as follows
 
 ![ResultsConcatenateRow](docs/figures/README-ResultsConcatenateRow.gif)
+[Back to top](https://github.com/SLINGhub/MSOrganiser#msorganiser)
 
 # Allow Normalisation With Multiple ISTD
 
@@ -190,6 +205,8 @@ Here are the transposed output
 ![ResultsnormAreaMultipleISTDTranspose](docs/figures/README-ResultsnormAreaMultipleISTDTranspose.PNG)
 
 ![ResultsnormConcMultipleISTDTranspose](docs/figures/README-ResultsnormConcMultipleISTDTranspose.PNG)
+
+[Back to top](https://github.com/SLINGhub/MSOrganiser#msorganiser)
 
 # Testing Mode
 
@@ -222,3 +239,5 @@ With these additional info, we can simply tell others that the concentration val
 * `normArea by ISTD` = (`Area` / `ISTD_Area`)
 
 * `normConc by ISTD` = (`Area` / `ISTD_Area`) * `ISTD_to_Samp_Amt_Ratio` * `ISTD_Conc`
+
+[Back to top](https://github.com/SLINGhub/MSOrganiser#msorganiser)
