@@ -3,7 +3,10 @@
 <!-- badges: start -->
 
 [![License:
-MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/SLINGhub/MSOrganiser/blob/master/LICENSE.md)
+MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/SLINGhub/MSOrganiser/blob/main/LICENSE.md)
+[![Maintainer:
+JauntyJJS](https://img.shields.io/badge/Maintainer-JauntyJJS-blue.svg)](https://github.com/JauntyJJS)
+[![Python](https://img.shields.io/badge/Python-3.9.4-brightgreen)](https://www.python.org/downloads/)
 <!-- badges: end -->
 
 `MSOrganiser` is created to provide users a convenient way to extract
@@ -41,7 +44,7 @@ the analytes.
     Conduct](https://www.contributor-covenant.org/version/2/0/code_of_conduct/).
     By participating in this project you agree to abide by its terms.
 -   License:
-    [MIT](https://github.com/SLINGhub/MSOrganiser/blob/master/LICENSE.md)
+    [MIT](https://github.com/SLINGhub/MSOrganiser/blob/main/LICENSE.md)
 -   Think `MSOrganiser` is useful? Let others discover it, by telling
     them in person, via Twitter
     [![Tweet](https://img.shields.io/twitter/url/http/shields.io.svg?style=social)](https://twitter.com/LOGIN)
@@ -55,14 +58,14 @@ the analytes.
     paper, please include the version number. For reproducibility, it is
     advisable to use the software from the
     [Releases](https://github.com/SLINGhub/MSOrganiser/releases) section
-    in GitHub rather than from the master branch.
+    in GitHub rather than from the main branch.
 -   To date, the software is only able to take in the following files
     exported from the following software.
     -   csv files from [Agilent MassHunter Quantitative Analysis
         Software](https://www.agilent.com/en/product/software-informatics/mass-spectrometry-software/data-analysis/quantitative-analysis)
 -   Refer to the [NEWS.md
-    file](https://github.com/SLINGhub/MSOrganiser/blob/master/NEWS.md)
-    to see what is being worked on as well as update to changes between
+    file](https://github.com/SLINGhub/MSOrganiser/blob/main/NEWS.md) to
+    see what is being worked on as well as update to changes between
     back to back versions.
 
 # Starting Up
