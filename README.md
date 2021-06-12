@@ -24,6 +24,7 @@ the analytes.
 -   [MSOrganiser](#msorganiser)
 -   [Table of Content](#table-of-content)
 -   [Meta](#meta)
+-   [Overview](#overview)
 -   [Starting Up](#starting-up)
 -   [Extracting Area And RT](#extracting-area-and-rt)
 -   [Calculating Normalised Area And
@@ -67,6 +68,17 @@ the analytes.
     file](https://github.com/SLINGhub/MSOrganiser/blob/main/NEWS.md) to
     see what is being worked on as well as update to changes between
     back to back versions.
+
+[Back to top](https://github.com/SLINGhub/MSOrganiser#msorganiser)
+
+# Overview
+
+For an overview on how the tool works, take a look at the Summary and
+Familiarisation file in the
+[documentation](https://github.com/SLINGhub/MSOrganiser/tree/main/docs)
+page. Below is a preview of the Summary file.
+
+![SummaryCheatSheet](docs/figures/README-SummaryCheatSheet.PNG)
 
 [Back to top](https://github.com/SLINGhub/MSOrganiser#msorganiser)
 

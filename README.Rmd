@@ -27,6 +27,7 @@ With the addition of the [`MSTemplate_Creator`](https://github.com/SLINGhub/MSTe
 - [MSOrganiser]
 - [Table of Content]
 - [Meta]
+- [Overview]
 - [Starting Up]
 - [Extracting Area And RT]
 - [Calculating Normalised Area And Concentration]
@@ -49,6 +50,14 @@ With the addition of the [`MSTemplate_Creator`](https://github.com/SLINGhub/MSTe
 * To date, the software is only able to take in the following files exported from the following software. 
   * csv files from [Agilent MassHunter Quantitative Analysis Software](https://www.agilent.com/en/product/software-informatics/mass-spectrometry-software/data-analysis/quantitative-analysis)
 * Refer to the [NEWS.md file](https://github.com/SLINGhub/MSOrganiser/blob/main/NEWS.md) to see what is being worked on as well as update to changes between back to back versions.
+
+[Back to top](https://github.com/SLINGhub/MSOrganiser#msorganiser)
+
+# Overview
+
+For an overview on how the tool works, take a look at the Summary and Familiarisation file in the [documentation](https://github.com/SLINGhub/MSOrganiser/tree/main/docs) page. Below is a preview of the Summary file.
+
+![SummaryCheatSheet](docs/figures/README-SummaryCheatSheet.PNG)
 
 [Back to top](https://github.com/SLINGhub/MSOrganiser#msorganiser)
 
