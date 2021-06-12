@@ -73,8 +73,8 @@ the analytes.
 
 # Overview
 
-For an overview on how the tool works, take a look at the Summary and
-Familiarisation file in the
+For an overview on how the tool works, take a look at the Summary file
+in the
 [documentation](https://github.com/SLINGhub/MSOrganiser/tree/main/docs)
 page. Below is a preview of the Summary file.
 

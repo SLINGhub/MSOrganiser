@@ -55,7 +55,7 @@ With the addition of the [`MSTemplate_Creator`](https://github.com/SLINGhub/MSTe
 
 # Overview
 
-For an overview on how the tool works, take a look at the Summary and Familiarisation file in the [documentation](https://github.com/SLINGhub/MSOrganiser/tree/main/docs) page. Below is a preview of the Summary file.
+For an overview on how the tool works, take a look at the Summary file in the [documentation](https://github.com/SLINGhub/MSOrganiser/tree/main/docs) page. Below is a preview of the Summary file.
 
 ![SummaryCheatSheet](docs/figures/README-SummaryCheatSheet.PNG)
 
