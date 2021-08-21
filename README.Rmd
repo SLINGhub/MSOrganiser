@@ -11,6 +11,7 @@ knitr::opts_chunk$set(
 ```
 
 # MSOrganiser
+<img src="docs/figures/logo.png" align="right" height="200" />
 
 <!-- badges: start -->
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/SLINGhub/MSOrganiser/blob/main/LICENSE.md)

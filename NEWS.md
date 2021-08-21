@@ -4,11 +4,15 @@
 
 * Find a way to make the documentation of the functions of `MSOrganiser` online.
 
-## MSOrganiser 1.0.0
+## Completed
+
+* Added a logo.
+
+# MSOrganiser 1.0.0
 
 * Added some Github related markdown files like issue templates, contributing guidelines and code of conduct.
 
-## MSOrganiser 0.0.2
+# MSOrganiser 0.0.2
 
 * Changed output excel sheet font to "Consolas" so that the number "0" and the letter "O" can be differentiated easily.
 * Add error message to encourage users to use a later version of `MSTemplate_Creator` (above 0.0.1)
