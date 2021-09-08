@@ -645,16 +645,15 @@ class ISTD_Operations():
                     print('\"' + things + '\"',flush=True)
             return [Conc_df,Conc_df,Conc_df]
 
-        #We cannot accept duplicated Data_File_Name and Sample Name
-        #By right Data_File_Name should be uniquely one value since it has been filtered in ISTD_Operations.read_Sample_Annot
+        # We cannot accept duplicated Data_File_Name and Sample Name in Sample_Annot_df input
         if(len(Sample_Annot_df[["Data_File_Name","Sample_Name"]][Sample_Annot_df[["Data_File_Name","Sample_Name"]].duplicated(keep=False)]) > 0):
             #Return empty data set
             if logger:
                 logger.warning('Skipping step to get normConc. Sample Annotation data frame has non-unique Sample_Name.')
-                logger.warning('\n{}'.format( Sample_Annot_df[["Data_File_Name","Sample_Name"]][Sample_Annot_df[["Data_File_Name","Sample_Name"]].duplicated(keep=False)] ) )
+                logger.warning('\n{}'.format( Sample_Annot_df[["Data_File_Name","Sample_Name"]][Sample_Annot_df[["Data_File_Name","Sample_Name"]].duplicated(keep=False)].to_string(index=False) ) )
             if ingui:
                 print('Skipping step to get normConc. Sample Annotation data frame has non-unique Sample_Name.' ,flush=True)
-                print(Sample_Annot_df[["Data_File_Name","Sample_Name"]][Sample_Annot_df[["Data_File_Name","Sample_Name"]].duplicated(keep=False)], flush =True)
+                print(Sample_Annot_df[["Data_File_Name","Sample_Name"]][Sample_Annot_df[["Data_File_Name","Sample_Name"]].duplicated(keep=False)].to_string(index=False), flush =True)
             return [Conc_df,Conc_df,Conc_df]
 
         #Calculate the dilution factor or "ISTD_to_Sample_Amount_Ratio"
@@ -668,13 +667,46 @@ class ISTD_Operations():
             #Assuming the Sample_Name is on the first level and blank on the second level
             merged_df.columns = merged_df.columns.droplevel(1)
         else:
-            merged_df = Transition_Name_df.loc[:, Transition_Name_df.columns == 'Sample_Name']
+            merged_df = Transition_Name_df.loc[:, Transition_Name_df.columns == "Sample_Name"]
 
-        #Merge it with the Sample_Annot_df so that the order of the Sample_name follows Transition_Name_df
-        merged_df = pd.merge(merged_df, Sample_Annot_df.loc[:, ["Sample_Name","ISTD_to_Sample_Amount_Ratio"]], on="Sample_Name")
+        # We cannot accept duplicated Sample_Name in Transition_Name_df input (Input normalised area data frame)
+        if(len(merged_df[["Sample_Name"]][merged_df[["Sample_Name"]].duplicated(keep=False)]) > 0):
+            #Return empty data set
+            if logger:
+                logger.warning('Skipping step to get normConc. Input normalised area data frame has non-unique Sample_Name.')
+                logger.warning('\n{}'.format(merged_df[["Sample_Name"]][merged_df[["Sample_Name"]].duplicated(keep=False)].to_string(index=False) ) )
+            if ingui:
+                print('Skipping step to get normConc. Input normalised area has non-unique Sample_Name.' ,flush=True)
+                print(merged_df[["Sample_Name"]][merged_df[["Sample_Name"]].duplicated(keep=False)].to_string(index=False), flush =True)
+            return [Conc_df,Conc_df,Conc_df]
 
-        ISTD_Samp_Ratio_df = pd.DataFrame(index=Transition_Name_df.index, columns=Transition_Name_df.columns,dtype='float64')
-        ISTD_Samp_Ratio_df.apply(lambda x: x.update(merged_df["ISTD_to_Sample_Amount_Ratio"]) ,axis=0)
+        # Now that we have Sample_Name in Transition_Name_df and Sample_Annot_df, we need to check if they can be merged.
+
+        # Give a warning if there are samples in the raw data that the sample annotation file do not have.
+        # In the row concatenation case, the Sample_Name should all be unique
+        # In the column concatenation case, the Sample_Name should be repeated for every
+        # Data_File_Name group
+        unique_Sample_Name_list =  Sample_Annot_df["Sample_Name"].tolist()
+        merged_Sample_Name_list = merged_df["Sample_Name"].tolist()
+        unused_Sample_Name_list =  list(set(merged_Sample_Name_list).difference(unique_Sample_Name_list))
+        if(len(unused_Sample_Name_list) > 0):
+            for unused_Sample_Name in unused_Sample_Name_list:
+                if logger:
+                    logger.warning('%s is in Sample Name column of the raw data set but it is not in the Sample_Name column of Sample Annotation file', str(unused_Sample_Name))
+                if ingui:
+                    print(str(unused_Sample_Name) + ' is in Sample Name column of the raw data set but it is not in the Sample_Name column of Sample Annotation file' ,flush=True)
+            if logger:
+                logger.warning('Check that these sample names are in the Sample Annotation file. Make sure the corresponding Data_File_Name is correct.')
+            if ingui:
+                print('Check that these sample names are in the Sample Annotation file. Make sure the corresponding Data_File_Name is correct.' ,flush=True)
+
+        # Merge it with the Sample_Annot_df so that the order of the Sample_name follows Transition_Name_df
+        # We do a left join merge so samples not present in Transition_Name_df will not be used.
+        merged_df = pd.merge(merged_df, Sample_Annot_df.loc[:, ["Sample_Name","ISTD_to_Sample_Amount_Ratio"]], 
+                             how="left", on="Sample_Name")
+
+        ISTD_Samp_Ratio_df = pd.DataFrame(index=Transition_Name_df.index, columns=Transition_Name_df.columns, dtype='float64')
+        ISTD_Samp_Ratio_df.apply(lambda x: x.update(merged_df["ISTD_to_Sample_Amount_Ratio"]) , axis=0)
 
         #Assignment of string must come after df apply
         ISTD_Samp_Ratio_df['Sample_Name'] = Transition_Name_df['Sample_Name']

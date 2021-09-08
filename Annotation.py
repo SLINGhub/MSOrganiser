@@ -348,14 +348,14 @@ class MS_Template():
         return Sample_Annot_df
 
     def __validate_Sample_Annot_sheet(self,sheetname,Sample_Annot_df):
-        #Validate the Sample_Annot sheet has data when normalization is performed
+        # Validate the Sample_Annot sheet has data when normalization is performed
         if self.__doing_normalization:
             self.__check_if_df_is_empty(sheetname,Sample_Annot_df)
 
-        #Check if "Raw_Data_File_Name" exists as a header in Sample_Annot_df
-        #If yes, give an error and ask the user to use the latest version of
-        #the MSTemplate_Creator
-        #Check if the column name exists as a header in the df
+        # Check if "Raw_Data_File_Name" exists as a header in Sample_Annot_df
+        # If yes, give an error and ask the user to use the latest version of
+        # the MSTemplate_Creator
+        # Check if the column name exists as a header in the df
         if "Raw_Data_File_Name" in Sample_Annot_df:
             if self.__logger:
                 self.__logger.error('The ' + sheetname  + ' sheet contains the column "Raw_Data_File_Name". ' +
@@ -371,27 +371,48 @@ class MS_Template():
             sys.exit(-1)
 
 
-        #Check if the column Data_File_Name exists as a header in Sample_Annot_df
+        # Check if the column Data_File_Name exists as a header in Sample_Annot_df
         self.__checkColumns_in_df('Data_File_Name',sheetname,Sample_Annot_df)
 
-        #Check if the column Merge_Status exists as a header in Sample_Annot_df
+        # Check if the column Merge_Status exists as a header in Sample_Annot_df
         #self.__checkColumns_in_df('Merge_Status',sheetname,Sample_Annot_df)
 
-        #Check if the column Sample_Name exists as a header in Sample_Annot_df
+        # Check if the column Sample_Name exists as a header in Sample_Annot_df
         self.__checkColumns_in_df('Sample_Name',sheetname,Sample_Annot_df)
 
-        #Check if the column Sample_Type exists as a header in Sample_Annot_df
+        # Check if the column Sample_Type exists as a header in Sample_Annot_df
         self.__checkColumns_in_df('Sample_Type',sheetname,Sample_Annot_df)
 
-        #Check if the column Sample_Amount exists as a header in Sample_Annot_df
+        # Check if the column Sample_Amount exists as a header in Sample_Annot_df
         self.__checkColumns_in_df('Sample_Amount',sheetname,Sample_Annot_df)
 
-        #Check if the column Sample_Amount_Unit exists as a header in Sample_Annot_df
+        # Check if the column Sample_Amount_Unit exists as a header in Sample_Annot_df
         self.__checkColumns_in_df('Sample_Amount_Unit',sheetname,Sample_Annot_df)
 
-        #Check if the column ISTD_Mixture_Volume_[uL] exists as a header in Sample_Annot_df
+        # Check if the column ISTD_Mixture_Volume_[uL] exists as a header in Sample_Annot_df
         self.__checkColumns_in_df('ISTD_Mixture_Volume_[uL]',sheetname,Sample_Annot_df)
 
-        #Check if the column Concentration_Unit exists as a header in Sample_Annot_df
+        # Check if the column Concentration_Unit exists as a header in Sample_Annot_df
         self.__checkColumns_in_df('Concentration_Unit',sheetname,Sample_Annot_df)
 
+        # Check if the column Data_File_Name has empty entries and highlight them.
+        if(len(Sample_Annot_df[["Data_File_Name","Sample_Name"]][Sample_Annot_df["Data_File_Name"].isna()]) > 0):
+            if self.__logger:
+                self.__logger.warning('There are sample names that are not associated with a data file name. They will not be used during analysis')
+                self.__logger.warning('\n{}'.format( Sample_Annot_df[["Data_File_Name","Sample_Name"]][Sample_Annot_df["Data_File_Name"].isna()].to_string(index=False) ) )
+                self.__logger.warning('Ensure that both columns Data_File_Name and Sample_Name are filled for each sample.')
+            if self.__ingui:
+                print('There are sample names that are not associated with a data file name. They will not be used during analysis' , flush = True)
+                print(Sample_Annot_df[["Data_File_Name","Sample_Name"]][Sample_Annot_df["Data_File_Name"].isna()].to_string(index=False), flush = True)
+                print('Ensure that both columns Data_File_Name and Sample_Name are filled for each sample.', flush = True)
+
+        # Check if the column Sample_Name has empty entries and highlight them.
+        if(len(Sample_Annot_df[["Data_File_Name","Sample_Name"]][Sample_Annot_df["Sample_Name"].isna()]) > 0):
+            if self.__logger:
+                self.__logger.warning('There are data file names that are not associated with a sample name. They will not be used during analysis')
+                self.__logger.warning('\n{}'.format( Sample_Annot_df[["Data_File_Name","Sample_Name"]][Sample_Annot_df["Sample_Name"].isna()].to_string(index=False) ) )
+                self.__logger.warning('Ensure that both columns Data_File_Name and Sample_Name are filled for each sample.')
+            if self.__ingui:
+                print('There are data file names that are not associated with a sample name. They will not be used during analysis' , flush = True)
+                print(Sample_Annot_df[["Data_File_Name","Sample_Name"]][Sample_Annot_df["Sample_Name"].isna()].to_string(index=False), flush = True)
+                print('Ensure that both columns Data_File_Name and Sample_Name are filled for each sample.', flush = True)

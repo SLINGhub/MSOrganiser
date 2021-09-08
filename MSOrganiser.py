@@ -758,9 +758,9 @@ if __name__ == '__main__':
         PDFReport.output_to_PDF()
         #Output concatenated wide data after going through all the files
         output_concatenated_wide_data(stored_args, 
-                                       concatenate_df_list = concatenate_df_list, 
-                                       concatenate_df_sheet_name = concatenate_df_sheet_name,
-                                       logger = logger)
+                                      concatenate_df_list = concatenate_df_list, 
+                                      concatenate_df_sheet_name = concatenate_df_sheet_name,
+                                      logger = logger)
 
         #Output concatenated long table
         output_concatenated_long_table(stored_args, 
