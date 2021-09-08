@@ -332,7 +332,7 @@ class MS_Analysis():
 
         """
 
-        #Perform normalisation using ISTD if it is not done earlier
+        # Perform normalisation using ISTD if it is not done earlier
         if(self.norm_Area_df.empty or self.ISTD_map_df.empty):
             self.get_Normalised_Area(analysis_name,
                                      outputdata=False,
@@ -340,7 +340,9 @@ class MS_Analysis():
                                      using_multiple_input_files = using_multiple_input_files,
                                      concatenation_type = concatenation_type)
 
-        #Perform concentration calculation, we need self.norm_Area_df, self.ISTD_map_df and self.Sample_Annot_df
+        # At this stage, the self.norm_Area_df should have been concatenated if option is selected...
+
+        # Perform concentration calculation, we need self.norm_Area_df, self.ISTD_map_df and self.Sample_Annot_df
         if using_multiple_input_files:
             MS_FilePathList = [os.path.basename(MS_FilePath) for MS_FilePath in self.MS_FilePaths]
         else:
@@ -351,6 +353,8 @@ class MS_Analysis():
                                                             MS_FilePathList = MS_FilePathList, 
                                                             column_name = analysis_name,
                                                             logger= self.logger, ingui=self.ingui)
+
+        print(MS_FilePathList)
         self.Sample_Annot_df = Sample_Annot_df
 
         [norm_Conc_df,ISTD_Conc_df,ISTD_Samp_Ratio_df] = ISTD_Operations.getConc_by_ISTD(self.norm_Area_df,
