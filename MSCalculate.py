@@ -404,7 +404,7 @@ class ISTD_Operations():
 
         #Create empty dataframe with a preset column name and the expanded Transition_Name_df
         # Initialize empty list
-        tuples=[("Sample_Name","")]
+        tuples=[("Sample_Name","")]      
         for Transition_Name in Transition_Name_dict:
             if len(Transition_Name_dict[Transition_Name]) == 0:
                 #print((Transition_Name, ""))
