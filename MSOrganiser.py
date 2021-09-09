@@ -115,7 +115,8 @@ def get_Parameters_df(stored_args, MS_FilePath = None,
 
 def check_duplicated_columns_in_wide_data(input_wide_data, output_option,
                                           logger = None, ingui = True,
-                                          allow_multiple_istd = False):
+                                          allow_multiple_istd = False,
+                                          testing = False):
 
     # Convert the dataframe column name to a list
     column_name_list = input_wide_data.columns.values.tolist()
@@ -144,7 +145,7 @@ def check_duplicated_columns_in_wide_data(input_wide_data, output_option,
             print('In the ' + output_option + ' data frame, ' + 
                   'There are column names (Transition_Name) in the output files that are duplicated. ' +
                   'The data in these duplicated column names may be different. ' +
-                  'Please check the input files especially if you are concatenating by columns.' , 
+                  'Please check the input files especially if you are concatenating by columns.' + 
                   'Duplicated columns are ' + duplicated_column_name_string, flush=True)
         sys.exit(-1)
 
@@ -337,7 +338,8 @@ def no_concatenate_workflow(stored_args, logger=None, testing = False):
                 # "Area","RT","FWHM","S/N" etc
                 check_duplicated_columns_in_wide_data(Output_df, output_option,
                                                       logger = logger, ingui = True,
-                                                      allow_multiple_istd = False)
+                                                      allow_multiple_istd = False,
+                                                      testing = testing)
                 check_duplicated_sample_names_in_wide_data(Output_df, output_option,
                                                            logger = None, ingui = True,
                                                            allow_multiple_istd = False)
@@ -580,7 +582,8 @@ def concatenate_along_rows_workflow(stored_args, logger=None, testing = False):
         concatenated_data = concatenate_df_list[output_option_index]
         check_duplicated_columns_in_wide_data(concatenated_data, output_option,
                                               logger = logger, ingui = True,
-                                              allow_multiple_istd = False)
+                                              allow_multiple_istd = False,
+                                              testing = testing)
         check_duplicated_sample_names_in_wide_data(concatenated_data, output_option,
                                                    logger = None, ingui = True,
                                                    allow_multiple_istd = False)
@@ -772,7 +775,8 @@ def concatenate_along_columns_workflow(stored_args, logger=None, testing = False
             concatenated_data = concatenate_df_list[output_option_index]
             check_duplicated_columns_in_wide_data(concatenated_data, output_option,
                                                   logger = logger, ingui = True,
-                                                  allow_multiple_istd = False)
+                                                  allow_multiple_istd = False,
+                                                  testing = testing)
             check_duplicated_sample_names_in_wide_data(concatenated_data, output_option,
                                                        logger = None, ingui = True,
                                                        allow_multiple_istd = False)
