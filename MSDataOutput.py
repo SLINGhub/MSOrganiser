@@ -92,7 +92,7 @@ class MSDataOutput:
         
         """
 
-        #If df is empty we send a warning and skip the df
+        # If df is empty we send a warning and skip the df
         if df.empty:
             if logger:
                 logger.warning('%s has no data. Please check the input file',output_option)
@@ -100,7 +100,7 @@ class MSDataOutput:
                 print(output_option + ' has no data. Please check the input file',flush=True)
             return([df,output_option])
 
-        #Replace '/' as excel cannot have this as sheet title or file name
+        # Replace '/' as excel cannot have this as sheet title or file name
         if output_option == 'S/N':
             output_option = output_option.replace('/','_to_')
 

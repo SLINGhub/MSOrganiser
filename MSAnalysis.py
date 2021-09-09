@@ -354,7 +354,6 @@ class MS_Analysis():
                                                             column_name = analysis_name,
                                                             logger= self.logger, ingui=self.ingui)
 
-        print(MS_FilePathList)
         self.Sample_Annot_df = Sample_Annot_df
 
         [norm_Conc_df,ISTD_Conc_df,ISTD_Samp_Ratio_df] = ISTD_Operations.getConc_by_ISTD(self.norm_Area_df,

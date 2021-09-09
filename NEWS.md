@@ -3,12 +3,14 @@
 ## TODO
 
 * Find a way to make the documentation of the functions of `MSOrganiser` online.
-* Add warning message during concentration calculation when user input a sample that is found in the raw data but not found in the sample annotation file
-* Add warning message when user input a sample annotation file with missing data file name or sample name 
+* Update MSTemplate_Creator changes to the Concentration Unit.
 
 ## Completed
 
 * Added a logo.
+* Add warning message during concentration calculation when user input a sample that is found in the raw data but not found in the sample annotation file.
+* Add warning message when user input a sample annotation file with missing data file name or sample name.
+* Add warning message when user input a raw data file that has duplicate sample names or transition names with or without concatenation.
 
 # MSOrganiser 1.0.0
 
