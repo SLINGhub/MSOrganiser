@@ -4,8 +4,8 @@ import sys
 import pandas as pd
 import numpy as np
 from unittest.mock import patch
-from MSOrganiser import check_duplicated_columns_in_wide_data
-from MSOrganiser import check_duplicated_sample_names_in_wide_data
+from DuplicateCheck import check_duplicated_columns_in_wide_data
+from DuplicateCheck import check_duplicated_sample_names_in_wide_data
 from MSAnalysis import MS_Analysis
 
 class Duplicate_Input_Test(unittest.TestCase):
@@ -13,7 +13,7 @@ class Duplicate_Input_Test(unittest.TestCase):
     # for more details on mock
     def setUp(self):
         # Replace the print function in MSOrganiser.py file to a mock
-        self.patcher = patch('MSOrganiser.print')
+        self.patcher = patch('DuplicateCheck.print')
     def test_Duplicate_Column(self):
         """Check if the software is able to find duplicate columns (transition name) after reading a raw
            data file.
