@@ -53,6 +53,9 @@
     <Compile Include="tests\test_MSRawData.py" />
     <Compile Include="tests\test_NoConcatenation.py" />
     <Compile Include="tests\test_DuplicateInput.py" />
+    <Compile Include="tests\test_SampleAnnot.py">
+      <SubType>Code</SubType>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="cairo_dll\" />
