@@ -259,15 +259,6 @@ def no_concatenate_workflow(stored_args, logger=None, testing = False):
                 Output_df = MyData.get_from_Input_Data(output_option,
                                                        allow_multiple_istd=False)
 
-                # Get the data frame that correspond to the column_name like
-                # "Area","RT","FWHM","S/N" etc
-                DuplicateCheck.check_duplicated_columns_in_wide_data(Output_df, output_option,
-                                                                     logger = logger, ingui = True,
-                                                                     allow_multiple_istd = False)
-                DuplicateCheck.check_duplicated_sample_names_in_wide_data(Output_df, output_option,
-                                                                          logger = None, ingui = True,
-                                                                          allow_multiple_istd = False)
-
                 #If not doing unit testing,
                 #Output the Output_df results
                 if not testing:
@@ -504,10 +495,12 @@ def concatenate_along_rows_workflow(stored_args, logger=None, testing = False):
         # "Area","RT","FWHM","S/N" etc
         output_option_index = concatenate_df_sheet_name.index(output_option)
         concatenated_data = concatenate_df_list[output_option_index]
-        DuplicateCheck.check_duplicated_columns_in_wide_data(concatenated_data, output_option,
+        DuplicateCheck.check_duplicated_columns_in_wide_data(concatenated_data, 
+                                                             "row concatenated " + output_option,
                                                              logger = logger, ingui = True,
                                                              allow_multiple_istd = False)
-        DuplicateCheck.check_duplicated_sample_names_in_wide_data(concatenated_data, output_option,
+        DuplicateCheck.check_duplicated_sample_names_in_wide_data(concatenated_data, 
+                                                                  "row concatenated " + output_option,
                                                                   logger = None, ingui = True,
                                                                   allow_multiple_istd = False)
 
@@ -696,10 +689,12 @@ def concatenate_along_columns_workflow(stored_args, logger=None, testing = False
             # "Area","RT","FWHM","S/N" etc
             output_option_index = concatenate_df_sheet_name.index(output_option)
             concatenated_data = concatenate_df_list[output_option_index]
-            DuplicateCheck.check_duplicated_columns_in_wide_data(concatenated_data, output_option,
+            DuplicateCheck.check_duplicated_columns_in_wide_data(concatenated_data, 
+                                                                 "column concatenated " + output_option,
                                                                  logger = logger, ingui = True,
                                                                  allow_multiple_istd = False)
-            DuplicateCheck.check_duplicated_sample_names_in_wide_data(concatenated_data, output_option,
+            DuplicateCheck.check_duplicated_sample_names_in_wide_data(concatenated_data, 
+                                                                      "column concatenated " + output_option,
                                                                       logger = None, ingui = True,
                                                                       allow_multiple_istd = False)
     #We now create data frame of output options that require the full data like
