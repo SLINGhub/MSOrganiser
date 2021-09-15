@@ -28,6 +28,9 @@
   <ItemGroup>
     <Compile Include="Annotation.py" />
     <Compile Include="docs\source\conf.py" />
+    <Compile Include="DuplicateCheck.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="MSAnalysis.py">
       <SubType>Code</SubType>
     </Compile>
@@ -49,6 +52,7 @@
     <Compile Include="tests\test_MSAnalysis.py" />
     <Compile Include="tests\test_MSRawData.py" />
     <Compile Include="tests\test_NoConcatenation.py" />
+    <Compile Include="tests\test_DuplicateInput.py" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="cairo_dll\" />

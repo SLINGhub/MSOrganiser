@@ -4,6 +4,7 @@ from MSCalculate import ISTD_Operations
 import os
 import sys
 import pandas as pd
+import DuplicateCheck
 
 class MS_Analysis():
     """
@@ -68,7 +69,7 @@ class MS_Analysis():
                 sys.exit(-1)
         return(InputData)
 
-    def _get_Area_df_for_normalisation(self, allow_multiple_istd = False, 
+    def _get_Area_df_for_normalisation(self,
                                        using_multiple_input_files = False,
                                        concatenation_type = "rows"):
 
@@ -104,10 +105,40 @@ class MS_Analysis():
                             self.logger.error('Input concatenation type must be "rows" or "columns". Current input is %s', concatenation_type)
                         sys.exit(-1)
 
+            # We check if the concatenated data is valid without
+            # any duplicated columns and sample names, if there are, we should not proceed to calculation
+            # and inform the user of this issue.
+            output_option = "Area used for normalisation"
+            if concatenation_type == "rows":
+                output_option = "row concatenated Area used for normalisation"
+            elif concatenation_type == "columns":
+                output_option = "column concatenated Area used for normalisation"
+
+            # Check for duplicate column names (transition names)
+            DuplicateCheck.check_duplicated_columns_in_wide_data(concatenate_Area_df, output_option,
+                                                                 logger = self.logger, ingui = True,
+                                                                 allow_multiple_istd = False)
+            # Check for duplicate row names (sample names)
+            DuplicateCheck.check_duplicated_sample_names_in_wide_data(concatenate_Area_df, output_option,
+                                                                      logger = self.logger, ingui = True,
+                                                                      allow_multiple_istd = False)
+
             return(concatenate_Area_df)
         else:
             InputData = self._prepare_InputData()
             Area_df = InputData.get_table('Area',is_numeric=True)
+
+            output_option = "Area used for normalisation"
+
+            # Check for duplicate column names (transition names)
+            DuplicateCheck.check_duplicated_columns_in_wide_data(Area_df, output_option,
+                                                                 logger = self.logger, ingui = True,
+                                                                 allow_multiple_istd = False)
+            # Check for duplicate row names (sample names)
+            DuplicateCheck.check_duplicated_sample_names_in_wide_data(Area_df, output_option,
+                                                                      logger = self.logger, ingui = True,
+                                                                      allow_multiple_istd = False)
+
             return(Area_df)
 
     def _add_to_LongTable_df(self,wide_df,column_name,allow_multiple_istd = False):
@@ -220,9 +251,18 @@ class MS_Analysis():
 
         """
 
-        #We extract the data directly from the file and output accordingly
+        # We extract the data directly from the file and output accordingly
         InputData = self._prepare_InputData()
         Output_df = InputData.get_table(column_name,is_numeric=True)
+
+        # Check for duplicate column names (transition names)
+        DuplicateCheck.check_duplicated_columns_in_wide_data(Output_df, column_name,
+                                                             logger = self.logger, ingui = True,
+                                                             allow_multiple_istd = False)
+        # Check for duplicate row names (sample names)
+        DuplicateCheck.check_duplicated_sample_names_in_wide_data(Output_df, column_name,
+                                                                  logger = self.logger, ingui = True,
+                                                                  allow_multiple_istd = False)
 
         if allow_multiple_istd:
             #Get ISTD map df
@@ -241,6 +281,15 @@ class MS_Analysis():
                                                                                              allow_multiple_istd = allow_multiple_istd)
             Output_df = ISTD_Operations.expand_Transition_Name_df(Output_df,Transition_Name_dict,
                                                                   logger=self.logger,ingui=self.ingui)
+
+            # Check for duplicate column names (transition names)
+            DuplicateCheck.check_duplicated_columns_in_wide_data(Output_df, column_name,
+                                                                 logger = self.logger, ingui = True,
+                                                                 allow_multiple_istd = True)
+            # Check for duplicate row names (sample names)
+            DuplicateCheck.check_duplicated_sample_names_in_wide_data(Output_df, column_name,
+                                                                      logger = self.logger, ingui = True,
+                                                                      allow_multiple_istd = True)
 
         if self.LongTable:
             MS_Analysis._add_to_LongTable_df(self,Output_df,column_name,allow_multiple_istd)
@@ -276,7 +325,6 @@ class MS_Analysis():
         ##Get Area Table
 
         Area_df = MS_Analysis._get_Area_df_for_normalisation(self, 
-                                                             allow_multiple_istd = allow_multiple_istd,
                                                              using_multiple_input_files = using_multiple_input_files,
                                                              concatenation_type = concatenation_type)
 

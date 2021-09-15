@@ -1,5 +1,6 @@
 # coding: utf-8
 import sys
+import DuplicateCheck
 import MSParser
 from MSAnalysis import MS_Analysis
 from MSDataOutput import MSDataOutput_Excel
@@ -12,8 +13,6 @@ import os
 import sys
 import logging
 import pandas as pd
-
-from collections import Counter
 
 from datetime import datetime
 import time
@@ -112,79 +111,6 @@ def get_Parameters_df(stored_args, MS_FilePath = None,
 
     Parameters_df = pd.DataFrame(Parameter_list,columns=['Parameters', 'Value'])
     return Parameters_df
-
-def check_duplicated_columns_in_wide_data(input_wide_data, output_option,
-                                          logger = None, ingui = True,
-                                          allow_multiple_istd = False):
-
-    # Convert the dataframe column name to a list
-    column_name_list = input_wide_data.columns.values.tolist()
-    # Get a list of duplicated column names
-    duplicated_column_name_list = [key for key in Counter(column_name_list).keys() if Counter(column_name_list)[key] > 1]
-
-    # When there are duplicated
-    if len(duplicated_column_name_list) > 0:
-
-        # Convert the list into a string
-        duplicated_column_name_string = ""
-        if allow_multiple_istd:
-            duplicated_column_name_string = ", ".join(map(str, duplicated_column_name_list))
-        else:
-            duplicated_column_name_string = ", ".join(duplicated_column_name_list)
-
-        # Inform the user and stop the program 
-        if logger:
-            logger.warning('In the %s data frame, ' + 
-                           'There are column names (Transition_Name) in the output files that are duplicated. ' +
-                           'The data in these duplicated column names may be different. ' +
-                           'Please check the input files especially if you are concatenating by columns. ' +
-                           'Duplicated columns are %s',
-                           output_option, duplicated_column_name_string)
-        if ingui:
-            print('In the ' + output_option + ' data frame, ' + 
-                  'There are column names (Transition_Name) in the output files that are duplicated. ' +
-                  'The data in these duplicated column names may be different. ' +
-                  'Please check the input files especially if you are concatenating by columns.' , 
-                  'Duplicated columns are ' + duplicated_column_name_string, flush=True)
-        sys.exit(-1)
-
-def check_duplicated_sample_names_in_wide_data(input_wide_data, output_option,
-                                               logger = None, ingui = True,
-                                               allow_multiple_istd = False):
-
-    # Convert the sample name column to a list
-    unique_Sample_Name_list = []
-    if allow_multiple_istd:
-        unique_Sample_Name_list = input_wide_data[("Sample_Name","")].tolist()
-    else:
-        unique_Sample_Name_list = input_wide_data["Sample_Name"].tolist()
-
-    # Get a list of duplicated column names
-    duplicated_Sample_Name_list = [key for key in Counter(unique_Sample_Name_list).keys() if Counter(unique_Sample_Name_list)[key] > 1]
-
-    # When there are duplicated
-    if len(duplicated_Sample_Name_list) > 0:
-
-        # Convert the list into a string
-        duplicated_Sample_Name_string = ", ".join(duplicated_Sample_Name_list)
-
-        # Inform the user and stop the program 
-        if logger:
-            logger.warning('In the %s data frame, ' + 
-                           'There are sample names in the output files that are duplicated. ' +
-                           'The data in these duplicated row names may be different. ' +
-                           'Please check the input files especially if you are concatenating by rows. ' +
-                           'Duplicated sample names are %s',
-                           output_option, duplicated_Sample_Name_string)
-        if ingui:
-            print('In the ' + output_option + ' data frame, ' + 
-                  'There are sample names in the output files that are duplicated. ' +
-                  'The data in these duplicated column names may be different. ' +
-                  'Please check the input files especially if you are concatenating by rows. ' , 
-                  'Duplicated sample names are ' + duplicated_Sample_Name_string, flush=True)
-
-        sys.exit(-1)
-
 
 def output_concatenated_wide_data(stored_args, 
                                   concatenate_df_list, concatenate_df_sheet_name,
@@ -332,15 +258,6 @@ def no_concatenate_workflow(stored_args, logger=None, testing = False):
                 #We extract the data directly from the file and output accordingly
                 Output_df = MyData.get_from_Input_Data(output_option,
                                                        allow_multiple_istd=False)
-
-                # Get the data frame that correspond to the column_name like
-                # "Area","RT","FWHM","S/N" etc
-                check_duplicated_columns_in_wide_data(Output_df, output_option,
-                                                      logger = logger, ingui = True,
-                                                      allow_multiple_istd = False)
-                check_duplicated_sample_names_in_wide_data(Output_df, output_option,
-                                                           logger = None, ingui = True,
-                                                           allow_multiple_istd = False)
 
                 #If not doing unit testing,
                 #Output the Output_df results
@@ -578,12 +495,14 @@ def concatenate_along_rows_workflow(stored_args, logger=None, testing = False):
         # "Area","RT","FWHM","S/N" etc
         output_option_index = concatenate_df_sheet_name.index(output_option)
         concatenated_data = concatenate_df_list[output_option_index]
-        check_duplicated_columns_in_wide_data(concatenated_data, output_option,
-                                              logger = logger, ingui = True,
-                                              allow_multiple_istd = False)
-        check_duplicated_sample_names_in_wide_data(concatenated_data, output_option,
-                                                   logger = None, ingui = True,
-                                                   allow_multiple_istd = False)
+        DuplicateCheck.check_duplicated_columns_in_wide_data(concatenated_data, 
+                                                             "row concatenated " + output_option,
+                                                             logger = logger, ingui = True,
+                                                             allow_multiple_istd = False)
+        DuplicateCheck.check_duplicated_sample_names_in_wide_data(concatenated_data, 
+                                                                  "row concatenated " + output_option,
+                                                                  logger = None, ingui = True,
+                                                                  allow_multiple_istd = False)
 
     #We now create data frame of output options that require the full data like
     #normArea by ISTD, normConc by ISTD, etc
@@ -770,13 +689,14 @@ def concatenate_along_columns_workflow(stored_args, logger=None, testing = False
             # "Area","RT","FWHM","S/N" etc
             output_option_index = concatenate_df_sheet_name.index(output_option)
             concatenated_data = concatenate_df_list[output_option_index]
-            check_duplicated_columns_in_wide_data(concatenated_data, output_option,
-                                                  logger = logger, ingui = True,
-                                                  allow_multiple_istd = False)
-            check_duplicated_sample_names_in_wide_data(concatenated_data, output_option,
-                                                       logger = None, ingui = True,
-                                                       allow_multiple_istd = False)
-
+            DuplicateCheck.check_duplicated_columns_in_wide_data(concatenated_data, 
+                                                                 "column concatenated " + output_option,
+                                                                 logger = logger, ingui = True,
+                                                                 allow_multiple_istd = False)
+            DuplicateCheck.check_duplicated_sample_names_in_wide_data(concatenated_data, 
+                                                                      "column concatenated " + output_option,
+                                                                      logger = None, ingui = True,
+                                                                      allow_multiple_istd = False)
     #We now create data frame of output options that require the full data like
     #normArea by ISTD, normConc by ISTD, etc
 
