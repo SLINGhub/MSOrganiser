@@ -303,7 +303,7 @@ class MS_Template():
         #Open the excel file
         wb = self.__readExcelWorkbook()
 
-        #Check if the excel file has the sheet "Transition_Name_Annot"
+        #Check if the excel file has the sheet "Sample_Annot"
         self.__checkExcelWorksheet_in_Workbook("Sample_Annot",wb)
         
         #Convert worksheet to a dataframe
@@ -320,7 +320,8 @@ class MS_Template():
         #Remove rows with all None, NA,NaN
         Sample_Annot_df = Sample_Annot_df.dropna(axis=0, how='all')
 
-        #Validate the Sample_Annot sheet is valid (the columns are not remove in the excel sheet but can be empty)
+        #Validate the Sample_Annot sheet is valid 
+        # (the columns are not remove in the excel sheet but can be empty)
         self.__validate_Sample_Annot_sheet("Sample_Annot",Sample_Annot_df)
 
         #We take the Sample Annotation data that can be found in the MS_FilePathList
