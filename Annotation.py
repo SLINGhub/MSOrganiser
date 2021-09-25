@@ -417,9 +417,9 @@ class MS_Template():
         # Check if the column Data_File_Name has empty entries and highlight them.
         if(len(Sample_Annot_df[["Data_File_Name","Sample_Name"]][Sample_Annot_df["Data_File_Name"].isna()]) > 0):
             if self.__logger:
-                self.__logger.warning('There are sample names that are not associated with a data file name. They will not be used during analysis')
-                self.__logger.warning('\n{}'.format( Sample_Annot_df[["Data_File_Name","Sample_Name"]][Sample_Annot_df["Data_File_Name"].isna()].to_string(index=False) ) )
-                self.__logger.warning('Ensure that both columns Data_File_Name and Sample_Name are filled for each sample.')
+                self.__logger.warning('There are sample names that are not associated with a data file name. They will not be used during analysis.\n' +
+                                      Sample_Annot_df[["Data_File_Name","Sample_Name"]][Sample_Annot_df["Data_File_Name"].isna()].to_string(index=False) + '\n'
+                                      'Ensure that both columns Data_File_Name and Sample_Name are filled for each sample.')
             if self.__ingui:
                 print('There are sample names that are not associated with a data file name. They will not be used during analysis.\n' +
                       Sample_Annot_df[["Data_File_Name","Sample_Name"]][Sample_Annot_df["Data_File_Name"].isna()].to_string(index=False) + '\n'
@@ -429,9 +429,9 @@ class MS_Template():
         # Check if the column Sample_Name has empty entries and highlight them.
         if(len(Sample_Annot_df[["Data_File_Name","Sample_Name"]][Sample_Annot_df["Sample_Name"].isna()]) > 0):
             if self.__logger:
-                self.__logger.warning('There are data file names that are not associated with a sample name. They will not be used during analysis')
-                self.__logger.warning('\n{}'.format( Sample_Annot_df[["Data_File_Name","Sample_Name"]][Sample_Annot_df["Sample_Name"].isna()].to_string(index=False) ) )
-                self.__logger.warning('Ensure that both columns Data_File_Name and Sample_Name are filled for each sample.')
+                self.__logger.warning('There are data file names that are not associated with a sample name. They will not be used during analysis.\n' +
+                                      Sample_Annot_df[["Data_File_Name","Sample_Name"]][Sample_Annot_df["Sample_Name"].isna()].to_string(index=False) + '\n'
+                      'Ensure that both columns Data_File_Name and Sample_Name are filled for each sample.')
             if self.__ingui:
                 print('There are data file names that are not associated with a sample name. They will not be used during analysis.\n' +
                       Sample_Annot_df[["Data_File_Name","Sample_Name"]][Sample_Annot_df["Sample_Name"].isna()].to_string(index=False) + '\n'
