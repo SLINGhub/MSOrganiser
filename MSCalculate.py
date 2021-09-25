@@ -38,8 +38,10 @@ class ISTD_Operations():
 
         """
 
-        AnnotationList = MS_Template(filepath=filepath,column_name=column_name, logger=logger,ingui=ingui,
-                                     doing_normalization = doing_normalization, allow_multiple_istd = allow_multiple_istd)
+        AnnotationList = MS_Template(filepath=filepath,column_name=column_name, 
+                                     logger=logger,ingui=ingui,
+                                     doing_normalization = doing_normalization, 
+                                     allow_multiple_istd = allow_multiple_istd)
         Transition_Name_Annot_df = AnnotationList.Read_Transition_Name_Annot_Sheet()
         ISTD_Annot_df = AnnotationList.Read_ISTD_Annot_Sheet()
         
