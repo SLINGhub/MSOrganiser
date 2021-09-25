@@ -2,6 +2,7 @@ import unittest
 import os
 from unittest.mock import patch
 from MSCalculate import ISTD_Operations
+from MSAnalysis import MS_Analysis
 
 INVALIDSHEETNAME_ANNOTATION = os.path.join(os.path.dirname(__file__),
                                            "testdata", "test_sample_annot", 
@@ -48,8 +49,16 @@ MISSINGSAMPLENAMEENTRIES_ANNOTATION = os.path.join(os.path.dirname(__file__),
                                                    "WideTableForm_MissingSampleNameEntries.xlsx")
 
 NOSAMPLEANNOTDATA_ANNOTATION = os.path.join(os.path.dirname(__file__),
-                                                   "testdata", "test_sample_annot", 
-                                                   "WideTableForm_NoSampleAnnotData.xlsx")
+                                            "testdata", "test_sample_annot", 
+                                            "WideTableForm_NoSampleAnnotData.xlsx")
+
+WIDETABLEFORM_FILENAME = os.path.join(os.path.dirname(__file__),
+                                      "testdata", "test_sample_annot",
+                                      'WideTableForm.csv')
+
+WIDETABLEFORM_ANNOTATION_WITH_MISSING_SAMPLES = os.path.join(os.path.dirname(__file__),
+                                                             "testdata", "test_sample_annot", 
+                                                             "WideTableForm_Annotation_WithMissingSamples.xlsx")
 
 class SampleAnnot_Test(unittest.TestCase):
     # See https://realpython.com/lessons/mocking-print-unit-tests/
@@ -209,15 +218,53 @@ class SampleAnnot_Test(unittest.TestCase):
         * Warn user if it finds a MSFilePath with no correspnding Sample Annotation data
 
         """
-        #MS_FilePathList = ["WideTableForm.csv", "WideTableForm1.csv", "WideTableForm2.csv"]
-        #MS_FilePathList = ["WideTableForm.csv", "WideTableForm1.csv"]
-        MS_FilePathList = ["WideTableForm1.csv"]
+        MS_FilePathList = ["WideTableForm.csv", "WideTableForm1.csv", "WideTableForm2.csv"]
 
-        Sample_Annot_df = ISTD_Operations.read_Sample_Annot(filepath = NOSAMPLEANNOTDATA_ANNOTATION,
-                                                            MS_FilePathList = MS_FilePathList,
-                                                            column_name = "Area",
-                                                            logger = None,
-                                                            ingui = True)
+        mock_print = self.patcher.start()
+
+        with self.assertRaises(SystemExit) as cm:
+            Sample_Annot_df = ISTD_Operations.read_Sample_Annot(filepath = NOSAMPLEANNOTDATA_ANNOTATION,
+                                                                MS_FilePathList = MS_FilePathList,
+                                                                column_name = "Area",
+                                                                logger = None,
+                                                                ingui = True)
+
+        # Ensure that the system ends with a -1 to indicate an error
+        self.assertEqual(cm.exception.code, -1)
+
+        # Ensure that the error was due to a MSFilePath with no correspnding Sample Annotation data
+        mock_print.assert_called_with('The "Data_File_Name" column in the Sample Annotation sheet does contain the input file name.\n' +
+                                      'WideTableForm.csv\n' +
+                                      'WideTableForm2.csv\n' +
+                                      'Please correct the Sample Annotation sheet or the input file name.',
+                                      flush = True)
+
+    def test_warn_sample_in_MSFilePath_but_not_in_SampleAnnot(self):
+        """Check if the software is able to list samples in a given MSFilePath that is not in the Sample Annotation data
+
+        * Read the file
+        * Warn user if it finds a sample in a given MSFilePath that is not in the Sample Annotation data
+
+        """
+
+        MyWideData = MS_Analysis(MS_FilePath = WIDETABLEFORM_FILENAME,
+                                 MS_FileType = 'Agilent Wide Table in csv',
+                                 Annotation_FilePath = WIDETABLEFORM_ANNOTATION_WITH_MISSING_SAMPLES,
+                                 ingui = True)
+
+        self.patcher = patch('MSCalculate.print')
+        mock_print = self.patcher.start()
+
+        [norm_Conc_df,ISTD_Conc_df,ISTD_Samp_Ratio_df,Sample_Annot_df] = MyWideData.get_Analyte_Concentration(analysis_name = 'normConc by ISTD')
+
+        # Ensure that the warning was due to a MSFilePath with no correspnding Sample Annotation data
+        mock_print.assert_called_with('There are Sample Names in the input raw data set that is ' +
+                                      'not in the Sample_Name column of the Sample Annotation sheet.\n' +
+                                      '10_TQC_06\n' +
+                                      '4_untreated\n' +
+                                      'Check that these sample names are in the Sample Annotation file. ' +
+                                      'Make sure the corresponding Data_File_Name is correct.',
+                                      flush=True)
 
 
     def tearDown(self):

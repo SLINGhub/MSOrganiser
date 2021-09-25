@@ -348,7 +348,7 @@ class MS_Template():
                           "\n".join(MS_FilePath_with_no_sample_annot) + '\n' +
                           'Please correct the Sample Annotation sheet or the input file name.',
                           flush = True)
-                #sys.exit(-1)
+                sys.exit(-1)
 
         #Remove whitespaces in column names
         Sample_Annot_df.columns = Sample_Annot_df.columns.str.strip()
