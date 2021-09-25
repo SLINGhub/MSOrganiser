@@ -303,7 +303,7 @@ class MS_Template():
         #Open the excel file
         wb = self.__readExcelWorkbook()
 
-        #Check if the excel file has the sheet "Transition_Name_Annot"
+        #Check if the excel file has the sheet "Sample_Annot"
         self.__checkExcelWorksheet_in_Workbook("Sample_Annot",wb)
         
         #Convert worksheet to a dataframe
@@ -320,18 +320,40 @@ class MS_Template():
         #Remove rows with all None, NA,NaN
         Sample_Annot_df = Sample_Annot_df.dropna(axis=0, how='all')
 
-        #Validate the Sample_Annot sheet is valid (the columns are not remove in the excel sheet but can be empty)
+        #Validate the Sample_Annot sheet is valid 
+        # (the columns are not remove in the excel sheet but can be empty)
         self.__validate_Sample_Annot_sheet("Sample_Annot",Sample_Annot_df)
 
         #We take the Sample Annotation data that can be found in the MS_FilePathList
         #Else we just take all of them
         if len(MS_FilePathList) > 0:
             Sample_Annot_df = Sample_Annot_df[Sample_Annot_df.Data_File_Name.isin(MS_FilePathList)]
+            MS_FilePath_with_no_sample_annot = []
+
+            # Check that the Filtered_Sample_Annot_df is not empty for each of the provided MS_FilePath
+            # If yes, stop the program and inform the user to check the Sample Annot file
+            for MS_FilePath in MS_FilePathList:
+                Filtered_Sample_Annot_df = Sample_Annot_df[Sample_Annot_df.Data_File_Name.isin([MS_FilePath])]
+
+                if(len(Filtered_Sample_Annot_df.index) == 0 ):
+                    MS_FilePath_with_no_sample_annot.append(MS_FilePath)
+
+            if(len(MS_FilePath_with_no_sample_annot) > 0 ):
+                if self.__logger:
+                    self.__logger.error('The "Data_File_Name" column in the Sample Annotation sheet does contain the input file name.\n' +
+                                        "\n".join(MS_FilePath_with_no_sample_annot) + '\n' +
+                                        'Please correct the Sample Annotation sheet or the input file name.')
+                if self.__ingui:
+                    print('The "Data_File_Name" column in the Sample Annotation sheet does contain the input file name.\n' + 
+                          "\n".join(MS_FilePath_with_no_sample_annot) + '\n' +
+                          'Please correct the Sample Annotation sheet or the input file name.',
+                          flush = True)
+                sys.exit(-1)
 
         #Remove whitespaces in column names
         Sample_Annot_df.columns = Sample_Annot_df.columns.str.strip()
 
-        #Convert all but number columns to numeric
+        #Convert all number columns to numeric
         Sample_Annot_df['Sample_Amount'] = pd.to_numeric(Sample_Annot_df['Sample_Amount'], errors='coerce')
         Sample_Annot_df['ISTD_Mixture_Volume_[uL]'] = pd.to_numeric(Sample_Annot_df['ISTD_Mixture_Volume_[uL]'], errors='coerce')
         #print(Sample_Annot_df.info())
@@ -348,9 +370,6 @@ class MS_Template():
         return Sample_Annot_df
 
     def __validate_Sample_Annot_sheet(self,sheetname,Sample_Annot_df):
-        # Validate the Sample_Annot sheet has data when normalization is performed
-        if self.__doing_normalization:
-            self.__check_if_df_is_empty(sheetname,Sample_Annot_df)
 
         # Check if "Raw_Data_File_Name" exists as a header in Sample_Annot_df
         # If yes, give an error and ask the user to use the latest version of
@@ -402,9 +421,10 @@ class MS_Template():
                 self.__logger.warning('\n{}'.format( Sample_Annot_df[["Data_File_Name","Sample_Name"]][Sample_Annot_df["Data_File_Name"].isna()].to_string(index=False) ) )
                 self.__logger.warning('Ensure that both columns Data_File_Name and Sample_Name are filled for each sample.')
             if self.__ingui:
-                print('There are sample names that are not associated with a data file name. They will not be used during analysis' , flush = True)
-                print(Sample_Annot_df[["Data_File_Name","Sample_Name"]][Sample_Annot_df["Data_File_Name"].isna()].to_string(index=False), flush = True)
-                print('Ensure that both columns Data_File_Name and Sample_Name are filled for each sample.', flush = True)
+                print('There are sample names that are not associated with a data file name. They will not be used during analysis.\n' +
+                      Sample_Annot_df[["Data_File_Name","Sample_Name"]][Sample_Annot_df["Data_File_Name"].isna()].to_string(index=False) + '\n'
+                      'Ensure that both columns Data_File_Name and Sample_Name are filled for each sample.', 
+                      flush = True)
 
         # Check if the column Sample_Name has empty entries and highlight them.
         if(len(Sample_Annot_df[["Data_File_Name","Sample_Name"]][Sample_Annot_df["Sample_Name"].isna()]) > 0):
@@ -413,6 +433,7 @@ class MS_Template():
                 self.__logger.warning('\n{}'.format( Sample_Annot_df[["Data_File_Name","Sample_Name"]][Sample_Annot_df["Sample_Name"].isna()].to_string(index=False) ) )
                 self.__logger.warning('Ensure that both columns Data_File_Name and Sample_Name are filled for each sample.')
             if self.__ingui:
-                print('There are data file names that are not associated with a sample name. They will not be used during analysis' , flush = True)
-                print(Sample_Annot_df[["Data_File_Name","Sample_Name"]][Sample_Annot_df["Sample_Name"].isna()].to_string(index=False), flush = True)
-                print('Ensure that both columns Data_File_Name and Sample_Name are filled for each sample.', flush = True)
+                print('There are data file names that are not associated with a sample name. They will not be used during analysis.\n' +
+                      Sample_Annot_df[["Data_File_Name","Sample_Name"]][Sample_Annot_df["Sample_Name"].isna()].to_string(index=False) + '\n'
+                      'Ensure that both columns Data_File_Name and Sample_Name are filled for each sample.', 
+                      flush = True)

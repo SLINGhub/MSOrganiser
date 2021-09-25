@@ -38,8 +38,10 @@ class ISTD_Operations():
 
         """
 
-        AnnotationList = MS_Template(filepath=filepath,column_name=column_name, logger=logger,ingui=ingui,
-                                     doing_normalization = doing_normalization, allow_multiple_istd = allow_multiple_istd)
+        AnnotationList = MS_Template(filepath=filepath,column_name=column_name, 
+                                     logger=logger,ingui=ingui,
+                                     doing_normalization = doing_normalization, 
+                                     allow_multiple_istd = allow_multiple_istd)
         Transition_Name_Annot_df = AnnotationList.Read_Transition_Name_Annot_Sheet()
         ISTD_Annot_df = AnnotationList.Read_ISTD_Annot_Sheet()
         
@@ -688,17 +690,21 @@ class ISTD_Operations():
         # Data_File_Name group
         unique_Sample_Name_list =  Sample_Annot_df["Sample_Name"].tolist()
         merged_Sample_Name_list = merged_df["Sample_Name"].tolist()
-        unused_Sample_Name_list =  list(set(merged_Sample_Name_list).difference(unique_Sample_Name_list))
+        unused_Sample_Name_list = sorted(list(set(merged_Sample_Name_list).difference(unique_Sample_Name_list)))
         if(len(unused_Sample_Name_list) > 0):
-            for unused_Sample_Name in unused_Sample_Name_list:
-                if logger:
-                    logger.warning('%s is in Sample Name column of the raw data set but it is not in the Sample_Name column of Sample Annotation file', str(unused_Sample_Name))
-                if ingui:
-                    print(str(unused_Sample_Name) + ' is in Sample Name column of the raw data set but it is not in the Sample_Name column of Sample Annotation file' ,flush=True)
             if logger:
-                logger.warning('Check that these sample names are in the Sample Annotation file. Make sure the corresponding Data_File_Name is correct.')
+                logger.warning('There are Sample Names in the input raw data set that is ' +
+                               'not in the Sample_Name column of the Sample Annotation sheet.\n' +
+                               "\n".join(unused_Sample_Name_list) + '\n' +
+                               'Check that these sample names are in the Sample Annotation file. ' +
+                               'Make sure the corresponding Data_File_Name is correct.')
             if ingui:
-                print('Check that these sample names are in the Sample Annotation file. Make sure the corresponding Data_File_Name is correct.' ,flush=True)
+                print('There are Sample Names in the input raw data set that is ' +
+                      'not in the Sample_Name column of the Sample Annotation sheet.\n' +
+                      "\n".join(unused_Sample_Name_list) + '\n' +
+                      'Check that these sample names are in the Sample Annotation file. ' +
+                      'Make sure the corresponding Data_File_Name is correct.',
+                      flush=True)
 
         # Merge it with the Sample_Annot_df so that the order of the Sample_name follows Transition_Name_df
         # We do a left join merge so samples not present in Transition_Name_df will not be used.
