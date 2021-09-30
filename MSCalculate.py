@@ -46,26 +46,28 @@ class ISTD_Operations():
         ISTD_Annot_df = AnnotationList.Read_ISTD_Annot_Sheet()
         
         if not ISTD_Annot_df.empty:
-            #Additional check to ensure each Transition_Name_ISTD in Transition_Name_Annot sheet has 
-            #Also appears in  the ISTD_Annot sheet
+            # Additional check to ensure each Transition_Name_ISTD in Transition_Name_Annot sheet 
+            # also appears in the ISTD_Annot sheet
             ISTD_list_in_Transition_Name_Annot_sheet = list(filter(None,Transition_Name_Annot_df['Transition_Name_ISTD'].unique()))
             ISTD_list_in_Annot_sheet = list(filter(None,ISTD_Annot_df['Transition_Name_ISTD'].unique()))
-            missing_ISTD = set(ISTD_list_in_Transition_Name_Annot_sheet) - set(ISTD_list_in_Annot_sheet)
+            missing_ISTD = sorted(list(set(ISTD_list_in_Transition_Name_Annot_sheet).difference(ISTD_list_in_Annot_sheet)))
             if missing_ISTD:
                 if logger:
-                    logger.warning('There are Transition_Name_ISTD in Transition_Name_Annot not mentioned in ISTD_Annot.')
+                    logger.warning('There are Transition_Name_ISTD in Transition_Name_Annot not mentioned in ISTD_Annot.\n' +
+                                   "\n".join(missing_ISTD) + '\n' +
+                                   'Check that these ISTD are in the ISTD_Annot sheet.'
+                                   )
                 if ingui:
-                    print('There are Transition_Name_ISTD in Transition_Name_Annot not mentioned in ISTD_Annot.',flush=True)
-                for Transition_Name in missing_ISTD:
-                    if logger:
-                        logger.warning('/"%s/"',Transition_Name)
-                    if ingui:
-                        print('\"' + Transition_Name + '\"',flush=True)
-            #Merge the two data frame by common ISTD
-            Transition_Name_Annot_df = pd.merge(Transition_Name_Annot_df, ISTD_Annot_df, on='Transition_Name_ISTD', how='outer')
+                    print('There are Transition_Name_ISTD in Transition_Name_Annot not mentioned in ISTD_Annot.\n' + 
+                          "\n".join(missing_ISTD) + '\n' +
+                          'Check that these ISTD are in the ISTD_Annot sheet.',
+                          flush=True)
+            # Merge the two data frame by common ISTD
+            Transition_Name_Annot_df = pd.merge(Transition_Name_Annot_df, ISTD_Annot_df, 
+                                                on = 'Transition_Name_ISTD', how = 'outer')
 
         if not Transition_Name_Annot_df.empty:
-            #Remove Rows with ISTD with no Transition_Names
+            # Remove Rows with ISTD with no Transition_Names
             Transition_Name_Annot_df = Transition_Name_Annot_df.dropna(subset=['Transition_Name'])
 
         return Transition_Name_Annot_df
@@ -696,13 +698,13 @@ class ISTD_Operations():
                 logger.warning('There are Sample Names in the input raw data set that is ' +
                                'not in the Sample_Name column of the Sample Annotation sheet.\n' +
                                "\n".join(unused_Sample_Name_list) + '\n' +
-                               'Check that these sample names are in the Sample Annotation file. ' +
+                               'Check that these sample names are in the Sample_Annot sheet. ' +
                                'Make sure the corresponding Data_File_Name is correct.')
             if ingui:
                 print('There are Sample Names in the input raw data set that is ' +
                       'not in the Sample_Name column of the Sample Annotation sheet.\n' +
                       "\n".join(unused_Sample_Name_list) + '\n' +
-                      'Check that these sample names are in the Sample Annotation file. ' +
+                      'Check that these sample names are in the Sample_Annot sheet. ' +
                       'Make sure the corresponding Data_File_Name is correct.',
                       flush=True)
 

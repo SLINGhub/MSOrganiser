@@ -4,6 +4,8 @@
 
 * Find a way to make the documentation of the functions of `MSOrganiser` online.
 * Update MSTemplate_Creator changes to the Concentration Unit.
+* Add unit test to check if Sample Annot is empty if we need to calculate concentration
+* Add unit test to check if Sample Annot has duplicate data
 
 ## Completed
 

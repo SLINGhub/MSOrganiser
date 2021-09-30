@@ -46,7 +46,6 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="MSRawData.py" />
-    <Compile Include="tests\testdata\test_ConcatenationRow.py" />
     <Compile Include="tests\test_ConcatenationColumn.py" />
     <Compile Include="tests\test_ConcatenationRow.py" />
     <Compile Include="tests\test_ISTDAnnot.py">
@@ -59,6 +58,7 @@
     <Compile Include="tests\test_SampleAnnot.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="tests\test_TransitionNameAnnot.py" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="cairo_dll\" />
@@ -330,10 +330,7 @@
     <Content Include="README.md" />
     <Content Include="requirements.txt" />
     <Content Include="tests\testdata\CompoundTableForm.csv" />
-    <Content Include="tests\testdata\MessyWideTableForm.csv" />
-    <Content Include="tests\testdata\MessyWideTableForm_ISTDmap.csv" />
     <Content Include="tests\testdata\WideTableForm.csv" />
-    <Content Include="tests\testdata\WideTableForm_ISTDmap.csv" />
     <Content Include="tests\testdata\WideTableForm_Results.xlsx" />
     <Content Include="tests\__pycache__\test_MSCalculate.cpython-36.pyc" />
     <Content Include="tests\__pycache__\test_MSRawData.cpython-36.pyc" />

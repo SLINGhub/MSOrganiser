@@ -2,7 +2,6 @@ import unittest
 import os
 from unittest.mock import patch
 from Annotation import MS_Template
-from MSCalculate import ISTD_Operations
 
 INVALIDSHEETNAME_ANNOTATION = os.path.join(os.path.dirname(__file__),
                                            "testdata", "test_istd_annot", 
@@ -108,8 +107,8 @@ class ISTDAnnot_Test(unittest.TestCase):
             self.assertEqual(cm.exception.code, -1)
 
             # Ensure that the error was due to missing columns
-            mock_print.assert_called_with('Sheet ' + self.valid_sheet_name  + 
-                                          ' is missing the column ' + missing_columns_list[i] + 
+            mock_print.assert_called_with('The ' + self.valid_sheet_name  + 
+                                          ' sheet is missing the column ' + missing_columns_list[i] + 
                                           ' at position ' + missing_columns_position[i] + '.',
                                           flush=True)
 
@@ -176,7 +175,7 @@ class ISTDAnnot_Test(unittest.TestCase):
         """Check if the software is able to check if ISTD Annotation has duplicate ISTD.
 
         * Read the file
-        * If there are duplicate ISTD,
+        * If there are duplicate ISTD, stop the program and inform where the duplicate is.
 
         """
 
@@ -199,10 +198,12 @@ class ISTDAnnot_Test(unittest.TestCase):
 
         # Ensure that the error was due to an invalid Sheet Name
         mock_print.assert_called_with('Data at Transition_Name_ISTD column(s) in the ' +
-                                      'ISTD_Annot sheet has duplicates at row 4, 5.', 
+                                      self.valid_sheet_name + ' ' +
+                                      'sheet has duplicates at row 4, 5.', 
                                       flush = True)
 
     def tearDown(self):
         self.patcher.stop()
+
 if __name__ == '__main__':
     unittest.main()

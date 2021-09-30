@@ -262,7 +262,7 @@ class SampleAnnot_Test(unittest.TestCase):
                                       'not in the Sample_Name column of the Sample Annotation sheet.\n' +
                                       '10_TQC_06\n' +
                                       '4_untreated\n' +
-                                      'Check that these sample names are in the Sample Annotation file. ' +
+                                      'Check that these sample names are in the Sample_Annot sheet. ' +
                                       'Make sure the corresponding Data_File_Name is correct.',
                                       flush=True)
 

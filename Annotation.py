@@ -89,12 +89,12 @@ class MS_Template():
             sys.exit(-1)
 
     def __check_if_df_is_empty(self,sheetname,df):
-        # Validate the Transition_Name_Annot sheet has data
+        # Validate the input sheet has data
         if df.empty:
             if self.__logger:
-                self.__logger.warning('The input ' + sheetname + ' data frame has no data.')
+                self.__logger.warning('The input ' + sheetname + ' sheet has no data.')
             if self.__ingui:
-                print('The input ' + sheetname + ' data frame has no data.',flush=True)
+                print('The input ' + sheetname + ' sheet has no data.',flush=True)
             sys.exit(-1)
 
     def __checkColumns_in_df(self,colname,sheetname,df):
@@ -256,23 +256,23 @@ class MS_Template():
         #Check if the sheet has been tampled
         if worksheet["A2"].value != "Transition_Name_ISTD":
             if self.__logger:
-                self.__logger.error('Sheet ISTD_Annot is missing the column Transition_Name_ISTD at position A2.')
+                self.__logger.error('The ISTD_Annot sheet is missing the column Transition_Name_ISTD at position A2.')
             if self.__ingui:
-                print('Sheet ISTD_Annot is missing the column Transition_Name_ISTD at position A2.',flush=True)
+                print('The ISTD_Annot sheet is missing the column Transition_Name_ISTD at position A2.',flush=True)
             sys.exit(-1)
 
         if worksheet["E3"].value != "ISTD_Conc_[nM]":
             if self.__logger:
-                self.__logger.error('Sheet ISTD_Annot is missing the column ISTD_Conc_[nM] at position E3.')
+                self.__logger.error('The ISTD_Annot sheet is missing the column ISTD_Conc_[nM] at position E3.')
             if self.__ingui:
-                print('Sheet ISTD_Annot is missing the column ISTD_Conc_[nM] at position E3.',flush=True)
+                print('The ISTD_Annot sheet is missing the column ISTD_Conc_[nM] at position E3.',flush=True)
             sys.exit(-1)
 
         if worksheet["F2"].value != "Custom_Unit":
             if self.__logger:
-                self.__logger.error('Sheet ISTD_Annot is missing the column Custom_Unit at position F2.')
+                self.__logger.error('The ISTD_Annot sheet is missing the column Custom_Unit at position F2.')
             if self.__ingui:
-                print('Sheet ISTD_Annot is missing the column Custom_Unit at position F2.',flush=True)
+                print('The ISTD_Annot sheet is missing the column Custom_Unit at position F2.',flush=True)
             sys.exit(-1)
 
         if worksheet["F3"].value in ["[M]","[mM]","[uM]","[nM]","[pM]",
