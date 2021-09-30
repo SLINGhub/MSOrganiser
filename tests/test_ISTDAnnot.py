@@ -32,6 +32,10 @@ INVALIDCUSTOMUNIT_ANNOTATION = os.path.join(os.path.dirname(__file__),
                                             "testdata", "test_istd_annot", 
                                             "WideTableForm_Annotation_InvalidCustomUnit.xlsx")
 
+DUPLICATEISTD_ANNOTATION = os.path.join(os.path.dirname(__file__),
+                                        "testdata", "test_istd_annot", 
+                                        "WideTableForm_Annotation_DuplicateISTD.xlsx")
+
 class ISTDAnnot_Test(unittest.TestCase):
     # See https://realpython.com/lessons/mocking-print-unit-tests/
     # for more details on mock
@@ -168,5 +172,37 @@ class ISTDAnnot_Test(unittest.TestCase):
                                       '[uM] or [umol/L] is invalid.', 
                                       flush=True)
 
+    def test_validation_DuplicateISTD(self):
+        """Check if the software is able to check if ISTD Annotation has duplicate ISTD.
+
+        * Read the file
+        * If there are duplicate ISTD,
+
+        """
+
+        MS_FilePathList = ["WideTableForm.csv"]
+
+        mock_print = self.patcher.start()
+
+        AnnotationList = MS_Template(filepath = DUPLICATEISTD_ANNOTATION,
+                                     column_name = "Area",
+                                     logger = None,
+                                     ingui = True,
+                                     doing_normalization = False, 
+                                     allow_multiple_istd = False)
+
+        with self.assertRaises(SystemExit) as cm:
+            ISTD_Annot_df = AnnotationList.Read_ISTD_Annot_Sheet()
+
+        # Ensure that the system ends with a -1 to indicate an error
+        self.assertEqual(cm.exception.code, -1)
+
+        # Ensure that the error was due to an invalid Sheet Name
+        mock_print.assert_called_with('Data at Transition_Name_ISTD column(s) in the ' +
+                                      'ISTD_Annot sheet has duplicates at row 4, 5.', 
+                                      flush = True)
+
+    def tearDown(self):
+        self.patcher.stop()
 if __name__ == '__main__':
     unittest.main()

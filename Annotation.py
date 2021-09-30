@@ -42,7 +42,7 @@ class MS_Template():
         return df
 
     def __filecheck(self,column_name):
-        #Check if input is blank/None
+        # Check if input is blank/None
         if not self.filepath:
             if self.__logger:
                 self.__logger.error('A ISTD map file is required to perform this calculation: %s', column_name)
@@ -50,7 +50,7 @@ class MS_Template():
                 print('A ISTD map file is required to perform this calculation: ' + column_name,flush=True)
             sys.exit(-1)
 
-        #Check if file exists
+        # Check if file exists
         if not os.path.isfile(self.filepath):
             if self.__logger:
                 self.__logger.error('%s does not exists. Please check the input file',self.filepath)
@@ -66,7 +66,7 @@ class MS_Template():
             sys.exit(-1)
 
     def __readExcelWorkbook(self):
-        #Read the excel file
+        # Read the excel file
         try:
             wb = load_workbook(filename=self.filepath,data_only=True)
         except Exception as e:
@@ -80,7 +80,7 @@ class MS_Template():
         return wb
 
     def __checkExcelWorksheet_in_Workbook(self,sheetname,wb):
-        #Check if the excel file has the sheet sheetname
+        # Check if the excel file has the sheet sheetname
         if sheetname not in wb.sheetnames:
             if self.__logger:
                 self.__logger.error('Sheet name ' + sheetname + ' does not exists. Please check the input excel file.')
@@ -89,7 +89,7 @@ class MS_Template():
             sys.exit(-1)
 
     def __check_if_df_is_empty(self,sheetname,df):
-        #Validate the Transition_Name_Annot sheet has data
+        # Validate the Transition_Name_Annot sheet has data
         if df.empty:
             if self.__logger:
                 self.__logger.warning('The input ' + sheetname + ' data frame has no data.')
@@ -98,7 +98,7 @@ class MS_Template():
             sys.exit(-1)
 
     def __checkColumns_in_df(self,colname,sheetname,df):
-        #Check if the column name exists as a header in the df
+        # Check if the column name exists as a header in the df
         if colname not in df:
             if self.__logger:
                 self.__logger.error('The ' + sheetname  + ' sheet is missing the column ' + colname + '.')
@@ -107,17 +107,17 @@ class MS_Template():
             sys.exit(-1)
 
     def __checkDuplicates_in_cols(self,colname_list,sheetname,df):
-        #Check if Transition_Name column has duplicate Transition_Names
-        #duplicateValues = df[colname].duplicated()
+        # Check if a list of columns in the input df has duplicate data
         duplicateValues = df.duplicated(subset=colname_list)
         if duplicateValues.any():
             duplicatelist = [ str(int(i) + 2)  for i in duplicateValues[duplicateValues==True].index.tolist()]
             if self.__logger:
-                self.__logger.error('The ' + ', '.join(colname_list) + ' in the ' + sheetname + 
-                                    ' sheet has duplicate transition names at row %s', ', '.join(duplicatelist))
+                self.__logger.error('Data at ' + ', '.join(colname_list) + ' column(s) in the ' + sheetname + 
+                                    ' sheet have duplicates at row %s', ', '.join(duplicatelist) + '.')
             if self.__ingui:
-                print('The ' + ', '.join(colname_list) + ' in the ' + sheetname + 
-                      ' sheet has duplicate transition names at row ' + ', '.join(duplicatelist),flush=True)
+                print('Data at ' + ', '.join(colname_list) + ' column(s) in the ' + sheetname + 
+                      ' sheet has duplicates at row ' + ', '.join(duplicatelist) + '.',
+                      flush=True)
             sys.exit(-1)
 
     def Read_Transition_Name_Annot_Sheet(self):
