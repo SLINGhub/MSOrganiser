@@ -275,10 +275,23 @@ class MS_Template():
                 print('Sheet ISTD_Annot is missing the column ISTD_Conc_nM at position E3',flush=True)
             sys.exit(-1)
 
-        #if worksheet["F3"].value not in ["[M]","[mM]","[uM]","[nM]","[pM]",
-        #                                 "[M] or [mmol/mL]", "[mM] or [umol/mL]",
-        #                                 "[uM] or [nmol/mL]", "[nM] or [pmol/mL]",
-        #                                 "[pM] or [fmol/mL]"]:
+        if worksheet["F3"].value in ["[M]","[mM]","[uM]","[nM]","[pM]",
+                                     "[M] or [mmol/mL]", "[mM] or [umol/mL]",
+                                     "[uM] or [nmol/mL]", "[nM] or [pmol/mL]",
+                                     "[pM] or [fmol/mL]"]:
+            if self.__logger:
+                self.__logger.error('Sheet ISTD_Annot Custom_Unit options ' +
+                                     worksheet["F3"].value + " " + 
+                                    'is no longer accepted in MSOrganiser.' +
+                                    'Please use a later version of MSTemplate_Creator (above 1.0.3)')
+            if self.__ingui:
+                print('Sheet ISTD_Annot Custom_Unit options ' +
+                       worksheet["F3"].value + " " + 
+                      'is no longer accepted in MSOrganiser.' +
+                      'Please use a later version of MSTemplate_Creator (above 1.0.3)', 
+                      flush=True)
+            sys.exit(-1)
+
         if worksheet["F3"].value not in ["[M]","[mM]","[uM]","[nM]","[pM]",
                                          "[M] or [umol/uL]", "[mM] or [nmol/uL]",
                                          "[uM] or [pmol/uL]", "[nM] or [fmol/uL]",

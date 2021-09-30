@@ -10,7 +10,7 @@ WIDETABLEFORMROW1_MULTIPLEISTD_FILENAME = os.path.join(os.path.dirname(__file__)
 WIDETABLEFORMROW2_MULTIPLEISTD_FILENAME = os.path.join(os.path.dirname(__file__),"testdata", 
                                           "test_no_concatenate_multipleISTD", "WideTableFormRow2.csv")
 WIDETABLEFORMROW_MULTIPLEISTD_ANNOTATION = os.path.join(os.path.dirname(__file__),"testdata", 
-                                           "test_no_concatenate_multipleISTD", "WideTableFormRow_Annotation.xlsm")
+                                           "test_no_concatenate_multipleISTD", "WideTableFormRow_Annotation.xlsx")
 WIDETABLEFORMROW1_MULTIPLEISTD_RESULTS_FILENAME = os.path.join(os.path.dirname(__file__),"testdata", 
                                                                "test_no_concatenate_multipleISTD", "WideTableFormRow1_Results.xlsx")
 WIDETABLEFORMROW1_MULTIPLEISTD_RESULTS_TRANSPOSE_FILENAME = os.path.join(os.path.dirname(__file__),"testdata", 
@@ -26,7 +26,7 @@ WIDETABLEFORMROW1_FILENAME = os.path.join(os.path.dirname(__file__),"testdata",
 WIDETABLEFORMROW2_FILENAME = os.path.join(os.path.dirname(__file__),"testdata", 
                                           "test_no_concatenate", "WideTableFormRow2.csv")
 WIDETABLEFORMROW_ANNOTATION = os.path.join(os.path.dirname(__file__),"testdata", 
-                                           "test_no_concatenate", "WideTableFormRow_Annotation.xlsm")
+                                           "test_no_concatenate", "WideTableFormRow_Annotation.xlsx")
 WIDETABLEFORMROW1_RESULTS_FILENAME = os.path.join(os.path.dirname(__file__),"testdata", 
                                                   "test_no_concatenate", "WideTableFormRow1_Results.xlsx")
 WIDETABLEFORMROW1_RESULTS_TRANSPOSE_FILENAME = os.path.join(os.path.dirname(__file__),"testdata", 

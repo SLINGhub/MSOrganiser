@@ -6,21 +6,21 @@ from MSAnalysis import MS_Analysis
 from MSOrganiser import concatenate_along_rows_workflow
 
 WIDETABLEFORM_FILENAME = os.path.join(os.path.dirname(__file__),"testdata", 'WideTableForm.csv')
-WIDETABLEFORM_ANNOTATION = os.path.join(os.path.dirname(__file__),"testdata", 'WideTableForm_Annotation.xlsm')
+WIDETABLEFORM_ANNOTATION = os.path.join(os.path.dirname(__file__),"testdata", 'WideTableForm_Annotation.xlsx')
 WIDETABLEFORM_RESULTS_FILENAME = os.path.join(os.path.dirname(__file__),"testdata", 'WideTableForm_Results.xlsx')
 WIDETABLEFORM_LONGTABLE_FILENAME = os.path.join(os.path.dirname(__file__),"testdata", 'WideTableForm_LongTable.xlsx')
 WIDETABLEFORM_LONGTABLE_WITH_ANNOT_FILENAME = os.path.join(os.path.dirname(__file__),"testdata", 'WideTableForm_LongTable_with_Annot.xlsx')
 
 LARGE_WIDETABLEFORM_FILENAME = os.path.join(os.path.dirname(__file__),"testdata", 'LargeTestData.csv')
-LARGE_WIDETABLEFORM_ANNOTATION = os.path.join(os.path.dirname(__file__),"testdata", 'LargeTestData_Annotation.xlsm')
+LARGE_WIDETABLEFORM_ANNOTATION = os.path.join(os.path.dirname(__file__),"testdata", 'LargeTestData_Annotation.xlsx')
 LARGE_WIDETABLEFORM_RESULTS_FILENAME = os.path.join(os.path.dirname(__file__),"testdata", 'LargeTestData_Results.xlsx')
 
 COMPOUNDTABLEFORM_FILENAME = os.path.join(os.path.dirname(__file__),"testdata", 'CompoundTableForm.csv')
-COMPOUNDTABLEFORM_ANNOTATION = os.path.join(os.path.dirname(__file__),"testdata", 'CompoundTableForm_Annotation.xlsm')
+COMPOUNDTABLEFORM_ANNOTATION = os.path.join(os.path.dirname(__file__),"testdata", 'CompoundTableForm_Annotation.xlsx')
 COMPOUNDTABLEFORM_RESULTS_FILENAME = os.path.join(os.path.dirname(__file__),"testdata", 'CompoundTableForm_Results.xlsx')
 
 SCIEX_FILENAME = os.path.join(os.path.dirname(__file__),"testdata", 'SciExTestData.txt')
-SCIEX_ANNOTATION = os.path.join(os.path.dirname(__file__),"testdata", 'SciExTestData_Annotation.xlsm')
+SCIEX_ANNOTATION = os.path.join(os.path.dirname(__file__),"testdata", 'SciExTestData_Annotation.xlsx')
 SCIEX_RESULTS_FILENAME = os.path.join(os.path.dirname(__file__),"testdata", 'SciExTestData_Results.xlsx')
 
 class Agilent_Test(unittest.TestCase):

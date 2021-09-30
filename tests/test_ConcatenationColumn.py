@@ -13,7 +13,7 @@ WIDETABLEFORMCOLUMN1_MULTIPLEISTD_FILENAME = os.path.join(os.path.dirname(__file
 WIDETABLEFORMCOLUMN2_MULTIPLEISTD_FILENAME = os.path.join(os.path.dirname(__file__),"testdata", 
                                              "test_concatenate_column_multipleISTD", "WideTableFormColumn2.csv")
 WIDETABLEFORMCOLUMN_MULTIPLEISTD_ANNOTATION = os.path.join(os.path.dirname(__file__),"testdata", 
-                                              "test_concatenate_column_multipleISTD", "WideTableFormColumn_Annotation.xlsm")
+                                              "test_concatenate_column_multipleISTD", "WideTableFormColumn_Annotation.xlsx")
 WIDETABLEFORMCOLUMN_MULTIPLEISTD_CONCATENATERESULTS_FILENAME = os.path.join(os.path.dirname(__file__),"testdata", 
                                                                "test_concatenate_column_multipleISTD", 
                                                                "WideTableFormColumn_ConcatenateResults.xlsx")
@@ -32,7 +32,7 @@ WIDETABLEFORMCOLUMN1_FILENAME = os.path.join(os.path.dirname(__file__),"testdata
 WIDETABLEFORMCOLUMN2_FILENAME = os.path.join(os.path.dirname(__file__),"testdata", 
                                              "test_concatenate_column", "WideTableFormColumn2.csv")
 WIDETABLEFORMCOLUMN_ANNOTATION = os.path.join(os.path.dirname(__file__),"testdata", 
-                                              "test_concatenate_column", "WideTableFormColumn_Annotation.xlsm")
+                                              "test_concatenate_column", "WideTableFormColumn_Annotation.xlsx")
 WIDETABLEFORMCOLUMN_CONCATENATERESULTS_FILENAME = os.path.join(os.path.dirname(__file__),"testdata", 
                                                                "test_concatenate_column", "WideTableFormColumn_ConcatenateResults.xlsx")
 WIDETABLEFORMCOLUMN_CONCATENATERESULTS_TRANSPOSE_FILENAME = os.path.join(os.path.dirname(__file__),"testdata", 
