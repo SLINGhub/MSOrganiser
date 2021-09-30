@@ -63,7 +63,6 @@ class MSDataReport_PDF(MSDataReport):
 
     Note:
         Make sure that the directory msreport is in the same directory as this code
-        See for more info https://pbpython.com/pdf-reports.html on creating html template
     """
 
     def __init__(self, output_directory, input_file_path, 

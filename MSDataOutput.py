@@ -201,22 +201,14 @@ class MSDataOutput_Excel(MSDataOutput):
 
         #Set options for excel to not turn strings into formulas
         #From https://stackoverflow.com/questions/54094172/file-corruption-while-writing-using-pandas
-        #options = {}
-        #options['strings_to_formulas'] = False
-        #options['strings_to_urls'] = False
-
-        #From https://stackoverflow.com/questions/68505077/pandas-to-excel-using-xlsx-writer-constant-memory-in-memory
+        options = {}
+        options['strings_to_formulas'] = False
+        options['strings_to_urls'] = False
 
         self.writer = os.path.join(self.output_directory, self.output_filename + '_' +  self.result_name + '.xlsx' )
 
         try:
-            self.writer = pd.ExcelWriter(self.writer, engine = 'openpyxl', 
-                                         #options = options,
-                                         engine_kwargs = {'options': {'strings_to_formulas': False,
-                                                                      'strings_to_urls' : False
-                                                                      }
-                                                         }
-                                         )
+            self.writer = pd.ExcelWriter(self.writer, engine = 'openpyxl', options = options)
             #self.writer = pd.ExcelWriter(self.writer, engine = 'xlsxwriter', options = options)
         except UserWarning as w:
             if self.logger:

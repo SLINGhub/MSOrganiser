@@ -275,14 +275,10 @@ class MS_Template():
                 print('Sheet ISTD_Annot is missing the column ISTD_Conc_nM at position E3',flush=True)
             sys.exit(-1)
 
-        #if worksheet["F3"].value not in ["[M]","[mM]","[uM]","[nM]","[pM]",
-        #                                 "[M] or [mmol/mL]", "[mM] or [umol/mL]",
-        #                                 "[uM] or [nmol/mL]", "[nM] or [pmol/mL]",
-        #                                 "[pM] or [fmol/mL]"]:
         if worksheet["F3"].value not in ["[M]","[mM]","[uM]","[nM]","[pM]",
-                                         "[M] or [umol/uL]", "[mM] or [nmol/uL]",
-                                         "[uM] or [pmol/uL]", "[nM] or [fmol/uL]",
-                                         "[pM] or [amol/uL]"]:
+                                         "[M] or [mmol/mL]", "[mM] or [umol/mL]",
+                                         "[uM] or [nmol/mL]", "[nM] or [pmol/mL]",
+                                         "[pM] or [fmol/mL]"]:
             if self.__logger:
                 self.__logger.error('Sheet ISTD_Annot Custom_Unit options %s is invalid', worksheet["F3"].value)
             if self.__ingui:
