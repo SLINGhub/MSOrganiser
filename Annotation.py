@@ -83,9 +83,9 @@ class MS_Template():
         #Check if the excel file has the sheet sheetname
         if sheetname not in wb.sheetnames:
             if self.__logger:
-                self.__logger.error('Sheet name ' + sheetname + ' does not exists. Please check the input excel file')
+                self.__logger.error('Sheet name ' + sheetname + ' does not exists. Please check the input excel file.')
             if self.__ingui:
-                print('Sheet name ' + sheetname + ' does not exists. Please check the input excel file',flush=True)
+                print('Sheet name ' + sheetname + ' does not exists. Please check the input excel file.',flush=True)
             sys.exit(-1)
 
     def __check_if_df_is_empty(self,sheetname,df):
@@ -196,13 +196,13 @@ class MS_Template():
         Returns:
             ISTD_Annot_df (pandas DataFrame): A panda data frame containing the contents of ISTD_Annot
         Note:
-            Transition_Name_ISTD and ISTD_Conc_[nM] are the only columns taken
+            Transition_Name_ISTD, ISTD_Conc_[nM] and Custom Unit are the only columns taken
         """
 
         #Open the excel file
         wb = self.__readExcelWorkbook()
 
-        #Check if the excel file has the sheet "Transition_Name_Annot"
+        #Check if the excel file has the sheet "ISTD_Annot"
         self.__checkExcelWorksheet_in_Workbook("ISTD_Annot",wb)
         
         #Convert worksheet to a dataframe
@@ -256,23 +256,23 @@ class MS_Template():
         #Check if the sheet has been tampled
         if worksheet["A2"].value != "Transition_Name_ISTD":
             if self.__logger:
-                self.__logger.error('Sheet ISTD_Annot is missing the column Transition_Name_ISTD at position A2')
+                self.__logger.error('Sheet ISTD_Annot is missing the column Transition_Name_ISTD at position A2.')
             if self.__ingui:
-                print('Sheet ISTD_Annot is missing the column Transition_Name_ISTD at position A2',flush=True)
+                print('Sheet ISTD_Annot is missing the column Transition_Name_ISTD at position A2.',flush=True)
             sys.exit(-1)
 
         if worksheet["E3"].value != "ISTD_Conc_[nM]":
             if self.__logger:
-                self.__logger.error('Sheet ISTD_Annot is missing the column ISTD_Conc_nM at position E3')
+                self.__logger.error('Sheet ISTD_Annot is missing the column ISTD_Conc_[nM] at position E3.')
             if self.__ingui:
-                print('Sheet ISTD_Annot is missing the column ISTD_Conc_nM at position E3',flush=True)
+                print('Sheet ISTD_Annot is missing the column ISTD_Conc_[nM] at position E3.',flush=True)
             sys.exit(-1)
 
         if worksheet["F2"].value != "Custom_Unit":
             if self.__logger:
-                self.__logger.error('Sheet ISTD_Annot is missing the column Custom_Unit at position F2')
+                self.__logger.error('Sheet ISTD_Annot is missing the column Custom_Unit at position F2.')
             if self.__ingui:
-                print('Sheet ISTD_Annot is missing the column ISTD_Conc_nM at position E3',flush=True)
+                print('Sheet ISTD_Annot is missing the column Custom_Unit at position F2.',flush=True)
             sys.exit(-1)
 
         if worksheet["F3"].value in ["[M]","[mM]","[uM]","[nM]","[pM]",
@@ -280,15 +280,15 @@ class MS_Template():
                                      "[uM] or [nmol/mL]", "[nM] or [pmol/mL]",
                                      "[pM] or [fmol/mL]"]:
             if self.__logger:
-                self.__logger.error('Sheet ISTD_Annot Custom_Unit options ' +
-                                     worksheet["F3"].value + " " + 
-                                    'is no longer accepted in MSOrganiser.' +
-                                    'Please use a later version of MSTemplate_Creator (above 1.0.3)')
+                self.__logger.error('Sheet ISTD_Annot\'s column Custom_Unit option ' +
+                                     worksheet["F3"].value + ' ' + 
+                                    'is no longer accepted in MSOrganiser. ' +
+                                    'Please use a later version of MSTemplate_Creator (above 1.0.3).')
             if self.__ingui:
-                print('Sheet ISTD_Annot Custom_Unit options ' +
-                       worksheet["F3"].value + " " + 
-                      'is no longer accepted in MSOrganiser.' +
-                      'Please use a later version of MSTemplate_Creator (above 1.0.3)', 
+                print('Sheet ISTD_Annot\'s column Custom_Unit option ' +
+                       worksheet["F3"].value + ' ' + 
+                      'is no longer accepted in MSOrganiser. ' +
+                      'Please use a later version of MSTemplate_Creator (above 1.0.3).', 
                       flush=True)
             sys.exit(-1)
 
@@ -297,9 +297,12 @@ class MS_Template():
                                          "[uM] or [pmol/uL]", "[nM] or [fmol/uL]",
                                          "[pM] or [amol/uL]"]:
             if self.__logger:
-                self.__logger.error('Sheet ISTD_Annot Custom_Unit options %s is invalid', worksheet["F3"].value)
+                self.__logger.error('Sheet ISTD_Annot\'s column Custom_Unit option ' +
+                                    worksheet["F3"].value + ' is invalid.')
             if self.__ingui:
-                print('Sheet ISTD_Annot Custom_Unit options ' + worksheet["F3"].value + ' is invalid', flush=True)
+                print('Sheet ISTD_Annot\'s column Custom_Unit option ' +
+                      worksheet["F3"].value + ' is invalid.', 
+                      flush=True)
             sys.exit(-1)
 
     def Read_Sample_Annot_Sheet(self,MS_FilePathList=[]):

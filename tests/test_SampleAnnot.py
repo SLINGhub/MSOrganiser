@@ -93,7 +93,7 @@ class SampleAnnot_Test(unittest.TestCase):
 
         # Ensure that the error was due to an invalid Sheet Name
         mock_print.assert_called_with('Sheet name ' + self.valid_sheet_name + ' does not exists.' + 
-                                      ' Please check the input excel file', 
+                                      ' Please check the input excel file.', 
                                       flush = True)
 
     def test_validation_RawDataFileName(self):
