@@ -164,10 +164,14 @@ class ISTD_Operations():
                     print('\"' + things + '\"',flush=True)
 
         if "!Blank Transition_Name_ISTD in map file" in ISTD_report['Transition_Name_ISTD'].unique():
+            bad_input_list = ISTD_report.loc[ ISTD_report['Transition_Name_ISTD'] == "!Blank Transition_Name_ISTD in map file" , 'Transition_Name' ]
+            if logger:
+                logger.warning("There are Transition_Names in data set mentioned in the Transition_Name_Annot sheet but have a blank Transition_Name_ISTD.\n" + 
+                               '\n'.join(f'"{bad_input}"' for bad_input in bad_input_list))
             if ingui:
-                print("There are Transition_Names in data set mentioned in the Transition_Name_Annot sheet but have a blank Transition_Name_ISTD.",flush=True)
-                for things in ISTD_report.loc[ ISTD_report['Transition_Name_ISTD'] == "!Blank Transition_Name_ISTD in map file" , 'Transition_Name' ]:
-                    print('\"' + things + '\"',flush=True)
+                print("There are Transition_Names in data set mentioned in the Transition_Name_Annot sheet but have a blank Transition_Name_ISTD.\n" + 
+                      '\n'.join(f'"{bad_input}"' for bad_input in bad_input_list),
+                      flush=True)
 
         if "!Missing Transition_Name_ISTD in data" in ISTD_report['Transition_Name_ISTD'].unique():
             if ingui:
@@ -241,14 +245,14 @@ class ISTD_Operations():
 
         """
 
-        #Get the mapping of one Transition_Name to exactly one ISTD
+        # Get the mapping of one Transition_Name to exactly one ISTD
         ISTD_list = Transition_Name_Annot_df.loc[Transition_Name_Annot_df['Transition_Name']==x.name,"Transition_Name_ISTD"].tolist()
 
         #print(x.name)
         #print(ISTD_list)
 
         if not ISTD_list:
-            #ISTD_list None
+            # ISTD_list None
             if logger:
                 logger.warning("%s is not found in the Transition_Name_Annot sheet. Please check ISTD map file",x.name)
             Transition_Name_dict[x.name] = None
@@ -256,42 +260,43 @@ class ISTD_Operations():
             return
 
         if allow_multiple_istd:
-            #Check if each ISTD in the ISTD_List is valid
+            # Check if each ISTD in the ISTD_List is valid
             valid_ISTD = []
-            for ISTD_index,ISTD in enumerate(ISTD_list):
+            # There is no need to get the index as cases
+            # Transtion_Name Transition_Name_ISTD
+            #       LPC 18:0
+            #       LPC 18:0
+            # Will give an error because of duplicate rows in
+            # Annotation.py __validate_Transition_Name_Annot_sheet function
+            for ISTD in ISTD_list:
                 if ISTD is None:
-                    #ISTD may be None
-                    if logger:
-                        logger.warning("%s number %s has a blank internal standard. Please check ISTD map file",
-                                       x.name, str(ISTD_index+1))
-                    #if ingui:
-                    #    print(x.name + " number " +  str(ISTD_index+1) +
-                    #          " has a blank internal standard. Please check ISTD map file", flush=True)
+                    # ISTD may be None
                     #Append an empty ISTD, this is not done if we do not allow multiple ISTD
                     valid_ISTD.append("")
                     ISTD_report_list.append(("!Blank Transition_Name_ISTD in map file", x.name))
                 elif not isinstance(ISTD,float):
-                    #When we have a valid ISTD
+                    # When we have a valid ISTD
                     valid_ISTD.append(ISTD)
                     ISTD_report_list.append((ISTD,x.name))
                 elif np.isnan(ISTD):
-                    #Value may be nan which is a type float
-                    if logger:
-                        logger.warning("%s number %s has a blank internal standard. Please check ISTD map file",
-                                       x.name, str(ISTD_index+1))
+                    # Value may be [nan] which is a type float
+                    # Unfortunately, this must be the last condition
+                    # else it gives an error
+                    # TypeError: ufunc 'isnan' not supported for the input types, and the inputs could not 
+                    # be safely coerced to any supported types according to the casting rule ''safe''
                     ISTD_report_list.append(("!Blank Transition_Name_ISTD in map file",x.name))
                 else:
                     if logger:
-                        logger.warning("%s has an invalid Transition_Name_ISTD of %s. Please check ISTD map file",x.name,str(ISTD))
-                    #if ingui:
-                    #    print(x.name + " has an invalid Transition_Name_ISTD of " + str(ISTD) + ". Please check ISTD map file",flush=True)
-                    #sys.exit(-1)
+                        logger.error("%s has an invalid Transition_Name_ISTD of %s. Please check ISTD map file",x.name,str(ISTD))
+                    if ingui:
+                        print(x.name + " has an invalid Transition_Name_ISTD of " + str(ISTD) + ". Please check ISTD map file",flush=True)
+                    sys.exit(-1)
             Transition_Name_dict[x.name] = valid_ISTD
             return
 
         if len(ISTD_list) > 1:
-            #If do not allow this, give a warning and do not set the dict entry to be None to prevent
-            #this transition from being normalised
+            # If do not allow this, give a warning and do not set the dict entry to be None to prevent
+            # this transition from being normalised
             if logger:
                 logger.warning("%s has duplicates or multiple internal standards. %s Please check ISTD map file",x.name," ".join(ISTD_list))
             if ingui:
@@ -299,24 +304,24 @@ class ISTD_Operations():
             ISTD_report_list.append(("!Duplicate Transition_Name_ISTD in map file",x.name))
             Transition_Name_dict[x.name] = None
         elif ISTD_list[0] is None:
-            #ISTD_list may be [None]
-            if logger:
-                logger.warning("%s has a blank internal standard. Please check ISTD map file",x.name)
+            # ISTD_list may be [None]
             Transition_Name_dict[x.name] = None
             ISTD_report_list.append(("!Blank Transition_Name_ISTD in map file",x.name))
         elif not isinstance(ISTD_list[0],float):
-            #When we have only one valid ISTD
+            # When we have only one valid ISTD
             Transition_Name_dict[x.name] = ISTD_list[0]
             ISTD_report_list.append((ISTD_list[0],x.name))
         elif np.isnan(ISTD_list[0]):
-            #Value may be [nan]
-            if logger:
-                logger.warning("%s has a blank internal standard. Please check ISTD map file",x.name)
+            # Value may be [nan] which is a type float
+            # Unfortunately, this must be the last condition
+            # else it gives an error
+            # TypeError: ufunc 'isnan' not supported for the input types, and the inputs could not 
+            # be safely coerced to any supported types according to the casting rule ''safe''
             Transition_Name_dict[x.name] = None
             ISTD_report_list.append(("!Blank Transition_Name_ISTD in map file",x.name))
         else:
             if logger:
-                logger.warning("%s has an invalid Transition_Name_ISTD of %s. Please check ISTD map file",x.name,str(ISTD_list[0]))
+                logger.error("%s has an invalid Transition_Name_ISTD of %s. Please check ISTD map file",x.name,str(ISTD_list[0]))
             if ingui:
                 print(x.name + " has an invalid Transition_Name_ISTD of " + str(ISTD_list[0]) + ". Please check ISTD map file",flush=True)
             sys.exit(-1)

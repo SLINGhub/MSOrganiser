@@ -3,6 +3,7 @@ import os
 from unittest.mock import patch
 from Annotation import MS_Template
 from MSCalculate import ISTD_Operations
+from MSAnalysis import MS_Analysis
 
 INVALIDSHEETNAME_ANNOTATION = os.path.join(os.path.dirname(__file__),
                                            "testdata", "test_transition_annot", 
@@ -32,9 +33,21 @@ DUPLICATEDATA_MULTIPLEISTD_ANNOTATION = os.path.join(os.path.dirname(__file__),
                                                      "testdata", "test_transition_annot", 
                                                      "WideTableForm_Annotation_DuplicateData_MultipleISTD.xlsx")
 
-WIDETABLEFORM_ANNOTATION_WITH_MISSING_ISTD = os.path.join(os.path.dirname(__file__),
-                                                          "testdata", "test_transition_annot", 
-                                                          "WideTableForm_Annotation_WithMissingISTD.xlsx")
+WIDETABLEFORM_ANNOTATION_WITH_ISTD_NOT_IN_ISTD_ANNOT = os.path.join(os.path.dirname(__file__),
+                                                                    "testdata", "test_transition_annot", 
+                                                                    "WideTableForm_Annotation_ISTD_not_in_ISTDAnnot.xlsx")
+
+WIDETABLEFORM_FILENAME = os.path.join(os.path.dirname(__file__),
+                                      "testdata", "test_transition_annot",
+                                      "WideTableForm.csv")
+
+BLANKTRANSITIONNAMEISTD_ANNOTATION = os.path.join(os.path.dirname(__file__),
+                                                  "testdata", "test_transition_annot", 
+                                                  "WideTableForm_Annotation_BlankTransitionNameISTD.xlsx")
+
+BLANKTRANSITIONNAMEISTD_MULTIPLEISTD_ANNOTATION = os.path.join(os.path.dirname(__file__),
+                                                               "testdata", "test_transition_annot", 
+                                                               "WideTableForm_Annotation_BlankTransitionNameISTD_MultipleISTD.xlsx")
 
 class TransitionNameAnnot_Test(unittest.TestCase):
     # See https://realpython.com/lessons/mocking-print-unit-tests/
@@ -231,11 +244,11 @@ class TransitionNameAnnot_Test(unittest.TestCase):
                                       flush = True)
 
     def test_warn_ISTD_in_Transition_Name_Annot_but_not_in_ISTD_Annot(self):
-        """Check if the software is able to check if the Transition Name Annotation file has
-           duplicate data. 
+        """Check if the software is able to warn if the ISTD in the 
+           Transition_Name_Annot sheet is absent in the ISTD_Annot sheet 
 
         * Read the file
-        * Highlight the presence of duplicate Transition Name if multiple ISTD is not allowed
+        * Warn if the ISTD in the Transition_Name_Annot sheet is absent in the ISTD_Annot sheet
 
         """
 
@@ -245,17 +258,87 @@ class TransitionNameAnnot_Test(unittest.TestCase):
         self.patcher = patch('MSCalculate.print')
         mock_print = self.patcher.start()
 
-        Transition_Name_Annot_df = ISTD_Operations.read_ISTD_map(filepath = WIDETABLEFORM_ANNOTATION_WITH_MISSING_ISTD,
+        Transition_Name_Annot_df = ISTD_Operations.read_ISTD_map(filepath = WIDETABLEFORM_ANNOTATION_WITH_ISTD_NOT_IN_ISTD_ANNOT,
                                                                  column_name = "Area",
                                                                  logger = None, ingui = True,
                                                                  doing_normalization = False, 
                                                                  allow_multiple_istd = False)
 
-        # Ensure that the error was due to missing columns
+        # Ensure that the warning was due to some Transition_Name_ISTD in Transition_Name_Annot not mentioned in ISTD_Annot
         mock_print.assert_called_with('There are Transition_Name_ISTD in Transition_Name_Annot not mentioned in ISTD_Annot.\n' + 
                                       "\n".join(missing_ISTD) + '\n' +
                                       'Check that these ISTD are in the ISTD_Annot sheet.',
                                       flush=True)
+
+    def test_warn_BlankISTD(self):
+        """Check if the software is able to warn if there are transition names with blank ISTD
+
+        * Read the file
+        * Warn if there are transition names with blank ISTD
+        """
+        MS_FilePathList = ["WideTableForm.csv"]
+
+        self.patcher = patch('MSCalculate.print')
+        mock_print = self.patcher.start()
+
+        # No Multiple ISTD Annotation Case
+
+        MyWideData = MS_Analysis(MS_FilePath = WIDETABLEFORM_FILENAME,
+                                 MS_FileType = 'Agilent Wide Table in csv',
+                                 Annotation_FilePath = BLANKTRANSITIONNAMEISTD_ANNOTATION,
+                                 ingui = True)
+
+        Area_df = MyWideData._get_Area_df_for_normalisation(using_multiple_input_files = False)
+
+        
+        Transition_Name_Annot_df = ISTD_Operations.read_ISTD_map(filepath = BLANKTRANSITIONNAMEISTD_ANNOTATION, 
+                                                                 column_name = "Area",
+                                                                 logger = None, ingui = True,
+                                                                 doing_normalization = False, 
+                                                                 allow_multiple_istd = False)
+
+        [ISTD_report,Transition_Name_dict] = ISTD_Operations.create_Transition_Name_dict(Transition_Name_df = Area_df,
+                                                                                         Transition_Name_Annot_df = Transition_Name_Annot_df,
+                                                                                         logger = False, 
+                                                                                         ingui = True,
+                                                                                         allow_multiple_istd = False)
+
+        # Ensure that the warning was due to some transition names not having a blank ISTD
+        mock_print.assert_called_with('There are Transition_Names in data set mentioned in the ' +
+                                      'Transition_Name_Annot sheet but have a blank Transition_Name_ISTD.\n' +
+                                      '\"LPC 18:0\"\n' + 
+                                      '\"MHC d18:1/24:1\"', 
+                                      flush = True)
+        # Multiple ISTD Annotation Case
+
+        MyWideData = MS_Analysis(MS_FilePath = WIDETABLEFORM_FILENAME,
+                                 MS_FileType = 'Agilent Wide Table in csv',
+                                 Annotation_FilePath = BLANKTRANSITIONNAMEISTD_MULTIPLEISTD_ANNOTATION ,
+                                 ingui = True)
+
+        Area_df = MyWideData._get_Area_df_for_normalisation(using_multiple_input_files = False)
+
+        
+        Transition_Name_Annot_df = ISTD_Operations.read_ISTD_map(filepath = BLANKTRANSITIONNAMEISTD_MULTIPLEISTD_ANNOTATION, 
+                                                                 column_name = "Area",
+                                                                 logger = None, ingui = True,
+                                                                 doing_normalization = False, 
+                                                                 allow_multiple_istd = True)
+
+        [ISTD_report,Transition_Name_dict] = ISTD_Operations.create_Transition_Name_dict(Transition_Name_df = Area_df,
+                                                                                         Transition_Name_Annot_df = Transition_Name_Annot_df,
+                                                                                         logger = False, 
+                                                                                         ingui = True,
+                                                                                         allow_multiple_istd = True)
+
+        # Ensure that the warning was due to some transition names not having a blank ISTD
+        mock_print.assert_called_with('There are Transition_Names in data set mentioned in the ' +
+                                      'Transition_Name_Annot sheet but have a blank Transition_Name_ISTD.\n' +
+                                      '\"LPC 18:0\"\n' + 
+                                      '\"LPC 18:1\"\n' + 
+                                      '\"MHC d18:1/24:1\"', 
+                                      flush = True)
+
 
     def tearDown(self):
         self.patcher.stop()
