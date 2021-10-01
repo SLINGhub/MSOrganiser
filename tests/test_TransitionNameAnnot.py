@@ -49,6 +49,14 @@ BLANKTRANSITIONNAMEISTD_MULTIPLEISTD_ANNOTATION = os.path.join(os.path.dirname(_
                                                                "testdata", "test_transition_annot", 
                                                                "WideTableForm_Annotation_BlankTransitionNameISTD_MultipleISTD.xlsx")
 
+WIDETABLEFORM_ANNOTATION_WITH_TRANSITIONNAME_ONLY_IN_RAWDATA = os.path.join(os.path.dirname(__file__),
+                                                                            "testdata", "test_transition_annot", 
+                                                                            "WideTableForm_Annotation_TransitionName_only_in_InputData.xlsx")
+
+WIDETABLEFORM_ANNOTATION_NOMULTIPLEISTD_ALLOWED = os.path.join(os.path.dirname(__file__),
+                                                               "testdata", "test_transition_annot", 
+                                                               "WideTableForm_Annotation_NoMultipleISTD_allowed.xlsx")
+
 class TransitionNameAnnot_Test(unittest.TestCase):
     # See https://realpython.com/lessons/mocking-print-unit-tests/
     # for more details on mock
@@ -304,7 +312,7 @@ class TransitionNameAnnot_Test(unittest.TestCase):
                                                                                          allow_multiple_istd = False)
 
         # Ensure that the warning was due to some transition names not having a blank ISTD
-        mock_print.assert_called_with('There are Transition_Names in data set mentioned in the ' +
+        mock_print.assert_called_with('There are Transition_Names mentioned in the ' +
                                       'Transition_Name_Annot sheet but have a blank Transition_Name_ISTD.\n' +
                                       '\"LPC 18:0\"\n' + 
                                       '\"MHC d18:1/24:1\"', 
@@ -338,6 +346,76 @@ class TransitionNameAnnot_Test(unittest.TestCase):
                                       '\"LPC 18:1\"\n' + 
                                       '\"MHC d18:1/24:1\"', 
                                       flush = True)
+
+    def test_warn_TransitionName_in_Input_Data_but_not_in_Transition_Name_Annot(self):
+        """Check if the software is able to warn if there are transition names in the 
+           input data but not in the Transition_Name_Annot sheet
+
+        * Read the file
+        * Warn if there are transition names in the input data but not in the Transition_Name_Annot sheet
+        """
+
+        MS_FilePathList = ["WideTableForm.csv"]
+
+        self.patcher = patch('MSCalculate.print')
+        mock_print = self.patcher.start()
+
+        # No Multiple ISTD Annotation Case
+
+        MyWideData = MS_Analysis(MS_FilePath = WIDETABLEFORM_FILENAME,
+                                 MS_FileType = 'Agilent Wide Table in csv',
+                                 Annotation_FilePath = WIDETABLEFORM_ANNOTATION_WITH_TRANSITIONNAME_ONLY_IN_RAWDATA ,
+                                 ingui = True)
+
+        Area_df = MyWideData._get_Area_df_for_normalisation(using_multiple_input_files = False)
+
+        
+        Transition_Name_Annot_df = ISTD_Operations.read_ISTD_map(filepath = WIDETABLEFORM_ANNOTATION_WITH_TRANSITIONNAME_ONLY_IN_RAWDATA , 
+                                                                 column_name = "Area",
+                                                                 logger = None, ingui = True,
+                                                                 doing_normalization = False, 
+                                                                 allow_multiple_istd = False)
+
+        [ISTD_report,Transition_Name_dict] = ISTD_Operations.create_Transition_Name_dict(Transition_Name_df = Area_df,
+                                                                                         Transition_Name_Annot_df = Transition_Name_Annot_df,
+                                                                                         logger = False, 
+                                                                                         ingui = True,
+                                                                                         allow_multiple_istd = False)
+
+        # Ensure that the warning was due to some transition names not having a blank ISTD
+        mock_print.assert_called_with('There are transitions in the input data set not mentioned ' + 
+                                      'in the Transition_Name column of the Transition_Name_Annot sheet.\n' +
+                                      '\"LPC 20:0 (IS)\"\n' + 
+                                      '\"MHC d18:1/24:0\"', 
+                                      flush = True)
+
+    def test_warn_No_Multiple_ISTD_Allowed(self):
+        """Check if the software is able to warn if there are transition names that are
+           going to be normalised by more than one ISTD but allow_multiple_istd 
+           is set to False
+
+        * Read the file
+        * Warn if there are transition names that are going to be normalised by 
+          more than one ISTD but allow_multiple_istd is set to False
+        """
+
+        MS_FilePathList = ["WideTableForm.csv"]
+
+        self.patcher = patch('MSCalculate.print')
+        #mock_print = self.patcher.start()
+
+        MyWideData = MS_Analysis(MS_FilePath = WIDETABLEFORM_FILENAME,
+                                 MS_FileType = 'Agilent Wide Table in csv',
+                                 Annotation_FilePath = WIDETABLEFORM_ANNOTATION_NOMULTIPLEISTD_ALLOWED ,
+                                 ingui = True)
+
+        [norm_Area_df,ISTD_Area,Transition_Name_Annot,ISTD_Report] = MyWideData.get_Normalised_Area(analysis_name = "normArea by ISTD", 
+                            outputdata=True, 
+                            allow_multiple_istd = False,
+                            using_multiple_input_files = False,
+                            concatenation_type = "rows")
+
+        print(ISTD_Report)
 
 
     def tearDown(self):
