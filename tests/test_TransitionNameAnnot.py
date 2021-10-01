@@ -340,7 +340,7 @@ class TransitionNameAnnot_Test(unittest.TestCase):
                                                                                          allow_multiple_istd = True)
 
         # Ensure that the warning was due to some transition names not having a blank ISTD
-        mock_print.assert_called_with('There are Transition_Names in data set mentioned in the ' +
+        mock_print.assert_called_with('There are Transition_Names mentioned in the ' +
                                       'Transition_Name_Annot sheet but have a blank Transition_Name_ISTD.\n' +
                                       '\"LPC 18:0\"\n' + 
                                       '\"LPC 18:1\"\n' + 
