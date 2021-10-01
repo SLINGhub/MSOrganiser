@@ -66,10 +66,6 @@ class ISTD_Operations():
             Transition_Name_Annot_df = pd.merge(Transition_Name_Annot_df, ISTD_Annot_df, 
                                                 on = 'Transition_Name_ISTD', how = 'outer')
 
-        if not Transition_Name_Annot_df.empty:
-            # Remove Rows with ISTD with no Transition_Names
-            Transition_Name_Annot_df = Transition_Name_Annot_df.dropna(subset=['Transition_Name'])
-
         return Transition_Name_Annot_df
 
     def read_Sample_Annot(filepath,MS_FilePathList,column_name,logger=None,ingui=False):

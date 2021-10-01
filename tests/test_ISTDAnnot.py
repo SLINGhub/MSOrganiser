@@ -199,7 +199,7 @@ class ISTDAnnot_Test(unittest.TestCase):
         # Ensure that the error was due to an invalid Sheet Name
         mock_print.assert_called_with('Data at Transition_Name_ISTD column(s) in the ' +
                                       self.valid_sheet_name + ' ' +
-                                      'sheet has duplicates at row 4, 5.', 
+                                      'sheet has duplicates at row(s) 4, 5.', 
                                       flush = True)
 
     def tearDown(self):

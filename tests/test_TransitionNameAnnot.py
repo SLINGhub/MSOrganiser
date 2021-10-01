@@ -12,6 +12,10 @@ EMPTYDATA_ANNOTATION = os.path.join(os.path.dirname(__file__),
                                     "testdata", "test_transition_annot", 
                                     "WideTableForm_Annotation_EmptyData.xlsx")
 
+EMPTYTRANSITIONNAME_ANNOTATION = os.path.join(os.path.dirname(__file__),
+                                              "testdata", "test_transition_annot", 
+                                              "WideTableForm_Annotation_EmptyTransitionName.xlsx")
+
 NOTRANSITIONNAME_ANNOTATION = os.path.join(os.path.dirname(__file__),
                                            "testdata", "test_transition_annot", 
                                            "WideTableForm_Annotation_NoTransitionName.xlsx")
@@ -76,7 +80,7 @@ class TransitionNameAnnot_Test(unittest.TestCase):
            and only stop the process if normalisation is required. 
 
         * Read the file
-        * Highlight if the there are no data in the sheet and only stop if normalisation is required
+        * Highlight if there are no data in the sheet and only stop if normalisation is required
 
         """
         MS_FilePathList = ["WideTableForm.csv"]
@@ -95,7 +99,7 @@ class TransitionNameAnnot_Test(unittest.TestCase):
         Transition_Name_Annot_df = AnnotationList.Read_Transition_Name_Annot_Sheet()
         self.assertTrue(Transition_Name_Annot_df.empty)
 
-
+        # Ensure that error is given as doing_normalization is true
         AnnotationList = MS_Template(filepath = EMPTYDATA_ANNOTATION,
                                      column_name = "Area",
                                      logger = None,
@@ -111,6 +115,35 @@ class TransitionNameAnnot_Test(unittest.TestCase):
         # Ensure that the error was due to Empty dataset when normalisation is required
         mock_print.assert_called_with('The input ' + self.valid_sheet_name + ' sheet has no data.',
                                       flush=True)
+
+    def test_validation_EmptyTransitionName(self):
+        """Check if the software is able to detect annotations with no transition names 
+
+        * Read the file
+        * Highlight if there are annotations with no transition names
+
+        """
+        MS_FilePathList = ["WideTableForm.csv"]
+
+        mock_print = self.patcher.start()
+
+        AnnotationList = MS_Template(filepath = EMPTYTRANSITIONNAME_ANNOTATION,
+                                     column_name = "Area",
+                                     logger = None,
+                                     ingui = True,
+                                     doing_normalization = False, 
+                                     allow_multiple_istd = False)
+        with self.assertRaises(SystemExit) as cm:
+            Transition_Name_Annot_df = AnnotationList.Read_Transition_Name_Annot_Sheet()
+
+        # Ensure that the system ends with a -1 to indicate an error
+        self.assertEqual(cm.exception.code, -1)
+
+        # Ensure that the error was due to Empty dataset when normalisation is required
+        mock_print.assert_called_with('There are transition name annotations that are not ' +
+                                      'associated with a transition name at row(s) 5, 7. ' +
+                                      'Ensure that every annotation is associated with a Transition_Name.', 
+                                      flush = True)
 
     def test_validation_MissingColumnNames(self):
         """Check if the software is able to check if the Transition Name Annotation file has
@@ -176,7 +209,7 @@ class TransitionNameAnnot_Test(unittest.TestCase):
         # Ensure that the error was due to duplicate Transition Name
         mock_print.assert_called_with('Data at Transition_Name column(s) in the ' +
                                       self.valid_sheet_name + ' ' +
-                                      'sheet has duplicates at row 6, 10.', 
+                                      'sheet has duplicates at row(s) 6, 10.', 
                                       flush = True)
 
         AnnotationList = MS_Template(filepath = DUPLICATEDATA_MULTIPLEISTD_ANNOTATION,
@@ -194,7 +227,7 @@ class TransitionNameAnnot_Test(unittest.TestCase):
         # Ensure that the error was due to duplicate Transition Name
         mock_print.assert_called_with('Data at Transition_Name, Transition_Name_ISTD column(s) in the ' +
                                       self.valid_sheet_name + ' ' +
-                                      'sheet has duplicates at row 8, 13, 15.', 
+                                      'sheet has duplicates at row(s) 8, 13, 15.', 
                                       flush = True)
 
     def test_warn_ISTD_in_Transition_Name_Annot_but_not_in_ISTD_Annot(self):
@@ -224,5 +257,7 @@ class TransitionNameAnnot_Test(unittest.TestCase):
                                       'Check that these ISTD are in the ISTD_Annot sheet.',
                                       flush=True)
 
+    def tearDown(self):
+        self.patcher.stop()
 if __name__ == '__main__':
     unittest.main()

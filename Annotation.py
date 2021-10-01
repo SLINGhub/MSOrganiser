@@ -113,10 +113,10 @@ class MS_Template():
             duplicatelist = [ str(int(i) + 2)  for i in duplicateValues[duplicateValues==True].index.tolist()]
             if self.__logger:
                 self.__logger.error('Data at ' + ', '.join(colname_list) + ' column(s) in the ' + sheetname + 
-                                    ' sheet have duplicates at row %s', ', '.join(duplicatelist) + '.')
+                                    ' sheet have duplicates at row(s) ' + ', '.join(duplicatelist) + '.')
             if self.__ingui:
                 print('Data at ' + ', '.join(colname_list) + ' column(s) in the ' + sheetname + 
-                      ' sheet has duplicates at row ' + ', '.join(duplicatelist) + '.',
+                      ' sheet has duplicates at row(s) ' + ', '.join(duplicatelist) + '.',
                       flush=True)
             sys.exit(-1)
 
@@ -157,10 +157,16 @@ class MS_Template():
         #Remove whitespace for each string column
         Transition_Name_Annot_df = MS_Template.remove_whiteSpaces(Transition_Name_Annot_df)
 
-        #Remove columns with all None, NA,NaN
-        Transition_Name_Annot_df = Transition_Name_Annot_df.dropna(axis=1, how='all')
-          
+        #Remove columns with all None, NA,NaN except Transition_Name and Transition_Name_ISTD 
+        tmp = Transition_Name_Annot_df[Transition_Name_Annot_df.columns.difference(["Transition_Name", "Transition_Name_Annot"])].isna().all()
+        Transition_Name_Annot_df = Transition_Name_Annot_df.drop(tmp.index[tmp], axis=1)
+        #Transition_Name_Annot_df = Transition_Name_Annot_df.dropna(axis=1, how='all')
 
+        # Remove Rows with ISTD with no Transition_Names
+        # A bit redundant as error has been given in __validate_Transition_Name_Annot_sheet
+        if not Transition_Name_Annot_df.empty:
+            Transition_Name_Annot_df = Transition_Name_Annot_df.dropna(subset=['Transition_Name'])
+          
         #print(Transition_Name_Annot_df)
 
         #Close the workbook
@@ -177,6 +183,24 @@ class MS_Template():
         #Check if the column Transition_Name exists as a header in Transition_Name_Annot_df
         self.__checkColumns_in_df('Transition_Name',sheetname,Transition_Name_Annot_df)
 
+        #Check if the column Transition_Name exists as a header in Transition_Name_Annot_df
+        self.__checkColumns_in_df('Transition_Name_ISTD',sheetname,Transition_Name_Annot_df)
+
+        # Check if the column Transition_Name has empty entries and highlight them.
+        emptyTransitions = Transition_Name_Annot_df[Transition_Name_Annot_df["Transition_Name"].isna()]
+        if len(emptyTransitions) > 0:
+            emptyTransitionslist = [ str(int(i) + 2)  for i in emptyTransitions[emptyTransitions==True].index.tolist()]
+            if self.__logger:
+                self.__logger.error('There are transition name annotations that are not associated with a transition name at row(s) ' +
+                                    ', '.join(emptyTransitionslist) + '. ' +
+                                    'Ensure that every annotation is associated with a Transition_Name.')
+            if self.__ingui:
+                print('There are transition name annotations that are not associated with a transition name at row(s) ' +
+                      ', '.join(emptyTransitionslist) + '. ' +
+                      'Ensure that every annotation is associated with a Transition_Name.', 
+                      flush = True)
+            sys.exit(-1)
+
         #Check if Transition_Name column has duplicate Transition_Names
         if allow_multiple_istd:
             self.__checkDuplicates_in_cols(colname_list = ['Transition_Name', 'Transition_Name_ISTD'],
@@ -186,9 +210,6 @@ class MS_Template():
             self.__checkDuplicates_in_cols(colname_list = ['Transition_Name'],
                                            sheetname = sheetname,
                                            df = Transition_Name_Annot_df)
-
-        #Check if the column Transition_Name exists as a header in Transition_Name_Annot_df
-        self.__checkColumns_in_df('Transition_Name_ISTD',sheetname,Transition_Name_Annot_df)
 
     def Read_ISTD_Annot_Sheet(self):
         """Read the excel sheet ISTD_Annot as a pandas data frame
@@ -360,11 +381,11 @@ class MS_Template():
 
             if(len(MS_FilePath_with_no_sample_annot) > 0 ):
                 if self.__logger:
-                    self.__logger.error('The "Data_File_Name" column in the Sample Annotation sheet does contain the input file name.\n' +
+                    self.__logger.error('The "Data_File_Name" column in the Sample Annotation sheet does not contain the input file name(s).\n' +
                                         "\n".join(MS_FilePath_with_no_sample_annot) + '\n' +
                                         'Please correct the Sample Annotation sheet or the input file name.')
                 if self.__ingui:
-                    print('The "Data_File_Name" column in the Sample Annotation sheet does contain the input file name.\n' + 
+                    print('The "Data_File_Name" column in the Sample Annotation sheet does not contain the input file name(s).\n' + 
                           "\n".join(MS_FilePath_with_no_sample_annot) + '\n' +
                           'Please correct the Sample Annotation sheet or the input file name.',
                           flush = True)
@@ -435,25 +456,33 @@ class MS_Template():
         self.__checkColumns_in_df('Concentration_Unit',sheetname,Sample_Annot_df)
 
         # Check if the column Data_File_Name has empty entries and highlight them.
-        if(len(Sample_Annot_df[["Data_File_Name","Sample_Name"]][Sample_Annot_df["Data_File_Name"].isna()]) > 0):
+        emptyDataFileName = Sample_Annot_df[["Data_File_Name","Sample_Name"]][Sample_Annot_df["Data_File_Name"].isna()]
+        if len(emptyDataFileName) > 0:
+            emptyDataFileNamelist = [ str(int(i) + 2)  for i in emptyDataFileName[emptyDataFileName==True].index.tolist()]
             if self.__logger:
-                self.__logger.warning('There are sample names that are not associated with a data file name. They will not be used during analysis.\n' +
-                                      Sample_Annot_df[["Data_File_Name","Sample_Name"]][Sample_Annot_df["Data_File_Name"].isna()].to_string(index=False) + '\n'
+                self.__logger.warning('There are sample names that are not associated with a data file name at row(s) ' +
+                                      ', '.join(emptyDataFileNamelist) + '. ' +
+                                      'They will not be used during analysis. '
                                       'Ensure that both columns Data_File_Name and Sample_Name are filled for each sample.')
             if self.__ingui:
-                print('There are sample names that are not associated with a data file name. They will not be used during analysis.\n' +
-                      Sample_Annot_df[["Data_File_Name","Sample_Name"]][Sample_Annot_df["Data_File_Name"].isna()].to_string(index=False) + '\n'
+                print('There are sample names that are not associated with a data file name at row(s) ' +
+                      ', '.join(emptyDataFileNamelist) + '. ' +
+                      'They will not be used during analysis. '
                       'Ensure that both columns Data_File_Name and Sample_Name are filled for each sample.', 
                       flush = True)
 
         # Check if the column Sample_Name has empty entries and highlight them.
-        if(len(Sample_Annot_df[["Data_File_Name","Sample_Name"]][Sample_Annot_df["Sample_Name"].isna()]) > 0):
+        emptySampleName = Sample_Annot_df[["Data_File_Name","Sample_Name"]][Sample_Annot_df["Sample_Name"].isna()]
+        if len(emptySampleName) > 0:
+            emptySampleNamelist = [ str(int(i) + 2)  for i in emptySampleName[emptySampleName==True].index.tolist()]
             if self.__logger:
-                self.__logger.warning('There are data file names that are not associated with a sample name. They will not be used during analysis.\n' +
-                                      Sample_Annot_df[["Data_File_Name","Sample_Name"]][Sample_Annot_df["Sample_Name"].isna()].to_string(index=False) + '\n'
-                      'Ensure that both columns Data_File_Name and Sample_Name are filled for each sample.')
+                self.__logger.warning('There are data file names that are not associated with a sample name at row(s) ' + 
+                                      ', '.join(emptySampleNamelist) + '. ' +
+                                      'They will not be used during analysis. ' +
+                                      'Ensure that both columns Data_File_Name and Sample_Name are filled for each sample.')
             if self.__ingui:
-                print('There are data file names that are not associated with a sample name. They will not be used during analysis.\n' +
-                      Sample_Annot_df[["Data_File_Name","Sample_Name"]][Sample_Annot_df["Sample_Name"].isna()].to_string(index=False) + '\n'
+                print('There are data file names that are not associated with a sample name at row(s) ' + 
+                      ', '.join(emptySampleNamelist) + '. ' +
+                      'They will not be used during analysis. ' +
                       'Ensure that both columns Data_File_Name and Sample_Name are filled for each sample.', 
                       flush = True)
