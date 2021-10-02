@@ -196,12 +196,8 @@ class ISTD_Operations():
                       '\n'.join(f'"{bad_input}"' for bad_input in bad_input_list),
                       flush=True)
 
-        if "!Duplicate Transition_Name_ISTD in input data" in ISTD_report['Transition_Name_ISTD'].unique():
-            if ingui:
-                print("There are Transition_Names in the Transition_Name_Annot sheet " +
-                      "whose Transition_Names_ISTD are duplicated in data set. Please check input file",flush=True)
-                for things in ISTD_report.loc[ ISTD_report['Transition_Name_ISTD'] == "!Duplicate Transition_Name_ISTD in input data" , 'Transition_Name' ]:
-                    print('\"' + things + '\"',flush=True)
+        # Duplicate Transition_Name_ISTD in input data has been taken care
+        # by DuplicateCheck.py
 
         #Make ISTD column to be the index
         ISTD_report = ISTD_report.set_index(['Transition_Name_ISTD'])
@@ -306,10 +302,23 @@ class ISTD_Operations():
                         ISTD_report_list.append(("!Missing Transition_Name_ISTD in input data", x.name))
                         valid_ISTD.append(ISTD)
                         continue
-
-                    # When we have a valid ISTD
-                    valid_ISTD.append(ISTD)
-                    ISTD_report_list.append((ISTD,x.name))
+                    elif Transition_Name_df_column_list.count(ISTD) > 1:
+                        # ISTD is used in Annotation File but has duplicates in the input data
+                        # This check may be redundant because the
+                        # duplicate Transition_Name_ISTD in input data has been taken care
+                        # by DuplicateCheck.py
+                        if logger:
+                            logger.error(str(ISTD) + ' has duplicates in the input data. ' + 
+                                 'Please check the Transition_Name_Annot sheet')
+                        if ingui:
+                            print(str(ISTD) + ' has duplicates in the input data. ' + 
+                                  'Please check the Transition_Name_Annot sheet',
+                                  flush=True)
+                        sys.exit(-1)
+                    else:
+                        # When we have a valid ISTD
+                        valid_ISTD.append(ISTD)
+                        ISTD_report_list.append((ISTD,x.name))
                 else:
                     if logger:
                         logger.error(x.name + ' has an invalid Transition_Name_ISTD of ' + 
@@ -348,9 +357,17 @@ class ISTD_Operations():
                 return
             elif Transition_Name_df_column_list.count(ISTD_list[0]) > 1:
                 # ISTD is used in Annotation File but has duplicates in the input data
-                Transition_Name_dict[x.name] = ISTD_list[0]
-                ISTD_report_list.append(("!Duplicate Transition_Name_ISTD in input data", x.name))
-                return
+                # This check may be redundant because the
+                # duplicate Transition_Name_ISTD in input data has been taken care
+                # by DuplicateCheck.py
+                if logger:
+                    logger.error(str(ISTD_list[0]) + ' has duplicates in the input data. ' + 
+                                 'Please check the Transition_Name_Annot sheet')
+                if ingui:
+                    print(str(ISTD_list[0]) + ' has duplicates in the input data. ' + 
+                          'Please check the Transition_Name_Annot sheet',
+                          flush=True)
+                sys.exit(-1)
             else:
                 # When we have a valid ISTD
                 Transition_Name_dict[x.name] = ISTD_list[0]
@@ -382,15 +399,26 @@ class ISTD_Operations():
         if list(Transition_Name_df.columns.values).count(x.name[0]) == 1:
                 x.update(Transition_Name_df.loc[:, x.name[0] ])
         elif list(Transition_Name_df.columns.values).count(x.name[0]) > 1 :
+            # This check may be redundant because the
+            # duplicate Transition_Name in input data has been taken care
+            # by DuplicateCheck.py
             if logger:
-                logger.warning("%s appears more than once in the input data frame. Ignore updating Transition_Name_df", x.name[0])
-            #if ingui:
-                #print(x.name[0] + " appears more than once in the input data frame. Ignore updating Transition_Name_df")
+                logger.warning(x.name[0] + ' appears more than once in the input data frame. ' + 
+                               'Ignore updating Transition_Name_df.')
+            if ingui:
+                print(x.name[0] + ' appears more than once in the input data frame. ' + 
+                      'Ignore updating Transition_Name_df.',
+                      flush = True)
         else:
+            # This check may be redundant because the
+            # x is iterated from the columns of Transition_Name_df
             if logger:
-                logger.warning("%s cannot be found in the input data frame. Ignore updating Transition_Name_df", x.name[0])
-            #if ingui:
-                #print(x.name[0] + " cannot be found in the input data frame. Ignore updating Transition_Name_df")
+                logger.warning(x.name[0] + ' cannot be found in the input data frame. ' +
+                               'Ignore updating Transition_Name_df.')
+            if ingui:
+                print(x.name[0] + ' cannot be found in the input data frame. ' +
+                     'Ignore updating Transition_Name_df.',
+                     flush = True)
         return
 
     def _update_ISTD_data_from_Transition_Name_df(x,Transition_Name_dict,Transition_Name_df,
@@ -420,6 +448,9 @@ class ISTD_Operations():
             if list(Transition_Name_df.columns.values).count(Transition_Name_dict[x.name]) == 1:
                 x.update(Transition_Name_df.loc[:, Transition_Name_dict[x.name] ])
             elif list(Transition_Name_df.columns.values).count(Transition_Name_dict[x.name]) > 1 :
+                # This check may be redundant because the
+                # duplicate Transition_Name_ISTD in input data has been taken care
+                # by DuplicateCheck.py
                 if logger:
                     logger.warning(Transition_Name_dict[x.name] + ' appears more than once in the input data frame. ' +
                                    'Ignore normalisation in this column ' + x.name)
@@ -444,6 +475,9 @@ class ISTD_Operations():
             if list(Transition_Name_df.columns.values).count((x.name[1],x.name[1])) == 1:
                 x.update(Transition_Name_df.loc[:, (x.name[1],x.name[1]) ])
             elif list(Transition_Name_df.columns.values).count((x.name[1],x.name[1])) > 1 :
+                # This check may be redundant because the
+                # duplicate Transition_Name_ISTD in input data has been taken care
+                # by DuplicateCheck.py
                 if logger:
                     logger.warning(x.name[1] + ' appears more than once in the input data frame. ' +
                                    'Ignore normalisation in this column ' + str(x.name))

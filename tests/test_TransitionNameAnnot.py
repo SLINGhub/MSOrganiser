@@ -451,7 +451,7 @@ class TransitionNameAnnot_Test(unittest.TestCase):
                                       'Ignore normalisation in this column LPC 20:0 (IS)',
                                       flush = True)
 
-    def test_warn_ISTD_in_Transition_Name_Annot_but_not_in_Input_Data(self):
+    def test_warn_ISTD_in_Transition_Name_Annot_but_not_in_Input_Data_multiple_ISTD(self):
         """Check if the software is able to warn if there are ISTD
            that is indicated in the Transition_Name_ISTD column
            but are not present in the input data (Multiple ISTD case)
@@ -509,8 +509,7 @@ class TransitionNameAnnot_Test(unittest.TestCase):
         mock_print.assert_called_with('LPC 17:1 (IS) cannot be found in the input data frame. ' + 
                                       'Ignore normalisation in this column (\'LPC 18:0\', \'LPC 17:1 (IS)\')',
                                       flush = True)
-
-
+  
 
     def tearDown(self):
         self.patcher.stop()
