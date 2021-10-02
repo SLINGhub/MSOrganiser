@@ -53,9 +53,13 @@ WIDETABLEFORM_ANNOTATION_WITH_TRANSITIONNAME_ONLY_IN_RAWDATA = os.path.join(os.p
                                                                             "testdata", "test_transition_annot", 
                                                                             "WideTableForm_Annotation_TransitionName_only_in_InputData.xlsx")
 
-WIDETABLEFORM_ANNOTATION_NOMULTIPLEISTD_ALLOWED = os.path.join(os.path.dirname(__file__),
-                                                               "testdata", "test_transition_annot", 
-                                                               "WideTableForm_Annotation_NoMultipleISTD_allowed.xlsx")
+WIDETABLEFORM_ANNOTATION_ISTD_NOT_IN_INPUTDATA = os.path.join(os.path.dirname(__file__),
+                                                              "testdata", "test_transition_annot", 
+                                                              "WideTableForm_Annotation_ISTD_not_in_InputData.xlsx")
+
+WIDETABLEFORM_ANNOTATION_ISTD_NOT_IN_INPUTDATA_MULTIPLEISTD = os.path.join(os.path.dirname(__file__),
+                                                                           "testdata", "test_transition_annot", 
+                                                                           "WideTableForm_Annotation_ISTD_not_in_InputData_MultipleISTD.xlsx")
 
 class TransitionNameAnnot_Test(unittest.TestCase):
     # See https://realpython.com/lessons/mocking-print-unit-tests/
@@ -389,33 +393,123 @@ class TransitionNameAnnot_Test(unittest.TestCase):
                                       '\"MHC d18:1/24:0\"', 
                                       flush = True)
 
-    def test_warn_No_Multiple_ISTD_Allowed(self):
-        """Check if the software is able to warn if there are transition names that are
-           going to be normalised by more than one ISTD but allow_multiple_istd 
-           is set to False
+    def test_warn_ISTD_in_Transition_Name_Annot_but_not_in_Input_Data(self):
+        """Check if the software is able to warn if there are ISTD
+           that is indicated in the Transition_Name_ISTD column
+           but are not present in the input data
 
         * Read the file
-        * Warn if there are transition names that are going to be normalised by 
-          more than one ISTD but allow_multiple_istd is set to False
+        * Warn if there are ISTD that is indicated in the 
+          Transition_Name_ISTD column but are not present in the input data
         """
 
         MS_FilePathList = ["WideTableForm.csv"]
 
         self.patcher = patch('MSCalculate.print')
-        #mock_print = self.patcher.start()
+        mock_print = self.patcher.start()
 
         MyWideData = MS_Analysis(MS_FilePath = WIDETABLEFORM_FILENAME,
                                  MS_FileType = 'Agilent Wide Table in csv',
-                                 Annotation_FilePath = WIDETABLEFORM_ANNOTATION_NOMULTIPLEISTD_ALLOWED ,
+                                 Annotation_FilePath = WIDETABLEFORM_ANNOTATION_ISTD_NOT_IN_INPUTDATA ,
                                  ingui = True)
 
-        [norm_Area_df,ISTD_Area,Transition_Name_Annot,ISTD_Report] = MyWideData.get_Normalised_Area(analysis_name = "normArea by ISTD", 
-                            outputdata=True, 
-                            allow_multiple_istd = False,
-                            using_multiple_input_files = False,
-                            concatenation_type = "rows")
+        Area_df = MyWideData._get_Area_df_for_normalisation(using_multiple_input_files = False)
 
-        print(ISTD_Report)
+        
+        Transition_Name_Annot_df = ISTD_Operations.read_ISTD_map(filepath = WIDETABLEFORM_ANNOTATION_ISTD_NOT_IN_INPUTDATA , 
+                                                                 column_name = "Area",
+                                                                 logger = None, ingui = True,
+                                                                 doing_normalization = True, 
+                                                                 allow_multiple_istd = False)
+
+        [ISTD_report,Transition_Name_dict] = ISTD_Operations.create_Transition_Name_dict(Transition_Name_df = Area_df,
+                                                                                         Transition_Name_Annot_df = Transition_Name_Annot_df,
+                                                                                         logger = False, 
+                                                                                         ingui = True,
+                                                                                         allow_multiple_istd = False)
+
+        # Ensure that the warning was due to ISTD mentioned in the Transition_Name_Annot sheet
+        # but cannot be found in the input data set
+        mock_print.assert_called_with('There are Transition_Names mentioned ' + 
+                                      'in the Transition_Name_Annot sheet ' +
+                                      'whose Transition_Names_ISTD does not exists ' +
+                                      'in the input dataset.\n' +
+                                      '\"LPC 18:0\"\n' + 
+                                      '\"LPC 20:0 (IS)\"', 
+                                      flush = True)
+
+        #Perform normalisation using ISTD
+        [norm_Area_df,ISTD_Area] = ISTD_Operations.normalise_by_ISTD(Area_df,Transition_Name_dict,
+                                                                     logger = False,
+                                                                     ingui = True,
+                                                                     allow_multiple_istd = False)
+
+        # Ensure that the warning was due to normalisation not done because 
+        # the ISTD mentioned in the Transition_Name_Annot sheet
+        # but cannot be found in the input data set
+        mock_print.assert_called_with('LPC 17:1 (IS) cannot be found in the input data frame. ' + 
+                                      'Ignore normalisation in this column LPC 20:0 (IS)',
+                                      flush = True)
+
+    def test_warn_ISTD_in_Transition_Name_Annot_but_not_in_Input_Data(self):
+        """Check if the software is able to warn if there are ISTD
+           that is indicated in the Transition_Name_ISTD column
+           but are not present in the input data (Multiple ISTD case)
+
+        * Read the file
+        * Warn if there are ISTD that is indicated in the 
+          Transition_Name_ISTD column but are not present in the input data
+        """
+
+        # Multiple ISTD case
+        MS_FilePathList = ["WideTableForm.csv"]
+
+        self.patcher = patch('MSCalculate.print')
+        mock_print = self.patcher.start()
+
+        MyWideData = MS_Analysis(MS_FilePath = WIDETABLEFORM_FILENAME,
+                                 MS_FileType = 'Agilent Wide Table in csv',
+                                 Annotation_FilePath = WIDETABLEFORM_ANNOTATION_ISTD_NOT_IN_INPUTDATA_MULTIPLEISTD ,
+                                 ingui = True)
+
+        Area_df = MyWideData._get_Area_df_for_normalisation(using_multiple_input_files = False)
+
+        
+        Transition_Name_Annot_df = ISTD_Operations.read_ISTD_map(filepath = WIDETABLEFORM_ANNOTATION_ISTD_NOT_IN_INPUTDATA_MULTIPLEISTD , 
+                                                                 column_name = "Area",
+                                                                 logger = None, ingui = True,
+                                                                 doing_normalization = True, 
+                                                                 allow_multiple_istd = True)
+
+        [ISTD_report,Transition_Name_dict] = ISTD_Operations.create_Transition_Name_dict(Transition_Name_df = Area_df,
+                                                                                         Transition_Name_Annot_df = Transition_Name_Annot_df,
+                                                                                         logger = False, 
+                                                                                         ingui = True,
+                                                                                         allow_multiple_istd = True)
+        # Ensure that the warning was due to 
+        mock_print.assert_called_with('There are Transition_Names mentioned ' + 
+                                      'in the Transition_Name_Annot sheet ' +
+                                      'whose Transition_Names_ISTD does not exists ' +
+                                      'in the input dataset.\n' +
+                                      '\"LPC 18:0\"\n' + 
+                                      '\"LPC 18:1\"', 
+                                      flush = True)
+
+        ##Update the Area_df so that it can be normalised by multiple ISTD
+        Area_df = ISTD_Operations.expand_Transition_Name_df(Area_df,Transition_Name_dict,
+                                                            logger = False, 
+                                                            ingui = True)
+
+        #Perform normalisation using ISTD
+        [norm_Area_df,ISTD_Area] = ISTD_Operations.normalise_by_ISTD(Area_df,Transition_Name_dict,
+                                                                     logger = False,
+                                                                     ingui = True,
+                                                                     allow_multiple_istd = True)
+
+        mock_print.assert_called_with('LPC 17:1 (IS) cannot be found in the input data frame. ' + 
+                                      'Ignore normalisation in this column (\'LPC 18:0\', \'LPC 17:1 (IS)\')',
+                                      flush = True)
+
 
 
     def tearDown(self):
