@@ -486,7 +486,9 @@ class TransitionNameAnnot_Test(unittest.TestCase):
                                                                                          logger = False, 
                                                                                          ingui = True,
                                                                                          allow_multiple_istd = True)
-        # Ensure that the warning was due to 
+        
+        # Ensure that the warning was due to ISTD mentioned in the Transition_Name_Annot sheet
+        # but cannot be found in the input data set
         mock_print.assert_called_with('There are Transition_Names mentioned ' + 
                                       'in the Transition_Name_Annot sheet ' +
                                       'whose Transition_Names_ISTD does not exists ' +
@@ -506,6 +508,9 @@ class TransitionNameAnnot_Test(unittest.TestCase):
                                                                      ingui = True,
                                                                      allow_multiple_istd = True)
 
+        # Ensure that the warning was due to normalisation not done because 
+        # the ISTD mentioned in the Transition_Name_Annot sheet
+        # but cannot be found in the input data set
         mock_print.assert_called_with('LPC 17:1 (IS) cannot be found in the input data frame. ' + 
                                       'Ignore normalisation in this column (\'LPC 18:0\', \'LPC 17:1 (IS)\')',
                                       flush = True)

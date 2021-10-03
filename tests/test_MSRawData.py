@@ -64,7 +64,7 @@ class Agilent_Test(unittest.TestCase):
 
 
     def test_WideDataLarge(self):
-        """Check if the software is able to do the following with large dataset sPerfect_Index_AllLipids_raw.csv:
+        """Check if the software is able to do the following with large dataset LargeTestData.csv:
 
         * Extract Area, RT and FWHM successfully using AgilentMSRawData.get_table
         """
