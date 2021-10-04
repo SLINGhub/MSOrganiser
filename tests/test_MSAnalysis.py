@@ -1,4 +1,5 @@
 import unittest
+from unittest.mock import patch
 import os
 import pandas as pd
 import openpyxl
@@ -25,49 +26,31 @@ SCIEX_RESULTS_FILENAME = os.path.join(os.path.dirname(__file__),"testdata", 'Sci
 
 class Agilent_Test(unittest.TestCase):
 
+    # See https://realpython.com/lessons/mocking-print-unit-tests/
+    # for more details on mock
     def setUp(self):
-        MyWideData = MS_Analysis(MS_FilePath = WIDETABLEFORM_FILENAME,
-                                 MS_FileType = 'Agilent Wide Table in csv',
-                                 Annotation_FilePath = WIDETABLEFORM_ANNOTATION,
-                                 ingui = True)
-        WideDataResults = openpyxl.load_workbook(WIDETABLEFORM_RESULTS_FILENAME)
+        # Replace the print function in Annotation.py file to a mock
+        self.patcher = patch('MSCalculate.print')
 
-        MyLargeWideData = MS_Analysis(MS_FilePath = LARGE_WIDETABLEFORM_FILENAME,
-                                      MS_FileType = 'Agilent Wide Table in csv',
-                                      Annotation_FilePath = LARGE_WIDETABLEFORM_ANNOTATION,
-                                      ingui = True)
-        LargeWideDataResults = openpyxl.load_workbook(LARGE_WIDETABLEFORM_RESULTS_FILENAME)
+        self.InputDataList = [WIDETABLEFORM_FILENAME,
+                              LARGE_WIDETABLEFORM_FILENAME,
+                              COMPOUNDTABLEFORM_FILENAME,
+                              SCIEX_FILENAME]
 
-        MyCompoundData = MS_Analysis(MS_FilePath = COMPOUNDTABLEFORM_FILENAME,
-                                     MS_FileType = 'Agilent Compound Table in csv',
-                                     Annotation_FilePath = COMPOUNDTABLEFORM_ANNOTATION,
-                                     ingui = True)
-        CompoundDataResults = openpyxl.load_workbook(COMPOUNDTABLEFORM_RESULTS_FILENAME)
+        self.DataResultList = [WIDETABLEFORM_RESULTS_FILENAME,
+                               LARGE_WIDETABLEFORM_RESULTS_FILENAME,
+                               COMPOUNDTABLEFORM_RESULTS_FILENAME,
+                               SCIEX_RESULTS_FILENAME]
 
-        MySciexData = MS_Analysis(MS_FilePath = SCIEX_FILENAME,
-                                  MS_FileType = 'Multiquant Long Table in txt',
-                                  Annotation_FilePath = SCIEX_ANNOTATION,
-                                  ingui = True)
-        SciexResults = openpyxl.load_workbook(SCIEX_RESULTS_FILENAME)
+        self.AnnotationList = [WIDETABLEFORM_ANNOTATION,
+                               LARGE_WIDETABLEFORM_ANNOTATION,
+                               COMPOUNDTABLEFORM_ANNOTATION,
+                               SCIEX_ANNOTATION]
 
-        self.DataList = [MyWideData,MyLargeWideData,MyCompoundData,MySciexData]
-        self.DataResultList = [WideDataResults,LargeWideDataResults,CompoundDataResults,SciexResults]
-
-        self.MyLongTableData = MS_Analysis(MS_FilePath = WIDETABLEFORM_FILENAME,
-                                           MS_FileType = 'Agilent Wide Table in csv',
-                                           Annotation_FilePath = WIDETABLEFORM_ANNOTATION,
-                                           ingui = True,
-                                           longtable = True, 
-                                           longtable_annot = False)
-        self.LongTableDataResults = openpyxl.load_workbook(WIDETABLEFORM_LONGTABLE_FILENAME)
-
-        self.MyLongTableDataWithAnnot = MS_Analysis(MS_FilePath = WIDETABLEFORM_FILENAME,
-                                                    MS_FileType = 'Agilent Wide Table in csv',
-                                                    Annotation_FilePath = WIDETABLEFORM_ANNOTATION,
-                                                    ingui = True,
-                                                    longtable = True, 
-                                                    longtable_annot = True)
-        self.LongTableDataWithAnnotResults = openpyxl.load_workbook(WIDETABLEFORM_LONGTABLE_WITH_ANNOT_FILENAME)
+        self.MSFileTypeList = ['Agilent Wide Table in csv',
+                               'Agilent Wide Table in csv',
+                               'Agilent Compound Table in csv',
+                               'Multiquant Long Table in txt']
 
     def test_getnormAreaTable(self):
         """Check if the software is able to calculate the normalise area using MS_Analysis.get_Normalised_Area from these datasets 
@@ -79,10 +62,28 @@ class Agilent_Test(unittest.TestCase):
         """
 
         #Perform normalisation using ISTD
-        for i in range(len(self.DataList)):
-            [norm_Area_df,ISTD_Area,Transition_Name_Annot,ISTD_Report] = self.DataList[i].get_Normalised_Area('normArea by ISTD')
-            self.__compare_df('normArea_by_ISTD',norm_Area_df,self.DataResultList[i])
-            self.__compare_df('Transition_Name_Annot',Transition_Name_Annot,self.DataResultList[i])
+        for i in range(len(self.InputDataList)):
+            MyData = MS_Analysis(MS_FilePath = self.InputDataList[i],
+                                 MS_FileType = self.MSFileTypeList[i],
+                                 Annotation_FilePath = self.AnnotationList[i],
+                                 ingui = True)
+            Results = openpyxl.load_workbook(self.DataResultList[i])
+
+            if os.path.basename(self.InputDataList[i]) == "LargeTestData.csv" :
+                mock_print = self.patcher.start()
+
+            [norm_Area_df,ISTD_Area,Transition_Name_Annot,ISTD_Report] = MyData.get_Normalised_Area('normArea by ISTD')
+            
+            if os.path.basename(self.InputDataList[i]) == "LargeTestData.csv" :
+                mock_print.assert_called_with('There are Transition_Names mentioned in the ' +
+                                              'Transition_Name_Annot sheet but have a blank Transition_Name_ISTD.\n' +
+                                              '\"Sph d17:0 (ISTD)\"\n' + 
+                                              '\"Sph d17:1 (ISTD)\"', 
+                                              flush = True)
+
+            self.__compare_df('normArea_by_ISTD',norm_Area_df,Results)
+            self.__compare_df('Transition_Name_Annot',Transition_Name_Annot,Results)
+            Results.close()
 
 
     def test_getAnalyteConcTable(self):
@@ -95,35 +96,77 @@ class Agilent_Test(unittest.TestCase):
         """
 
         #Perform analyte concentration using ISTD
-        for i in range(len(self.DataList)):
-            [norm_Conc_df,ISTD_Conc_df,ISTD_Samp_Ratio_df,Sample_Annot_df] = self.DataList[i].get_Analyte_Concentration('normConc by ISTD')
-            self.__compare_df('normConc_by_ISTD',norm_Conc_df,self.DataResultList[i])
+        for i in range(len(self.InputDataList)):
+            MyData = MS_Analysis(MS_FilePath = self.InputDataList[i],
+                                 MS_FileType = self.MSFileTypeList[i],
+                                 Annotation_FilePath = self.AnnotationList[i],
+                                 ingui = True)
+            Results = openpyxl.load_workbook(self.DataResultList[i])
+
+            if os.path.basename(self.InputDataList[i]) == "LargeTestData.csv" :
+                mock_print = self.patcher.start()
+
+            [norm_Conc_df,ISTD_Conc_df,ISTD_Samp_Ratio_df,Sample_Annot_df] = MyData.get_Analyte_Concentration('normConc by ISTD')
+            
+            if os.path.basename(self.InputDataList[i]) == "LargeTestData.csv" :
+                mock_print.assert_called_with('There are Transition_Names mentioned in the ' +
+                                              'Transition_Name_Annot sheet but have a blank Transition_Name_ISTD.\n' +
+                                              '\"Sph d17:0 (ISTD)\"\n' + 
+                                              '\"Sph d17:1 (ISTD)\"', 
+                                              flush = True)
+            
+            self.__compare_df('normConc_by_ISTD',norm_Conc_df,Results)
+            
             #Remove the column "Merge_Status" as it is not relevant
             #Reorder the column such that "Concentration_Unit" is at the last column
             Sample_Annot_df = Sample_Annot_df[["Data_File_Name", "Sample_Name",
                                                "Sample_Amount", "Sample_Amount_Unit",
                                                "ISTD_Mixture_Volume_[uL]", "ISTD_to_Sample_Amount_Ratio",
                                                "Concentration_Unit"]]
-            self.__compare_df('Sample_Annot',Sample_Annot_df,self.DataResultList[i])
+            self.__compare_df('Sample_Annot',Sample_Annot_df,Results)
+            Results.close()
 
     def test_getLongTable(self):
         """Check if the software is able to get the LongTable from these datasets
 
         * WideTableForm.csv
         """
-        self.MyLongTableData.get_from_Input_Data('Area', outputdata = False)
-        Long_Table_df = self.MyLongTableData.get_Long_Table()
-        self.__compare_df('Long_Table',Long_Table_df,self.LongTableDataResults)
 
-        self.MyLongTableDataWithAnnot.get_from_Input_Data('Area', outputdata = False)
-        self.MyLongTableDataWithAnnot.get_Normalised_Area('normArea by ISTD', outputdata = False)
-        self.MyLongTableDataWithAnnot.get_Analyte_Concentration('normConc by ISTD', outputdata = False)
-        Long_Table_df = self.MyLongTableDataWithAnnot.get_Long_Table()
-        self.__compare_df('Long_Table',Long_Table_df,self.LongTableDataWithAnnotResults)
+        MyLongTableData = MS_Analysis(MS_FilePath = WIDETABLEFORM_FILENAME,
+                                      MS_FileType = 'Agilent Wide Table in csv',
+                                      Annotation_FilePath = WIDETABLEFORM_ANNOTATION,
+                                      ingui = True,
+                                      longtable = True, 
+                                      longtable_annot = False)
+
+        LongTableDataResults = openpyxl.load_workbook(WIDETABLEFORM_LONGTABLE_FILENAME)
+
+        MyLongTableData.get_from_Input_Data('Area', outputdata = False)
+        Long_Table_df = MyLongTableData.get_Long_Table()
+        self.__compare_df('Long_Table',Long_Table_df,LongTableDataResults)
+
+    def test_getLongTable_with_Annot(self):
+        """Check if the software is able to get the LongTable with Annotations from these datasets
+
+        * WideTableForm.csv
+        """
+
+        MyLongTableDataWithAnnot = MS_Analysis(MS_FilePath = WIDETABLEFORM_FILENAME,
+                                               MS_FileType = 'Agilent Wide Table in csv',
+                                               Annotation_FilePath = WIDETABLEFORM_ANNOTATION,
+                                               ingui = True,
+                                               longtable = True, 
+                                               longtable_annot = True)
+        LongTableDataWithAnnotResults = openpyxl.load_workbook(WIDETABLEFORM_LONGTABLE_WITH_ANNOT_FILENAME)
+
+        MyLongTableDataWithAnnot.get_from_Input_Data('Area', outputdata = False)
+        MyLongTableDataWithAnnot.get_Normalised_Area('normArea by ISTD', outputdata = False)
+        MyLongTableDataWithAnnot.get_Analyte_Concentration('normConc by ISTD', outputdata = False)
+        Long_Table_df = MyLongTableDataWithAnnot.get_Long_Table()
+        self.__compare_df('Long_Table',Long_Table_df,LongTableDataWithAnnotResults)
            
     def tearDown(self):
-        for i in range(len(self.DataResultList)):
-            self.DataResultList[i].close()
+        self.patcher.stop()
 
     def __compare_df(self,table_name,MSData_df,ExcelWorkbook):
         MSData_df = MSData_df.apply(pd.to_numeric, errors='ignore', downcast = 'float')

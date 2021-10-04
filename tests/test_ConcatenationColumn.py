@@ -1,4 +1,5 @@
 import unittest
+from unittest.mock import patch
 import os
 import pandas as pd
 import openpyxl
@@ -45,6 +46,12 @@ WIDETABLEFORMCOLUMN_CONCATENATERESULTS_LONGTABLE_WITH_ANNOT_FILENAME = os.path.j
                                                                                     "test_concatenate_column", 
                                                                                     "WideTableFormColumn_Concatenate_LongTable_with_Annot.xlsx")
 class Concatenation_By_Column_Test(unittest.TestCase):
+    # See https://realpython.com/lessons/mocking-print-unit-tests/
+    # for more details on mock
+    def setUp(self):
+        # Replace the print function in Annotation.py file to a mock
+        self.patcher = patch('MSCalculate.print')
+
     def test_concatenate_by_columns(self):
         """Check if the software is able to from the two input raw data with same samples but different transitions
 
@@ -66,7 +73,9 @@ class Concatenation_By_Column_Test(unittest.TestCase):
             'Long_Table_Annot': False, 
             'Testing': False
             }
+
         [PDFReport, concatenate_df_list, concatenate_df_sheet_name] = concatenate_along_columns_workflow(stored_args,testing = True)
+        
         #print(concatenate_df_sheet_name)
         for sheet_name in concatenate_df_sheet_name:
             if sheet_name != "Long_Table":
@@ -98,6 +107,7 @@ class Concatenation_By_Column_Test(unittest.TestCase):
             'Long_Table_Annot': False, 
             'Testing': False
             }
+
         [PDFReport, concatenate_df_list, concatenate_df_sheet_name] = concatenate_along_columns_workflow(stored_args,testing = True)
         data_index = concatenate_df_sheet_name.index("Long_Table")
         ExcelData_df = self.__sheet_to_df(workbook = WIDETABLEFORMCOLUMN_CONCATENATERESULTS_LONGTABLE_FILENAME,
@@ -128,6 +138,7 @@ class Concatenation_By_Column_Test(unittest.TestCase):
             'Long_Table_Annot': True, 
             'Testing': False
             }
+
         [PDFReport, concatenate_df_list, concatenate_df_sheet_name] = concatenate_along_columns_workflow(stored_args,testing = True)
         data_index = concatenate_df_sheet_name.index("Long_Table")
         ExcelData_df = self.__sheet_to_df(workbook = WIDETABLEFORMCOLUMN_CONCATENATERESULTS_LONGTABLE_WITH_ANNOT_FILENAME,
@@ -158,6 +169,7 @@ class Concatenation_By_Column_Test(unittest.TestCase):
             'Long_Table_Annot': False, 
             'Testing': False
             }
+
         [PDFReport, concatenate_df_list, concatenate_df_sheet_name] = concatenate_along_columns_workflow(stored_args,testing = True)
         for sheet_name in concatenate_df_sheet_name:
             if sheet_name != "Long_Table":
@@ -198,7 +210,18 @@ class Concatenation_By_Column_Test(unittest.TestCase):
             'Long_Table_Annot': False, 
             'Testing': False
             }
+
+        mock_print = self.patcher.start()
+
         [PDFReport, concatenate_df_list, concatenate_df_sheet_name] = concatenate_along_columns_workflow(stored_args,testing = True)
+        
+        # Ensure that the warning was due to some transition names not having a blank ISTD
+        mock_print.assert_called_with('There are Transition_Names mentioned in the ' +
+                                      'Transition_Name_Annot sheet but have a blank Transition_Name_ISTD.\n' +
+                                      '\"LPC 14:0\"\n' + 
+                                      '\"LPC 24:0\"', 
+                                      flush = True)
+        
         #print(concatenate_df_sheet_name)
         for sheet_name in concatenate_df_sheet_name:
             if sheet_name != "Long_Table":
@@ -230,7 +253,17 @@ class Concatenation_By_Column_Test(unittest.TestCase):
             'Long_Table_Annot': False, 
             'Testing': False
             }
+
+        mock_print = self.patcher.start()
+
         [PDFReport, concatenate_df_list, concatenate_df_sheet_name] = concatenate_along_columns_workflow(stored_args,testing = True)
+
+        mock_print.assert_called_with('There are Transition_Names mentioned in the ' +
+                                      'Transition_Name_Annot sheet but have a blank Transition_Name_ISTD.\n' +
+                                      '\"LPC 14:0\"\n' + 
+                                      '\"LPC 24:0\"', 
+                                      flush = True)        
+        
         data_index = concatenate_df_sheet_name.index("Long_Table")
         ExcelData_df = self.__sheet_to_df(workbook = WIDETABLEFORMCOLUMN_MULTIPLEISTD_CONCATENATERESULTS_LONGTABLE_FILENAME,
                                           sheet_name = "Long_Table",
@@ -260,7 +293,17 @@ class Concatenation_By_Column_Test(unittest.TestCase):
             'Long_Table_Annot': True, 
             'Testing': False
             }
+
+        mock_print = self.patcher.start()
+
         [PDFReport, concatenate_df_list, concatenate_df_sheet_name] = concatenate_along_columns_workflow(stored_args,testing = True)
+        
+        mock_print.assert_called_with('There are Transition_Names mentioned in the ' +
+                                      'Transition_Name_Annot sheet but have a blank Transition_Name_ISTD.\n' +
+                                      '\"LPC 14:0\"\n' + 
+                                      '\"LPC 24:0\"', 
+                                      flush = True) 
+        
         data_index = concatenate_df_sheet_name.index("Long_Table")
         ExcelData_df = self.__sheet_to_df(workbook = WIDETABLEFORMCOLUMN_MULTIPLEISTD_CONCATENATERESULTS_LONGTABLE_WITH_ANNOT_FILENAME,
                                           sheet_name = "Long_Table",
@@ -290,7 +333,17 @@ class Concatenation_By_Column_Test(unittest.TestCase):
             'Long_Table_Annot': False, 
             'Testing': False
             }
+
+        mock_print = self.patcher.start()
+
         [PDFReport, concatenate_df_list, concatenate_df_sheet_name] = concatenate_along_columns_workflow(stored_args,testing = True)
+        
+        mock_print.assert_called_with('There are Transition_Names mentioned in the ' +
+                                      'Transition_Name_Annot sheet but have a blank Transition_Name_ISTD.\n' +
+                                      '\"LPC 14:0\"\n' + 
+                                      '\"LPC 24:0\"', 
+                                      flush = True)
+        
         for sheet_name in concatenate_df_sheet_name:
             if sheet_name != "Long_Table":
                 data_index = concatenate_df_sheet_name.index(sheet_name)
@@ -361,6 +414,9 @@ class Concatenation_By_Column_Test(unittest.TestCase):
                 #print(unique)
 
         return ExcelData_df
+
+    def tearDown(self):
+        self.patcher.stop()
 
 if __name__ == '__main__':
     unittest.main()

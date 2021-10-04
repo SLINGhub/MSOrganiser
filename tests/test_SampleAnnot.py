@@ -186,11 +186,9 @@ class SampleAnnot_Test(unittest.TestCase):
                                                             ingui = True)
 
         # Ensure that the warning was due to missing entries in Data File Name column 
-        mock_print.assert_called_with('There are sample names that are not associated with a data file name. ' +
-                                      'They will not be used during analysis.\n' +
-                                      'Data_File_Name Sample_Name\n' +
-                                      '          None   10_TQC_06\n' +
-                                      '          None        1_8h\n' +
+        mock_print.assert_called_with('There are sample names that are not associated ' + 
+                                      'with a data file name at row(s) 7, 15. ' +
+                                      'They will not be used during analysis. '
                                       'Ensure that both columns Data_File_Name and Sample_Name are filled for each sample.',
                                       flush = True)
 
@@ -201,12 +199,9 @@ class SampleAnnot_Test(unittest.TestCase):
                                                             ingui = True)
 
         # Ensure that the warning was due to missing entries in Sample Name column 
-        mock_print.assert_called_with('There are data file names that are not associated with a sample name. ' +
-                                      'They will not be used during analysis.\n' +
-                                      '    Data_File_Name Sample_Name\n' +
-                                      'WideTableFormA.csv        None\n' +
-                                      'WideTableFormB.csv        None\n' +
-                                      '              None        None\n' +
+        mock_print.assert_called_with('There are data file names that are not associated ' +
+                                      'with a sample name at row(s) 6, 16, 22. ' +
+                                      'They will not be used during analysis. ' +
                                       'Ensure that both columns Data_File_Name and Sample_Name are filled for each sample.',
                                       flush = True)
 
@@ -233,7 +228,7 @@ class SampleAnnot_Test(unittest.TestCase):
         self.assertEqual(cm.exception.code, -1)
 
         # Ensure that the error was due to a MSFilePath with no correspnding Sample Annotation data
-        mock_print.assert_called_with('The "Data_File_Name" column in the Sample Annotation sheet does contain the input file name.\n' +
+        mock_print.assert_called_with('The "Data_File_Name" column in the Sample Annotation sheet does not contain the input file name(s).\n' +
                                       'WideTableForm.csv\n' +
                                       'WideTableForm2.csv\n' +
                                       'Please correct the Sample Annotation sheet or the input file name.',
@@ -262,7 +257,7 @@ class SampleAnnot_Test(unittest.TestCase):
                                       'not in the Sample_Name column of the Sample Annotation sheet.\n' +
                                       '10_TQC_06\n' +
                                       '4_untreated\n' +
-                                      'Check that these sample names are in the Sample Annotation file. ' +
+                                      'Check that these sample names are in the Sample_Annot sheet. ' +
                                       'Make sure the corresponding Data_File_Name is correct.',
                                       flush=True)
 

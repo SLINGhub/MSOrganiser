@@ -1,4 +1,5 @@
 import unittest
+from unittest.mock import patch
 import os
 import pandas as pd
 import openpyxl
@@ -36,6 +37,12 @@ WIDETABLEFORMROW1_RESULTS_LONGTABLE_FILENAME = os.path.join(os.path.dirname(__fi
 WIDETABLEFORMROW1_RESULTS_LONGTABLE_WITH_ANNOT_FILENAME = os.path.join(os.path.dirname(__file__),"testdata", 
                                                                        "test_no_concatenate", "WideTableFormRow1_LongTable_with_Annot.xlsx")
 class NoConcatenation_Test(unittest.TestCase):
+    # See https://realpython.com/lessons/mocking-print-unit-tests/
+    # for more details on mock
+    def setUp(self):
+        # Replace the print function in Annotation.py file to a mock
+        self.patcher = patch('MSCalculate.print')
+
     def test_no_concatenate(self):
         """Check if the software is able to from the two input raw data
 
@@ -217,8 +224,17 @@ class NoConcatenation_Test(unittest.TestCase):
             'Testing': False
         }
 
+        mock_print = self.patcher.start()
+
         # We just check the results of the first file input 
         [file_data_list, file_name] = no_concatenate_workflow(stored_args,testing = True)
+
+        mock_print.assert_called_with('There are Transition_Names mentioned in the ' +
+                                      'Transition_Name_Annot sheet but have a blank Transition_Name_ISTD.\n' +
+                                      '\"LPC 14:0\"\n' + 
+                                      '\"LPC 24:0\"', 
+                                      flush = True)
+
         file_name_index = file_name.index(WIDETABLEFORMROW1_MULTIPLEISTD_FILENAME)
         [file_data,sheet_names] = file_data_list[file_name_index]
 
@@ -255,8 +271,17 @@ class NoConcatenation_Test(unittest.TestCase):
             'Testing': False
         }
 
+        mock_print = self.patcher.start()
+
         # We just check the results of the first file input 
         [file_data_list, file_name] = no_concatenate_workflow(stored_args,testing = True)
+
+        mock_print.assert_called_with('There are Transition_Names mentioned in the ' +
+                                      'Transition_Name_Annot sheet but have a blank Transition_Name_ISTD.\n' +
+                                      '\"LPC 14:0\"\n' + 
+                                      '\"LPC 24:0\"', 
+                                      flush = True)
+
         file_name_index = file_name.index(WIDETABLEFORMROW1_MULTIPLEISTD_FILENAME)
         [file_data,sheet_names] = file_data_list[file_name_index]
 
@@ -290,8 +315,17 @@ class NoConcatenation_Test(unittest.TestCase):
             'Testing': False
         }
 
+        mock_print = self.patcher.start()
+
         # We just check the results of the first file input 
         [file_data_list, file_name] = no_concatenate_workflow(stored_args,testing = True)
+
+        mock_print.assert_called_with('There are Transition_Names mentioned in the ' +
+                                      'Transition_Name_Annot sheet but have a blank Transition_Name_ISTD.\n' +
+                                      '\"LPC 14:0\"\n' + 
+                                      '\"LPC 24:0\"', 
+                                      flush = True)
+
         file_name_index = file_name.index(WIDETABLEFORMROW1_MULTIPLEISTD_FILENAME)
         [file_data,sheet_names] = file_data_list[file_name_index]
 
@@ -325,8 +359,17 @@ class NoConcatenation_Test(unittest.TestCase):
             'Testing': False
         }
 
+        mock_print = self.patcher.start()
+
         # We just check the results of the first file input 
         [file_data_list, file_name] = no_concatenate_workflow(stored_args,testing = True)
+
+        mock_print.assert_called_with('There are Transition_Names mentioned in the ' +
+                                      'Transition_Name_Annot sheet but have a blank Transition_Name_ISTD.\n' +
+                                      '\"LPC 14:0\"\n' + 
+                                      '\"LPC 24:0\"', 
+                                      flush = True)
+
         file_name_index = file_name.index(WIDETABLEFORMROW1_MULTIPLEISTD_FILENAME)
         [file_data,sheet_names] = file_data_list[file_name_index]
 
@@ -402,8 +445,8 @@ class NoConcatenation_Test(unittest.TestCase):
 
         return ExcelData_df
 
-#class Concatenation_By_Row_Test(unittest.TestCase):
-#    print("Here")
+    def tearDown(self):
+        self.patcher.stop()
 
 if __name__ == '__main__':
     unittest.main()
