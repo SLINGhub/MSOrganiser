@@ -40,7 +40,7 @@ class NoConcatenation_Test(unittest.TestCase):
     # See https://realpython.com/lessons/mocking-print-unit-tests/
     # for more details on mock
     def setUp(self):
-        # Replace the print function in Annotation.py file to a mock
+        # Replace the print function in MSCalculate.py file to a mock
         self.patcher = patch('MSCalculate.print')
 
     def test_no_concatenate(self):

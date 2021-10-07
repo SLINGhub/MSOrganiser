@@ -53,19 +53,26 @@ class MS_Analysis():
             if self.MS_FilePath.endswith('.csv'):
                 InputData = AgilentMSRawData(filepath=self.MS_FilePath,logger=self.logger)
             else:
-                if self.ingui:
-                    print('Filepath ' + str(self.MS_FilePath) + ' must have a .csv extention',flush=True)
                 if self.logger:
-                    self.logger.error('Filepath %s must have a .csv extention',self.MS_FilePath)
+                    self.logger.error('Input file path ' + '\'' + str(self.MS_FilePath) + '\' ' + 
+                                      'must have a .csv extention.')
+                if self.ingui:
+                    print('Input file path ' + '\'' + str(self.MS_FilePath) + '\' ' + 
+                          'must have a .csv extention.',
+                          flush = True)
                 sys.exit(-1)
         elif self.MS_FileType in ['Multiquant Long Table in txt']:
             if self.MS_FilePath.endswith('.txt'):
                 InputData = SciexMSRawData(filepath=self.MS_FilePath,logger=self.logger)
             else:
-                if self.ingui:
-                    print('Filepath ' + str(self.MS_FilePath) + ' must have a .txt extention',flush=True)
                 if self.logger:
-                    self.logger.error('Filepath %s must have a .txt extention',self.MS_FilePath)
+                    self.logger.error('Input file path ' + '\'' + str(self.MS_FilePath) + '\' ' + 
+                                      'must have a .txt extention.',
+                                      flush = True)
+                if self.ingui:
+                    print('Input file path ' + '\'' + str(self.MS_FilePath) + '\' ' + 
+                          'must have a .txt extention.',
+                          flush = True)
                 sys.exit(-1)
         return(InputData)
 
