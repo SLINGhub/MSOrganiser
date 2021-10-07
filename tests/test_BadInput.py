@@ -19,6 +19,12 @@ NO_ANNOT_FILE_JSONFILENAME = os.path.join(os.path.dirname(__file__),"testdata",
 INPUT_FOLDERNAME = os.path.join(os.path.dirname(__file__),"testdata", 
                                           "test_bad_input", 'input_folder.csv')
 
+NO_DATAFILENAME_WIDETABLEFORM_FILENAME = os.path.join(os.path.dirname(__file__),"testdata", 
+                                                      "test_bad_input", 'NoDataFileColumn_WideTableForm.csv')
+
+NO_DATAFILENAME_COMPOUNDTABLEFORM_FILENAME = os.path.join(os.path.dirname(__file__),"testdata", 
+                                                          "test_bad_input", 'NoDataFileColumn_CompoundTableForm.csv')
+
 TEST_JSONFILENAME = os.path.join(os.path.dirname(__file__),"testdata", 
                                  "test_bad_input", 'No_Output_Options.json')
 
@@ -178,7 +184,7 @@ class Parsing_Issue_Test(unittest.TestCase):
         # Ensure that the system ends with a -1 to indicate an error
         self.assertEqual(cm.exception.code, -1)
 
-        # Ensure that the error was due to wrong file extention
+        # Ensure that the error was due to input of a folder instead of a file
         mock_print.assert_called_with('Input file path ' + '\'' + INPUT_FOLDERNAME + '\'' +
                                       ' does not lead to a system file. ' + 
                                       'Please check if the input file path is a system file and not a folder.',
@@ -217,13 +223,81 @@ class Parsing_Issue_Test(unittest.TestCase):
         # Ensure that the system ends with a -1 to indicate an error
         self.assertEqual(cm.exception.code, -1)
 
-        # Ensure that the error was due to wrong file extention
+        # Ensure that the error was due to input of a csv file that does not exists
         mock_print.assert_called_with('Input file path ' + '\'non_existing_file.csv\'' +
                                       ' could not be found. ' +
                                       'Please check if the input file path.',
                                       flush = True)
 
         self.patcher.stop()
+
+
+    def test_input_agilent_file_no_data_file(self):
+        """Check if the software is able to detect if the Agilent input file in
+           Wide Table Form or Compound Table Form have a Data File column 
+        """
+
+        # Replace the print function in MSRawData.py file to a mock
+        self.patcher = patch('MSRawData.print')
+        mock_print = self.patcher.start()
+
+        stored_args = {
+            'MS_Files': [NO_DATAFILENAME_WIDETABLEFORM_FILENAME], 
+            'MS_FileType': 'Agilent Wide Table in csv', 
+            'Output_Directory': 'D:\\MSOrganiser', 
+            'Output_Options': ['Area'], 
+            'Annot_File': "", 
+            'Output_Format': 'Excel', 
+            'Concatenate': 'No Concatenate', 
+            'Transpose_Results': False, 
+            'Allow_Multiple_ISTD': False, 
+            'Long_Table': False, 
+            'Long_Table_Annot': False, 
+            'Testing': False
+        }
+
+        with self.assertRaises(SystemExit) as cm:
+            [file_data_list, file_name] = no_concatenate_workflow(stored_args,testing = True)
+
+        # Ensure that the system ends with a -1 to indicate an error
+        self.assertEqual(cm.exception.code, -1)
+
+        # Ensure that the error was due to no Data File column in the Agilent Wide Table Form in csv
+        mock_print.assert_called_with('\'' + os.path.basename(NO_DATAFILENAME_WIDETABLEFORM_FILENAME) + '\' ' +
+                                      'has no column containing \"Data File\". ' + 
+                                      'Please check the input file.',
+                                      flush = True)
+
+
+        stored_args = {
+            'MS_Files': [NO_DATAFILENAME_COMPOUNDTABLEFORM_FILENAME], 
+            'MS_FileType': 'Agilent Compound Table in csv', 
+            'Output_Directory': 'D:\\MSOrganiser', 
+            'Output_Options': ['Area'], 
+            'Annot_File': "", 
+            'Output_Format': 'Excel', 
+            'Concatenate': 'No Concatenate', 
+            'Transpose_Results': False, 
+            'Allow_Multiple_ISTD': False, 
+            'Long_Table': False, 
+            'Long_Table_Annot': False, 
+            'Testing': False
+        }
+
+        with self.assertRaises(SystemExit) as cm:
+            [file_data_list, file_name] = no_concatenate_workflow(stored_args,testing = True)
+
+        # Ensure that the system ends with a -1 to indicate an error
+        self.assertEqual(cm.exception.code, -1)
+
+        # Ensure that the error was due to no Data File column in the Agilent Compound Table Form in csv
+        mock_print.assert_called_with('\'' + os.path.basename(NO_DATAFILENAME_COMPOUNDTABLEFORM_FILENAME) + '\' ' +
+                                      'has no column containing \"Data File\". ' + 
+                                      'Please check the input file.',
+                                      flush = True)
+
+        self.patcher.stop()
+
 
 if __name__ == '__main__':
     unittest.main()
