@@ -23,17 +23,27 @@ class MSRawData:
     def __filecheck(self,filepath):
         """Check if filepath exists and is a file"""
         if not filepath.exists():
-            if self.__ingui:
-                print('Filepath ' + str(filepath) + ' could not be found',flush=True)
             if self.__logger:
-                self.__logger.error('Filepath %s could not be found',filepath.absolute())
-                sys.exit(-1)
+                self.__logger.error('Input file path ' + '\'' + str(filepath) + '\'' +
+                                    ' could not be found. ' +
+                                    'Please check if the input file path.')
+            if self.__ingui:
+                print('Input file path ' + '\'' + str(filepath) +  '\'' +
+                      ' could not be found. ' +
+                      'Please check if the input file path.',
+                      flush = True)
+            sys.exit(-1)
         elif not filepath.is_file():
-            if self.__ingui:
-                print('Filepath ' + str(filepath) + ' is not a file',flush=True)
             if self.__logger:
-                self.__logger.error('Filepath %s is not a file.',filepath.absolute())
-                sys.exit(-1)
+                self.__logger.error('Input file path ' + '\'' + str(filepath) + '\'' + 
+                                    ' does not lead to a system file. ' + 
+                                    'Please check if the input file path is a system file and not a folder.')
+            if self.__ingui:
+                print('Input file path ' + '\'' + str(filepath) + '\'' +
+                      ' does not lead to a system file. ' + 
+                      'Please check if the input file path is a system file and not a folder.',
+                      flush = True)
+            sys.exit(-1)
 
     def remove_whiteSpaces(self,df):
         """Strip the whitespaces for each string columns of a df
@@ -108,7 +118,8 @@ class AgilentMSRawData(MSRawData):
         elif column_name in self.VALID_COMPOUND_METHODS:
             column_group = "Method"
         else:
-            self.__logger.error('%s is not a valid column in MassHunter or not available as a valid output for this program.',column_name)
+            if self.__logger:
+                self.__logger.error('%s is not a valid column in MassHunter or not available as a valid output for this program.',column_name)
             if self.__ingui:
                 print(column_name + ' is not a valid column in MassHunter or not available as a valid output for this program.',flush=True)
             sys.exit(-1)
@@ -287,9 +298,15 @@ class AgilentMSRawData(MSRawData):
         DataFileName_df = self.RawData.loc[:,DataFileName_Col].copy()
 
         if DataFileName_df.empty:
-            self.__logger.error('%s has no column containing \"Data File\". Please check the input file',self.__filename)
+            if self.__logger:
+                self.__logger.error('\'' + self.__filename + '\' ' +
+                                    'has no column containing \"Data File\". ' + 
+                                    'Please check the input file.')
             if self.__ingui:
-                print(self.__filename + ' has no column containing \"Data File\". Please check the input file',flush=True)
+                print('\'' + self.__filename + '\' ' +
+                      'has no column containing \"Data File\". ' + 
+                      'Please check the input file.',
+                      flush=True)
             sys.exit(-1)
 
         #We standardise the name to Sample_Name
@@ -318,9 +335,15 @@ class AgilentMSRawData(MSRawData):
         DataFileName_df = self.RawData.loc[2,DataFileName_Col].copy().to_frame()
         
         if DataFileName_df.empty:
-            self.__logger.error('%s has no column containing \"Data File\". Please check the input file',self.__filename)
+            if self.__logger:
+                self.__logger.error('\'' + self.__filename + '\' ' +
+                                    'has no column containing \"Data File\". ' + 
+                                    'Please check the input file.')
             if self.__ingui:
-                print(self.__filename + ' has no column containing \"Data File\". Please check the input file',flush=True)
+                print('\'' + self.__filename + '\' ' +
+                      'has no column containing \"Data File\". ' + 
+                      'Please check the input file.',
+                      flush=True)
             sys.exit(-1)
 
         #We standardise the name to Sample Name
@@ -344,7 +367,8 @@ class AgilentMSRawData(MSRawData):
 
         #Check if input is blank/None
         if not filepath:
-            self.__logger.error('%s is empty. Please give an input file', str(filepath))
+            if self.__logger:
+                self.__logger.error('%s is empty. Please give an input file', str(filepath))
             if self.__ingui:
                 print(str(filepath) + ' is empty. Please give an input file',flush=True)
             sys.exit(-1)
@@ -355,7 +379,7 @@ class AgilentMSRawData(MSRawData):
                 self.__logger.error('%s does not exists. Please check the input file',str(filepath))
             if self.__ingui:
                 print(str(filepath) + ' does not exists. Please check the input file',flush=True)
-                sys.exit(-1)
+            sys.exit(-1)
 
         #self.RawData = pd.read_csv(filepath, header=None,low_memory=False,encoding = "ISO-8859-1")
         all_encoders_fail = True
@@ -462,7 +486,8 @@ class SciexMSRawData(MSRawData):
         """
 
         if column_name not in self.VALID_COMPOUND_RESULTS:
-            self.__logger.error('%s is not a valid column in Sciex or not available as a valid output for this program.',column_name)
+            if self.__logger:
+                self.__logger.error('%s is not a valid column in Sciex or not available as a valid output for this program.',column_name)
             if self.__ingui:
                 print(column_name + ' is not a valid column in Sciex or not available as a valid output for this program.',flush=True)
             sys.exit(-1)
@@ -481,7 +506,8 @@ class SciexMSRawData(MSRawData):
 
         #Check if input is blank/None
         if not filepath:
-            self.__logger.error('%s is empty. Please give an input file', str(filepath))
+            if self.__logger:
+                self.__logger.error('%s is empty. Please give an input file', str(filepath))
             if self.__ingui:
                 print(str(filepath) + ' is empty. Please give an input file',flush=True)
             sys.exit(-1)

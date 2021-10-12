@@ -25,76 +25,85 @@ import sys
        #     }]
        # }]
        )
-def parse_MSOrganiser_args(args_json_file_path=""):
+def parse_MSOrganiser_args(args_json_file_path = "", testing = False):
     """Function to start the Gooey Interface, record the stored arguments and write them to a json file
     
     Args:
         args_json_file_path (str): The file path to where the json file be created. Default is where the MSOrganiser.exe file is
+        testing (bool): if True, unit test is currently being perform. 
 
     Returns:
         stored_args (dict): A dictionary storing the input parameters.
 
     """
-    #Create default json file is located in the same directory as the executable file
+    # Create default json file is located in the same directory as the executable file
     if not args_json_file_path:
         args_file = os.path.join(os.path.abspath(os.path.dirname(sys.argv[0])),"MSOrganiser-args.json")
     else:
-        args_file =  args_json_file_path
+        args_file = args_json_file_path
 
-    #Load the parameters from json file or create an empty dictionary
+    # Load the parameters from json file or create an empty dictionary
     stored_args = _load_args_from_json(args_file=args_file)
 
-    #Create a Gooey Parser from the stored args
-    parser = _create_Gooey_Parser(stored_args)
+    # Create a Gooey Parser from the stored args
+    if not testing:
+        # Create a Gooey Parser from the stored args
+        parser = _create_Gooey_Parser(stored_args)
+        
+        # Update the args with the most recent parameter settings
+        args = parser.parse_args()
+        stored_args = vars(args)
 
-    #Update the args with the most recent parameter settings
-    args = parser.parse_args()
-    stored_args = vars(args)
+    # Verify that the arguments are valid before saving/using them
 
-    #Verify that the arguments are valid before saving/using them
-
-    #Check if MS_Files option is not empty
+    # Check if MS_Files option is not empty
     if not stored_args['MS_Files']:
         print("Please key in at least one input MS file",flush=True)
         sys.exit(-1)
 
-    #Check if Output_Directory option is not empty
+    # Check if Output_Directory option is not empty
     if not stored_args['Output_Directory']:
         print("Please key in at least one output directory",flush=True)
         sys.exit(-1)
 
-    #Check if Output_Options is selected
+    # Check if Output_Options is selected
     if not stored_args['Output_Options']:
         print("Please key in at least one result to output",flush=True)
         sys.exit(-1)
+    elif any(output_option in ['normArea by ISTD', 'normConc by ISTD'] for output_option in stored_args['Output_Options']):
+        # Check if Annot_File is not empty when normArea by ISTD or
+        # normConc by ISTD or both are selected in Output_Options
+        if not stored_args['Annot_File']:
+            print("Please key in an annotation file when \'normArea by ISTD\' " + 
+                  "or \'normConc by ISTD\' are selected in Output_Options",
+                  flush=True)
+            sys.exit(-1)
 
-    #Check if Concatenate is selected
-    if not stored_args['Concatenate']:
-        print("Please key in at least one option",flush=True)
-        sys.exit(-1)
 
-    #Store the values of the arguments so we have them next time we run
-    _save_args_to_json(args_file,stored_args)
+    # Store the values of the arguments so we have them next time we run
+    # No need to save if we are testing
+    if not testing:
+        _save_args_to_json(args_file,stored_args)
 
-    #Convert the string in Transpose Results to boolean
+    # Convert the string in Transpose Results to boolean
     if stored_args['Transpose_Results'] == 'True':
         stored_args['Transpose_Results'] = True
     else:
         stored_args['Transpose_Results'] = False
 
-    #Convert the string in Allow Mulitple ISTD to boolean
+    # Convert the string in Allow Mulitple ISTD to boolean
     if stored_args['Allow_Multiple_ISTD'] == 'True':
         stored_args['Allow_Multiple_ISTD'] = True
     else:
         stored_args['Allow_Multiple_ISTD'] = False
 
-    #Convert the string in Long Table to boolean
+    # Convert the string in Long Table to boolean
     if stored_args['Long_Table'] == 'True':
         stored_args['Long_Table'] = True
     else:
         stored_args['Long_Table'] = False
 
-    #Convert the string in Long Table to boolean
+    # Convert the string in Long Table to boolean
     if stored_args['Long_Table_Annot'] == 'True':
         stored_args['Long_Table_Annot'] = True
     else:
