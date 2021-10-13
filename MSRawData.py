@@ -94,17 +94,17 @@ class AgilentMSRawData(MSRawData):
         elif self.DataForm == "CompoundTableForm":
             return self.__get_table_compound(column_name,is_numeric)
 
-    def get_data_file_name(self):
-        """Function to get the list of sample names in a form of a dataframe
-
-        Returns:
-            A data frame of sample as rows and transition names as columns with values from the chosen column name
-
-        """
-        if self.DataForm == "WideTableForm":
-            return self.__get_data_file_name_wide()
-        elif self.DataForm == "CompoundTableForm":
-            return self.__get_data_file_name_compound()
+    #def get_data_file_name(self):
+    #    """Function to get the list of sample names in a form of a dataframe
+    #
+    #    Returns:
+    #        A data frame of sample as rows and transition names as columns with values from the chosen column name
+    #
+    #    """
+    #    if self.DataForm == "WideTableForm":
+    #        return self.__get_data_file_name_wide()
+    #    elif self.DataForm == "CompoundTableForm":
+    #        return self.__get_data_file_name_compound()
 
     def __get_table_wide(self,column_name,is_numeric=True):
         """Function to get the table from MassHunter Raw Data in Wide Table form"""
@@ -198,20 +198,31 @@ class AgilentMSRawData(MSRawData):
     def __get_compound_name_compound(self,column_name):
         """Function to get the df Transition Name as Rows, Sample Name as Columns with values from the chosen column_name. E.g Area """
 
-        #Find cols with Transition in Qualifier Method in the first row
-        Qualifier_Method_Col = self.RawData.iloc[0,:].str.contains("Qualifier \d Method", regex=True) & self.RawData.iloc[1,:].str.contains("Transition")
-        #Find cols with Data File in the second row
-        DataFileName_Col = self.RawData.iloc[1,:].str.contains("Data File")
-
-        #Find the number of Qualifiers each Transition is entitled to have
-        No_of_Qual_per_Transition = int((Qualifier_Method_Col.values==True).sum() / (DataFileName_Col.values==True).sum() )
-
-        #Get the column index where the group of Qualifier Method first appeared.
-        Qualifier_Method_Col_Index = Qualifier_Method_Col.index[Qualifier_Method_Col == True].tolist()
-
-        #Get the only column index of where the Transition Names are. We know for sure that it is on the third row
+        # Get the column index of where the Transition Names are. We know for sure that it is on the third row
         Compound_Col = self.RawData.iloc[0,:].str.contains("Compound Method") & self.RawData.iloc[1,:].str.contains("Name")
         Compound_Col_Index = Compound_Col.index[Compound_Col == True].tolist()
+        #Give an error if we can't get any transition name
+        if len(Compound_Col_Index) == 0 :
+            if self.__logger:
+                self.__logger.error('\'' + self.__filename + '\' ' +
+                                    'has no column contaning \"Name\" in Compound Method Table. ' +
+                                    'Please check the input file.')
+            if self.__ingui:
+                print('\'' + self.__filename + '\' ' +
+                      'has no column contaning \"Name\" in Compound Method Table. ' +
+                      'Please check the input file.',
+                      flush=True)
+            sys.exit(-1)
+
+        # Find cols with Transition in second row and Qualifier Method in the first row
+        Qualifier_Method_Col = self.RawData.iloc[0,:].str.contains("Qualifier \d Method", regex=True) & self.RawData.iloc[1,:].str.contains("Transition")
+        # Get the column index where the group of Qualifier Method first appeared.
+        Qualifier_Method_Col_Index = Qualifier_Method_Col.index[Qualifier_Method_Col == True].tolist()
+
+        # Find cols with Data File in the second row
+        DataFileName_Col = self.RawData.iloc[1,:].str.contains("Data File")
+        # Find the number of Qualifiers each Transition is entitled to have
+        No_of_Qual_per_Transition = int((Qualifier_Method_Col.values == True).sum() / (DataFileName_Col.values == True).sum() )
 
         #We start a new Compound_list
         Compound_list = []

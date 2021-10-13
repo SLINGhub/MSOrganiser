@@ -25,6 +25,11 @@ NO_DATAFILENAME_WIDETABLEFORM_FILENAME = os.path.join(os.path.dirname(__file__),
 NO_DATAFILENAME_COMPOUNDTABLEFORM_FILENAME = os.path.join(os.path.dirname(__file__),"testdata", 
                                                           "test_bad_input", 'NoDataFileColumn_CompoundTableForm.csv')
 
+NO_NAME_COMPOUNDTABLEFORM_FILENAME = os.path.join(os.path.dirname(__file__),"testdata", 
+                                                  "test_bad_input", 'NoName_CompoundTableForm_Qualifier.csv')
+
+COMPOUNDTABLEFORM_FILENAME = os.path.join(os.path.dirname(__file__),"testdata", 'CompoundTableForm.csv')
+
 TEST_JSONFILENAME = os.path.join(os.path.dirname(__file__),"testdata", 
                                  "test_bad_input", 'No_Output_Options.json')
 
@@ -297,6 +302,42 @@ class Parsing_Issue_Test(unittest.TestCase):
                                       flush = True)
 
         self.patcher.stop()
+
+    def test_input_agilent_compound_table_file_no_name(self):
+        """Check if the software is able to detect if the Agilent input file in
+           Compound Table Form have a Name column 
+        """
+        stored_args = {
+            'MS_Files': [NO_NAME_COMPOUNDTABLEFORM_FILENAME], 
+            'MS_FileType': 'Agilent Compound Table in csv', 
+            'Output_Directory': 'D:\\MSOrganiser', 
+            'Output_Options': ['Area'], 
+            'Annot_File': "", 
+            'Output_Format': 'Excel', 
+            'Concatenate': 'No Concatenate', 
+            'Transpose_Results': False, 
+            'Allow_Multiple_ISTD': False, 
+            'Long_Table': False, 
+            'Long_Table_Annot': False, 
+            'Testing': False
+        }
+
+        # Replace the print function in MSRawData.py file to a mock
+        self.patcher = patch('MSRawData.print')
+        mock_print = self.patcher.start()
+
+        with self.assertRaises(SystemExit) as cm:
+            [file_data_list, file_name] = no_concatenate_workflow(stored_args,testing = True)
+
+        # Ensure that the system ends with a -1 to indicate an error
+        self.assertEqual(cm.exception.code, -1)
+
+        # Ensure that the error was due to no Data File column in the Agilent Compound Table Form in csv
+        mock_print.assert_called_with('\'' + os.path.basename(NO_NAME_COMPOUNDTABLEFORM_FILENAME) + '\' ' +
+                                      'has no column contaning \"Name\" in Compound Method Table. ' + 
+                                      'Please check the input file.',
+                                      flush = True)
+
 
 
 if __name__ == '__main__':
