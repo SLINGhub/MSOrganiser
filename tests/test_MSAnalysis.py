@@ -12,6 +12,10 @@ WIDETABLEFORM_RESULTS_FILENAME = os.path.join(os.path.dirname(__file__),"testdat
 WIDETABLEFORM_LONGTABLE_FILENAME = os.path.join(os.path.dirname(__file__),"testdata", 'WideTableForm_LongTable.xlsx')
 WIDETABLEFORM_LONGTABLE_WITH_ANNOT_FILENAME = os.path.join(os.path.dirname(__file__),"testdata", 'WideTableForm_LongTable_with_Annot.xlsx')
 
+WIDETABLEFORM_QUALIFIER_FILENAME = os.path.join(os.path.dirname(__file__),"testdata", 'WideTableForm_Qualifier.csv')
+WIDETABLEFORM_QUALIFIER_ANNOTATION = os.path.join(os.path.dirname(__file__),"testdata", 'WideTableForm_Qualifier_Annotation.xlsx')
+WIDETABLEFORM_QUALIFIER_RESULTS_FILENAME = os.path.join(os.path.dirname(__file__),"testdata", 'WideTableForm_Qualifier_Results.xlsx')
+
 LARGE_WIDETABLEFORM_FILENAME = os.path.join(os.path.dirname(__file__),"testdata", 'LargeTestData.csv')
 LARGE_WIDETABLEFORM_ANNOTATION = os.path.join(os.path.dirname(__file__),"testdata", 'LargeTestData_Annotation.xlsx')
 LARGE_WIDETABLEFORM_RESULTS_FILENAME = os.path.join(os.path.dirname(__file__),"testdata", 'LargeTestData_Results.xlsx')
@@ -19,6 +23,10 @@ LARGE_WIDETABLEFORM_RESULTS_FILENAME = os.path.join(os.path.dirname(__file__),"t
 COMPOUNDTABLEFORM_FILENAME = os.path.join(os.path.dirname(__file__),"testdata", 'CompoundTableForm.csv')
 COMPOUNDTABLEFORM_ANNOTATION = os.path.join(os.path.dirname(__file__),"testdata", 'CompoundTableForm_Annotation.xlsx')
 COMPOUNDTABLEFORM_RESULTS_FILENAME = os.path.join(os.path.dirname(__file__),"testdata", 'CompoundTableForm_Results.xlsx')
+
+COMPOUNDTABLEFORM_QUALIFIER_FILENAME = os.path.join(os.path.dirname(__file__),"testdata", 'CompoundTableForm_Qualifier.csv')
+COMPOUNDTABLEFORM_QUALIFIER_ANNOTATION = os.path.join(os.path.dirname(__file__),"testdata", 'CompoundTableForm_Qualifier_Annotation.xlsx')
+COMPOUNDTABLEFORM_QUALIFIER_RESULTS_FILENAME = os.path.join(os.path.dirname(__file__),"testdata", 'CompoundTableForm_Qualifier_Results.xlsx')
 
 SCIEX_FILENAME = os.path.join(os.path.dirname(__file__),"testdata", 'SciExTestData.txt')
 SCIEX_ANNOTATION = os.path.join(os.path.dirname(__file__),"testdata", 'SciExTestData_Annotation.xlsx')
@@ -33,22 +41,30 @@ class Agilent_Test(unittest.TestCase):
         self.patcher = patch('MSCalculate.print')
 
         self.InputDataList = [WIDETABLEFORM_FILENAME,
+                              WIDETABLEFORM_QUALIFIER_FILENAME,
                               LARGE_WIDETABLEFORM_FILENAME,
                               COMPOUNDTABLEFORM_FILENAME,
+                              COMPOUNDTABLEFORM_QUALIFIER_FILENAME,
                               SCIEX_FILENAME]
 
         self.DataResultList = [WIDETABLEFORM_RESULTS_FILENAME,
+                               WIDETABLEFORM_QUALIFIER_RESULTS_FILENAME,
                                LARGE_WIDETABLEFORM_RESULTS_FILENAME,
                                COMPOUNDTABLEFORM_RESULTS_FILENAME,
+                               COMPOUNDTABLEFORM_QUALIFIER_RESULTS_FILENAME,
                                SCIEX_RESULTS_FILENAME]
 
         self.AnnotationList = [WIDETABLEFORM_ANNOTATION,
+                               WIDETABLEFORM_QUALIFIER_ANNOTATION,
                                LARGE_WIDETABLEFORM_ANNOTATION,
                                COMPOUNDTABLEFORM_ANNOTATION,
+                               COMPOUNDTABLEFORM_QUALIFIER_ANNOTATION,
                                SCIEX_ANNOTATION]
 
         self.MSFileTypeList = ['Agilent Wide Table in csv',
                                'Agilent Wide Table in csv',
+                               'Agilent Wide Table in csv',
+                               'Agilent Compound Table in csv',
                                'Agilent Compound Table in csv',
                                'Multiquant Long Table in txt']
 
@@ -56,6 +72,7 @@ class Agilent_Test(unittest.TestCase):
         """Check if the software is able to calculate the normalise area using MS_Analysis.get_Normalised_Area from these datasets 
 
         * WideTableForm.csv
+        * WideTableForm_Qualifier.csv
         * LargeTestData.csv
         * CompoundTableForm.csv
         * SciExTestData.txt
@@ -90,6 +107,7 @@ class Agilent_Test(unittest.TestCase):
         """Check if the software is able to calculate the transition names concentration using MS_Analysis.get_Analyte_Concentration from these datasets
 
         * WideTableForm.csv
+        * WideTableForm_Qualifier.csv
         * LargeTestData.csv
         * CompoundTableForm.csv
         * SciExTestData.txt

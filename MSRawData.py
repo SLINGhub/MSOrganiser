@@ -183,8 +183,15 @@ class AgilentMSRawData(MSRawData):
         
         #Reset the row index
         table_df = table_df.reset_index(drop=True)
-        table_df = table_df.apply(pd.to_numeric, errors='coerce')
+
+        #Convert text numbers into numeric
+        if is_numeric:
+            table_df = table_df.apply(pd.to_numeric, errors='coerce')
+
         table_df = pd.concat([DataFileName_df, table_df], axis=1)
+
+        #Strip the whitespaces for each string columns
+        table_df = self.remove_whiteSpaces(table_df)
 
         return table_df
 
@@ -269,7 +276,8 @@ class AgilentMSRawData(MSRawData):
                 break
             else:
                 #When there is a transition, we need to collect a subset of ColName_Qualifier_Col_Index that correspond to this transition
-                ColName_Qualifier_Col_Index_subset = [ColName_Qualifier_Col_Index[index] for index in range(0+i,int(len(ColName_Qualifier_Col_Index)/No_of_Qual_per_Transition),No_of_Qual_per_Transition)]
+                #ColName_Qualifier_Col_Index_subset = [ColName_Qualifier_Col_Index[index] for index in range(0+i,int(len(ColName_Qualifier_Col_Index)/No_of_Qual_per_Transition),No_of_Qual_per_Transition)]
+                ColName_Qualifier_Col_Index_subset = [ColName_Qualifier_Col_Index[index] for index in range(0+i,int(len(ColName_Qualifier_Col_Index)),No_of_Qual_per_Transition)]
                 Qualifier_df = pd.DataFrame(x[x.index.isin(ColName_Qualifier_Col_Index_subset)])
                 Qualifier_df = Qualifier_df.T.values.tolist()
 
@@ -365,7 +373,7 @@ class AgilentMSRawData(MSRawData):
     def __readfile(self,filepath):
         """Function to read the input file"""
 
-        #Check if input is blank/None
+        # Check if input is blank/None
         if not filepath:
             if self.__logger:
                 self.__logger.error('%s is empty. Please give an input file', str(filepath))
@@ -373,7 +381,7 @@ class AgilentMSRawData(MSRawData):
                 print(str(filepath) + ' is empty. Please give an input file',flush=True)
             sys.exit(-1)
 
-        #Check if the file exists for reading
+        # Check if the file exists for reading
         if not os.path.isfile(filepath):
             if self.__logger:
                 self.__logger.error('%s does not exists. Please check the input file',str(filepath))
@@ -398,14 +406,15 @@ class AgilentMSRawData(MSRawData):
                 print('Unable to read csv file with the available encoders',flush=True)
             sys.exit(-1)
 
-        #Check if the file has content
+        # Check if the file has content
         if self.RawData.empty:
             if self.__logger:
                 self.__logger.error('%s is an empty file. Please check the input file',str(filepath))
             if self.__ingui:
                 print(str(filepath) + ' is an empty file. Please check the input file',flush=True)
             sys.exit(-1)
-
+        
+        # On the first row, fill empty cells forward 
         self.RawData.iloc[0,:] = self.RawData.iloc[0,:].fillna(method='ffill')
 
     def __getdataform(self,filepath):
