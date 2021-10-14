@@ -109,48 +109,53 @@ class AgilentMSRawData(MSRawData):
     def __get_table_wide(self,column_name,is_numeric=True):
         """Function to get the table from MassHunter Raw Data in Wide Table form"""
 
-        #Get the data file name and give error when it cannot be found
+        # Get the data file name and give error when it cannot be found
         DataFileName_df = self.__get_data_file_name_wide()
 
-        #Check if Column name comes from Results or Methods group
+        # Check if Column name comes from Results or Methods group
         if column_name in self.VALID_COMPOUND_RESULTS:
             column_group = "Results"
         elif column_name in self.VALID_COMPOUND_METHODS:
             column_group = "Method"
         else:
             if self.__logger:
-                self.__logger.error('%s is not a valid column in MassHunter or not available as a valid output for this program.',column_name)
+                self.__logger.error('Output option ' + column_name + ' ' + 
+                                    'is not a valid column in MassHunter or not ' + 
+                                    'available as a valid output for this program.')
             if self.__ingui:
-                print(column_name + ' is not a valid column in MassHunter or not available as a valid output for this program.',flush=True)
+                print('Output option ' + column_name + ' ' + 
+                      'is not a valid column in MassHunter or not ' + 
+                      'available as a valid output for this program.',
+                      flush=True)
             sys.exit(-1)
 
-        #Extract the data  with the given column name and group
+        # Extract the data  with the given column name and group
         table_index = self.RawData.iloc[0,:].str.contains(column_group) & self.RawData.iloc[1,:].str.contains(column_name)
         table_df = self.RawData.loc[:,table_index].copy()
 
         if table_df.empty:
             return table_df
 
-        #Remove the column group text and whitespaces
+        # Remove the column group text and whitespaces
         table_df.iloc[0,:] = table_df.iloc[0,:].str.replace(column_group, "").str.strip()
 
-        #Assign column name
+        # Assign column name
         colnames = table_df.iloc[0,:].astype('str').str.strip()
         table_df.columns = colnames
 
-        #We remove the first and second row because the column names are given
+        # We remove the first and second row because the column names are given
         table_df = table_df.iloc[2:]
         
-        #Reset the row index
+        # Reset the row index
         table_df = table_df.reset_index(drop=True)
 
-        #Convert text numbers into numeric
+        # Convert text numbers into numeric
         if is_numeric:
             table_df = table_df.apply(pd.to_numeric, errors='coerce')
 
         table_df = pd.concat([DataFileName_df, table_df], axis=1)
         
-        #Strip the whitespaces for each string columns
+        # Strip the whitespaces for each string columns
         table_df = self.remove_whiteSpaces(table_df)
 
         return table_df
@@ -158,11 +163,29 @@ class AgilentMSRawData(MSRawData):
     def __get_table_compound(self,column_name,is_numeric=True):
         """Function to get the table from MassHunter Raw Data in Compound Table form"""
 
-        #Get the data file name and give error when it cannot be found
+        # Get the data file name and give error when it cannot be found
         DataFileName_df = self.__get_data_file_name_compound()
 
-        #Get the compound table df and give error when it cannot be found
-        #CompoundName_df = self.__get_compound_name_compound(column_name)
+        # Check if Column name comes from Results or Methods group
+        # TODO try to extract data from VALID_COMPOUND_METHODS
+        if column_name in self.VALID_COMPOUND_RESULTS:
+            column_group = "Results"
+        elif column_name in self.VALID_COMPOUND_METHODS:
+            column_group = "Method"
+        else:
+            if self.__logger:
+                self.__logger.error('Output option ' + column_name + ' ' + 
+                                    'is not a valid column in MassHunter or not ' + 
+                                    'available as a valid output for this program.')
+            if self.__ingui:
+                print('Output option ' + column_name + ' ' + 
+                      'is not a valid column in MassHunter or not ' + 
+                      'available as a valid output for this program.',
+                      flush=True)
+            sys.exit(-1)
+
+        # Get the compound table df and give error when it cannot be found
+        # CompoundName_df = self.__get_compound_name_compound(column_name)
         table_df = self.__get_compound_name_compound(column_name)
 
         if table_df.empty:
@@ -170,27 +193,27 @@ class AgilentMSRawData(MSRawData):
 
         table_df = table_df.transpose()
 
-        #Assign column name
+        # Assign column name
         colnames = table_df.iloc[0,:].astype('str').str.strip()
         table_df.columns = colnames
         
-        #We remove the first row because the column names are given
+        # We remove the first row because the column names are given
         table_df = table_df.iloc[1:]
 
-        #If column name is a compound method, only the first row has data, we need to replicate data for all the rows
+        # If column name is a compound method, only the first row has data, we need to replicate data for all the rows
         if column_name in self.VALID_COMPOUND_METHODS:
             table_df = pd.concat([table_df]*DataFileName_df.shape[0], ignore_index=True)
         
-        #Reset the row index
+        # Reset the row index
         table_df = table_df.reset_index(drop=True)
 
-        #Convert text numbers into numeric
+        # Convert text numbers into numeric
         if is_numeric:
             table_df = table_df.apply(pd.to_numeric, errors='coerce')
 
         table_df = pd.concat([DataFileName_df, table_df], axis=1)
 
-        #Strip the whitespaces for each string columns
+        # Strip the whitespaces for each string columns
         table_df = self.remove_whiteSpaces(table_df)
 
         return table_df
@@ -201,7 +224,8 @@ class AgilentMSRawData(MSRawData):
         # Get the column index of where the Transition Names are. We know for sure that it is on the third row
         Compound_Col = self.RawData.iloc[0,:].str.contains("Compound Method") & self.RawData.iloc[1,:].str.contains("Name")
         Compound_Col_Index = Compound_Col.index[Compound_Col == True].tolist()
-        #Give an error if we can't get any transition name
+
+        # Give an error if we can't get any transition name
         if len(Compound_Col_Index) == 0 :
             if self.__logger:
                 self.__logger.error('\'' + self.__filename + '\' ' +
@@ -224,10 +248,10 @@ class AgilentMSRawData(MSRawData):
         # Find the number of Qualifiers each Transition is entitled to have
         No_of_Qual_per_Transition = int((Qualifier_Method_Col.values == True).sum() / (DataFileName_Col.values == True).sum() )
 
-        #We start a new Compound_list
+        # We start a new Compound_list
         Compound_list = []
 
-        #We start on row three
+        # We start on row three
         self.RawData.iloc[2:,sorted(Compound_Col_Index + Qualifier_Method_Col_Index[0:No_of_Qual_per_Transition] )].apply(lambda x: AgilentMSRawData._get_Compound_List(x=x,
                                                                                                                                                                         Compound_list=Compound_list),
                                                                                                                           axis=1)
@@ -235,24 +259,24 @@ class AgilentMSRawData(MSRawData):
         CompoundName_df = pd.DataFrame(Compound_list)
         CompoundName_df = self.remove_whiteSpaces(CompoundName_df)
 
-        #All Column Name (e.g Area) and Transition index
+        # All Column Name (e.g Area) and Transition index
         ColName_Col = self.RawData.iloc[1,:].str.contains(column_name) | self.RawData.iloc[1,:].str.contains("Transition")
         ColName_Col_Index = ColName_Col.index[ColName_Col == True].tolist()
 
-        #Transition from Compound Method
+        # Transition from Compound Method (They should not be used to get the Qualifer Area)
         CpdMethod_Transition_Col = self.RawData.iloc[0,:].str.contains("Compound Method") & self.RawData.iloc[1,:].str.contains("Transition")
         CpdMethod_Transition_Col_Index = CpdMethod_Transition_Col.index[CpdMethod_Transition_Col == True].tolist()
 
-        #Column Name (e.g Area) found only at the Qualifier
+        # Column Name (e.g Area) found for the Qualifier
         ColName_Qualifier_Col = self.RawData.iloc[0,:].str.contains("Qualifier \d Results", regex=True) & self.RawData.iloc[1,:].str.contains(column_name)
         ColName_Qualifier_Col_Index = ColName_Qualifier_Col.index[ColName_Qualifier_Col == True].tolist()
 
-        #The Column Name (e.g Area), no transitons and not from Qualifier
+        # Column Name (e.g Area), found for the Transitions
         ColName_Compound_Col_Index = [x for x in ColName_Col_Index if x not in sorted(CpdMethod_Transition_Col_Index + Qualifier_Method_Col_Index + ColName_Qualifier_Col_Index, key = int)]
 
         table_list = []
 
-        #We start on row three, update the table list with the column_name
+        # We start on row three, update the table list with the column_name
         self.RawData.iloc[2:,sorted(ColName_Col_Index, key=int)].apply(lambda x: AgilentMSRawData._get_Compound_Data(x=x,
                                                                                                                      table_list=table_list, 
                                                                                                                      ColName_Compound_Col_Index = ColName_Compound_Col_Index,
@@ -264,6 +288,12 @@ class AgilentMSRawData(MSRawData):
         if pd.DataFrame(table_list).empty:
             return(pd.DataFrame(table_list))
         else:
+            # TODO
+            # Check if the number of rows in the table_list of values, 
+            # matches the number of rows (Transition and Qualifier Names) in the CompoundName_df
+            # If not, give an error of a possible corrupted csv input.
+            #print(len(CompoundName_df.index))
+            #print(len(pd.DataFrame(table_list)))
             return(pd.concat([CompoundName_df, pd.DataFrame(table_list) ], axis=1))
         return(pd.DataFrame()) 
 
@@ -431,15 +461,36 @@ class AgilentMSRawData(MSRawData):
     def __getdataform(self,filepath):
         """Function to get the Masshunter data form"""
 
-        if "Sample" in self.RawData.iloc[0,0]:
+        if pd.isna(self.RawData.iloc[0,0]):
+            if self.__logger:
+                self.__logger.error(str(filepath) + ' ' +
+                                    'is missing \"Sample\" at first row and column in Wide Table form ' + 
+                                    'or missing \"Compound Method\" at first row and column in Compound Table form. ' +
+                                    'Please check the input file')
+            if self.__ingui:
+                print(str(filepath) + ' ' +
+                      'is missing \"Sample\" at first row and column in Wide Table form ' + 
+                      'or missing \"Compound Method\" at first row and column in Compound Table form. ' +
+                      'Please check the input file',
+                      flush=True)
+            sys.exit(-1)
+
+        if self.RawData.iloc[0,0] == "Sample":
             self.DataForm = "WideTableForm"
-        elif "Compound Method" in self.RawData.iloc[0,0]:
+        elif self.RawData.iloc[0,0] == "Compound Method":
             self.DataForm = "CompoundTableForm"
         else:
             if self.__logger:
-                self.__logger.error('%s is not in Wide Table or Compound Table form. Please check the input file',str(filepath))
+                self.__logger.error(str(filepath) + ' ' +
+                                    'is missing \"Sample\" at first row and column in Wide Table form ' + 
+                                    'or missing \"Compound Method\" at first row and column in Compound Table form. ' +
+                                    'Please check the input file')
             if self.__ingui:
-                print(str(filepath) + ' is not in Wide Table or Compound Table form. Please check the input file',flush=True)
+                print(str(filepath) + ' ' +
+                      'is missing \"Sample\" at first row and column in Wide Table form ' + 
+                      'or missing \"Compound Method\" at first row and column in Compound Table form. ' +
+                      'Please check the input file',
+                      flush = True)
             sys.exit(-1)
 
 class SciexMSRawData(MSRawData):

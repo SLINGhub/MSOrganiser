@@ -189,9 +189,11 @@ def no_concatenate_workflow(stored_args, logger=None, testing = False):
     need_full_data_output_options = []
 
     for output_option in stored_args['Output_Options']:
-        if output_option in ["Area","RT","FWHM","S/N","Symmetry",
-                           "Precursor Ion","Product Ion"]:
-            no_need_full_data_output_options.append(output_option)
+        #if output_option in ["Area","RT","FWHM","S/N","Symmetry",
+        #                     "Precursor Ion","Product Ion"]:
+        #    no_need_full_data_output_options.append(output_option)
+        if output_option not in ['normConc by ISTD', 'normArea by ISTD']:
+             no_need_full_data_output_options.append(output_option)
         else:
             if output_option == 'normConc by ISTD' and 'normArea by ISTD' not in need_full_data_output_options:
                 need_full_data_output_options.append("normArea by ISTD")
@@ -423,9 +425,11 @@ def concatenate_along_rows_workflow(stored_args, logger=None, testing = False):
     need_full_data_output_options = []
 
     for output_option in stored_args['Output_Options']:
-        if output_option in ["Area","RT","FWHM","S/N","Symmetry",
-                           "Precursor Ion","Product Ion"]:
-            no_need_full_data_output_options.append(output_option)
+        #if output_option in ["Area","RT","FWHM","S/N","Symmetry",
+        #                     "Precursor Ion","Product Ion"]:
+        #    no_need_full_data_output_options.append(output_option)
+        if output_option not in ['normConc by ISTD', 'normArea by ISTD']:
+             no_need_full_data_output_options.append(output_option)
         else:
             if output_option == 'normConc by ISTD' and 'normArea by ISTD' not in need_full_data_output_options:
                 need_full_data_output_options.append("normArea by ISTD")
@@ -608,9 +612,11 @@ def concatenate_along_columns_workflow(stored_args, logger=None, testing = False
     need_full_data_output_options = []
 
     for output_option in stored_args['Output_Options']:
-        if output_option in ["Area","RT","FWHM","S/N","Symmetry",
-                           "Precursor Ion","Product Ion"]:
-            no_need_full_data_output_options.append(output_option)
+        #if output_option in ["Area","RT","FWHM","S/N","Symmetry",
+        #                     "Precursor Ion","Product Ion"]:
+        #    no_need_full_data_output_options.append(output_option)
+        if output_option not in ['normConc by ISTD', 'normArea by ISTD']:
+             no_need_full_data_output_options.append(output_option)
         else:
             if output_option == 'normConc by ISTD' and 'normArea by ISTD' not in need_full_data_output_options:
                 need_full_data_output_options.append("normArea by ISTD")
