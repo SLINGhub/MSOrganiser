@@ -4,6 +4,8 @@
 
 * Find a way to make the documentation of the functions of `MSOrganiser` online.
 * Update MSTemplate_Creator changes to the Concentration Unit.
+* When reading data from Agilent Compound Table form, check if the number of transitions matches the number of rows of the extracted data
+* Add new feature by adding data from Compound Methods Table.
 
 ## Completed
 
