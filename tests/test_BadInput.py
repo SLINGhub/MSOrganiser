@@ -61,7 +61,7 @@ class Parsing_Issue_Test(unittest.TestCase):
         self.assertEqual(cm.exception.code, -1)
 
         # Ensure that the error was due to no MS file input
-        mock_print.assert_called_with('Please key in at least one input MS file',
+        mock_print.assert_called_with('Please key in at least one input MS file.',
                                       flush = True)
 
         #Read the parser
@@ -73,7 +73,7 @@ class Parsing_Issue_Test(unittest.TestCase):
         self.assertEqual(cm.exception.code, -1)
 
         # Ensure that the error was due to no output directory input
-        mock_print.assert_called_with('Please key in at least one output directory',
+        mock_print.assert_called_with('Please key in at least one output directory.',
                                       flush = True)
 
 
@@ -86,7 +86,7 @@ class Parsing_Issue_Test(unittest.TestCase):
         self.assertEqual(cm.exception.code, -1)
 
         # Ensure that the error was due to no output option input
-        mock_print.assert_called_with('Please key in at least one result to output',
+        mock_print.assert_called_with('Please key in at least one result to output.',
                                       flush = True)
 
         #Read the parser
@@ -101,7 +101,7 @@ class Parsing_Issue_Test(unittest.TestCase):
         # normArea by ISTD or normConc by ISTD or both are selected 
         # in Output_Options
         mock_print.assert_called_with("Please key in an annotation file when \'normArea by ISTD\' " + 
-                                      "or \'normConc by ISTD\' are selected in Output_Options",
+                                      "or \'normConc by ISTD\' are selected in Output_Options.",
                                       flush = True)
 
         self.patcher.stop()
@@ -449,7 +449,7 @@ class Parsing_Issue_Test(unittest.TestCase):
         mock_print.assert_called_with(INVALID_AGILENT_DATAFORM_FILENAME + ' ' +
                                       'is missing \"Sample\" at first row and column in Wide Table form ' + 
                                       'or missing \"Compound Method\" at first row and column in Compound Table form. ' +
-                                      'Please check the input file',
+                                      'Please check the input file.',
                                       flush=True)
 
         #self.patcher.stop()
@@ -480,7 +480,7 @@ class Parsing_Issue_Test(unittest.TestCase):
         mock_print.assert_called_with(INVALID_AGILENT_DATAFORM_FILENAME2 + ' ' +
                                       'is missing \"Sample\" at first row and column in Wide Table form ' + 
                                       'or missing \"Compound Method\" at first row and column in Compound Table form. ' +
-                                      'Please check the input file',
+                                      'Please check the input file.',
                                       flush=True)
 
         self.patcher.stop()

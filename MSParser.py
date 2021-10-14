@@ -58,24 +58,24 @@ def parse_MSOrganiser_args(args_json_file_path = "", testing = False):
 
     # Check if MS_Files option is not empty
     if not stored_args['MS_Files']:
-        print("Please key in at least one input MS file",flush=True)
+        print("Please key in at least one input MS file.",flush=True)
         sys.exit(-1)
 
     # Check if Output_Directory option is not empty
     if not stored_args['Output_Directory']:
-        print("Please key in at least one output directory",flush=True)
+        print("Please key in at least one output directory.",flush=True)
         sys.exit(-1)
 
     # Check if Output_Options is selected
     if not stored_args['Output_Options']:
-        print("Please key in at least one result to output",flush=True)
+        print("Please key in at least one result to output.",flush=True)
         sys.exit(-1)
     elif any(output_option in ['normArea by ISTD', 'normConc by ISTD'] for output_option in stored_args['Output_Options']):
         # Check if Annot_File is not empty when normArea by ISTD or
         # normConc by ISTD or both are selected in Output_Options
         if not stored_args['Annot_File']:
             print("Please key in an annotation file when \'normArea by ISTD\' " + 
-                  "or \'normConc by ISTD\' are selected in Output_Options",
+                  "or \'normConc by ISTD\' are selected in Output_Options.",
                   flush=True)
             sys.exit(-1)
 
