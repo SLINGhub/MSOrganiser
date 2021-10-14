@@ -417,17 +417,17 @@ class AgilentMSRawData(MSRawData):
         # Check if input is blank/None
         if not filepath:
             if self.__logger:
-                self.__logger.error('%s is empty. Please give an input file', str(filepath))
+                self.__logger.error('%s is empty. Please give an input file.', str(filepath))
             if self.__ingui:
-                print(str(filepath) + ' is empty. Please give an input file',flush=True)
+                print(str(filepath) + ' is empty. Please give an input file.',flush=True)
             sys.exit(-1)
 
         # Check if the file exists for reading
         if not os.path.isfile(filepath):
             if self.__logger:
-                self.__logger.error('%s does not exists. Please check the input file',str(filepath))
+                self.__logger.error('%s does not exists. Please check the input file.',str(filepath))
             if self.__ingui:
-                print(str(filepath) + ' does not exists. Please check the input file',flush=True)
+                print(str(filepath) + ' does not exists. Please check the input file.',flush=True)
             sys.exit(-1)
 
         #self.RawData = pd.read_csv(filepath, header=None,low_memory=False,encoding = "ISO-8859-1")
@@ -450,9 +450,9 @@ class AgilentMSRawData(MSRawData):
         # Check if the file has content
         if self.RawData.empty:
             if self.__logger:
-                self.__logger.error('%s is an empty file. Please check the input file',str(filepath))
+                self.__logger.error('%s is an empty file. Please check the input file.',str(filepath))
             if self.__ingui:
-                print(str(filepath) + ' is an empty file. Please check the input file',flush=True)
+                print(str(filepath) + ' is an empty file. Please check the input file.',flush=True)
             sys.exit(-1)
         
         # On the first row, fill empty cells forward 
@@ -466,12 +466,12 @@ class AgilentMSRawData(MSRawData):
                 self.__logger.error(str(filepath) + ' ' +
                                     'is missing \"Sample\" at first row and column in Wide Table form ' + 
                                     'or missing \"Compound Method\" at first row and column in Compound Table form. ' +
-                                    'Please check the input file')
+                                    'Please check the input file.')
             if self.__ingui:
                 print(str(filepath) + ' ' +
                       'is missing \"Sample\" at first row and column in Wide Table form ' + 
                       'or missing \"Compound Method\" at first row and column in Compound Table form. ' +
-                      'Please check the input file',
+                      'Please check the input file.',
                       flush=True)
             sys.exit(-1)
 
@@ -484,12 +484,12 @@ class AgilentMSRawData(MSRawData):
                 self.__logger.error(str(filepath) + ' ' +
                                     'is missing \"Sample\" at first row and column in Wide Table form ' + 
                                     'or missing \"Compound Method\" at first row and column in Compound Table form. ' +
-                                    'Please check the input file')
+                                    'Please check the input file.')
             if self.__ingui:
                 print(str(filepath) + ' ' +
                       'is missing \"Sample\" at first row and column in Wide Table form ' + 
                       'or missing \"Compound Method\" at first row and column in Compound Table form. ' +
-                      'Please check the input file',
+                      'Please check the input file.',
                       flush = True)
             sys.exit(-1)
 
@@ -578,17 +578,17 @@ class SciexMSRawData(MSRawData):
         #Check if input is blank/None
         if not filepath:
             if self.__logger:
-                self.__logger.error('%s is empty. Please give an input file', str(filepath))
+                self.__logger.error('%s is empty. Please give an input file.', str(filepath))
             if self.__ingui:
-                print(str(filepath) + ' is empty. Please give an input file',flush=True)
+                print(str(filepath) + ' is empty. Please give an input file.',flush=True)
             sys.exit(-1)
 
         #Check if the file exists for reading
         if not os.path.isfile(filepath):
             if self.__logger:
-                self.__logger.error('%s does not exists. Please check the input file',str(filepath))
+                self.__logger.error('%s does not exists. Please check the input file.',str(filepath))
             if self.__ingui:
-                print(str(filepath) + ' does not exists. Please check the input file',flush=True)
+                print(str(filepath) + ' does not exists. Please check the input file.',flush=True)
                 sys.exit(-1)
 
         self.RawData = pd.read_csv(filepath,sep='\t',header=0,low_memory=False)
@@ -596,9 +596,9 @@ class SciexMSRawData(MSRawData):
         #Check if the file has content
         if self.RawData.empty:
             if self.__logger:
-                self.__logger.error('%s is an empty file. Please check the input file',str(filepath))
+                self.__logger.error('%s is an empty file. Please check the input file.',str(filepath))
             if self.__ingui:
-                print(str(filepath) + ' is an empty file. Please check the input file',flush=True)
+                print(str(filepath) + ' is an empty file. Please check the input file.',flush=True)
             sys.exit(-1)
 
         #Check if 'Sample Name' and 'Component Name' is inside RawData
