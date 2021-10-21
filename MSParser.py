@@ -5,8 +5,8 @@ import os
 import sys
 
 #This needs to be be right at the top with parse_MSOrganiser_args
-@Gooey(program_name='MS Data Organiser',
-       program_description='Create summary tables from MassHunter csv files',
+@Gooey(program_name='MS Organiser',
+       program_description='Extract and organise MRM transition names data exported from mass spectrometry software.',
        advanced=True,
        #tabbed_groups=True,
        default_size=(710,680),

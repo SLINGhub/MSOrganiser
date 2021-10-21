@@ -1,6 +1,6 @@
 # coding: utf-8
 import sys
-import DuplicateCheck
+import MSDuplicateCheck
 import MSParser
 from MSAnalysis import MS_Analysis
 from MSDataOutput import MSDataOutput_Excel
@@ -499,11 +499,11 @@ def concatenate_along_rows_workflow(stored_args, logger=None, testing = False):
         # "Area","RT","FWHM","S/N" etc
         output_option_index = concatenate_df_sheet_name.index(output_option)
         concatenated_data = concatenate_df_list[output_option_index]
-        DuplicateCheck.check_duplicated_columns_in_wide_data(concatenated_data, 
+        MSDuplicateCheck.check_duplicated_columns_in_wide_data(concatenated_data, 
                                                              "row concatenated " + output_option,
                                                              logger = logger, ingui = True,
                                                              allow_multiple_istd = False)
-        DuplicateCheck.check_duplicated_sample_names_in_wide_data(concatenated_data, 
+        MSDuplicateCheck.check_duplicated_sample_names_in_wide_data(concatenated_data, 
                                                                   "row concatenated " + output_option,
                                                                   logger = None, ingui = True,
                                                                   allow_multiple_istd = False)
@@ -695,11 +695,11 @@ def concatenate_along_columns_workflow(stored_args, logger=None, testing = False
             # "Area","RT","FWHM","S/N" etc
             output_option_index = concatenate_df_sheet_name.index(output_option)
             concatenated_data = concatenate_df_list[output_option_index]
-            DuplicateCheck.check_duplicated_columns_in_wide_data(concatenated_data, 
+            MSDuplicateCheck.check_duplicated_columns_in_wide_data(concatenated_data, 
                                                                  "column concatenated " + output_option,
                                                                  logger = logger, ingui = True,
                                                                  allow_multiple_istd = False)
-            DuplicateCheck.check_duplicated_sample_names_in_wide_data(concatenated_data, 
+            MSDuplicateCheck.check_duplicated_sample_names_in_wide_data(concatenated_data, 
                                                                       "column concatenated " + output_option,
                                                                       logger = None, ingui = True,
                                                                       allow_multiple_istd = False)

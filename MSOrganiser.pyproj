@@ -28,7 +28,7 @@
   <ItemGroup>
     <Compile Include="Annotation.py" />
     <Compile Include="docs\source\conf.py" />
-    <Compile Include="DuplicateCheck.py">
+    <Compile Include="MSDuplicateCheck.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="MSAnalysis.py">

@@ -4,7 +4,7 @@ from MSCalculate import ISTD_Operations
 import os
 import sys
 import pandas as pd
-import DuplicateCheck
+import MSDuplicateCheck
 
 class MS_Analysis():
     """
@@ -122,11 +122,11 @@ class MS_Analysis():
                 output_option = "column concatenated Area used for normalisation"
 
             # Check for duplicate column names (transition names)
-            DuplicateCheck.check_duplicated_columns_in_wide_data(concatenate_Area_df, output_option,
+            MSDuplicateCheck.check_duplicated_columns_in_wide_data(concatenate_Area_df, output_option,
                                                                  logger = self.logger, ingui = True,
                                                                  allow_multiple_istd = False)
             # Check for duplicate row names (sample names)
-            DuplicateCheck.check_duplicated_sample_names_in_wide_data(concatenate_Area_df, output_option,
+            MSDuplicateCheck.check_duplicated_sample_names_in_wide_data(concatenate_Area_df, output_option,
                                                                       logger = self.logger, ingui = True,
                                                                       allow_multiple_istd = False)
 
@@ -138,11 +138,11 @@ class MS_Analysis():
             output_option = "Area used for normalisation"
 
             # Check for duplicate column names (transition names)
-            DuplicateCheck.check_duplicated_columns_in_wide_data(Area_df, output_option,
+            MSDuplicateCheck.check_duplicated_columns_in_wide_data(Area_df, output_option,
                                                                  logger = self.logger, ingui = True,
                                                                  allow_multiple_istd = False)
             # Check for duplicate row names (sample names)
-            DuplicateCheck.check_duplicated_sample_names_in_wide_data(Area_df, output_option,
+            MSDuplicateCheck.check_duplicated_sample_names_in_wide_data(Area_df, output_option,
                                                                       logger = self.logger, ingui = True,
                                                                       allow_multiple_istd = False)
 
@@ -263,11 +263,11 @@ class MS_Analysis():
         Output_df = InputData.get_table(column_name,is_numeric=True)
 
         # Check for duplicate column names (transition names)
-        DuplicateCheck.check_duplicated_columns_in_wide_data(Output_df, column_name,
+        MSDuplicateCheck.check_duplicated_columns_in_wide_data(Output_df, column_name,
                                                              logger = self.logger, ingui = True,
                                                              allow_multiple_istd = False)
         # Check for duplicate row names (sample names)
-        DuplicateCheck.check_duplicated_sample_names_in_wide_data(Output_df, column_name,
+        MSDuplicateCheck.check_duplicated_sample_names_in_wide_data(Output_df, column_name,
                                                                   logger = self.logger, ingui = True,
                                                                   allow_multiple_istd = False)
 
@@ -290,11 +290,11 @@ class MS_Analysis():
                                                                   logger=self.logger,ingui=self.ingui)
 
             # Check for duplicate column names (transition names)
-            DuplicateCheck.check_duplicated_columns_in_wide_data(Output_df, column_name,
+            MSDuplicateCheck.check_duplicated_columns_in_wide_data(Output_df, column_name,
                                                                  logger = self.logger, ingui = True,
                                                                  allow_multiple_istd = True)
             # Check for duplicate row names (sample names)
-            DuplicateCheck.check_duplicated_sample_names_in_wide_data(Output_df, column_name,
+            MSDuplicateCheck.check_duplicated_sample_names_in_wide_data(Output_df, column_name,
                                                                       logger = self.logger, ingui = True,
                                                                       allow_multiple_istd = True)
 
