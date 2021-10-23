@@ -241,7 +241,7 @@ class MSDataOutput_Excel(MSDataOutput):
                 self.logger.error(e)
             sys.exit(-1)
 
-    def end_writer(self):
+    def end_writer(self, testing = False):
         """Function to close an Excel writer object"""
         if self.writer.engine=="xlsxwriter":
             if self.writer.book.fileclosed:
@@ -249,9 +249,26 @@ class MSDataOutput_Excel(MSDataOutput):
 
         try:
             self.writer.save()
+            if testing == True:
+                # If running in unit test, 
+                # close the book to prevent ResourceWarning that the book is not closed
+                self.writer.close()
+                # Delete the excel file
+                os.remove(os.path.join(self.output_directory, self.output_filename + '_' +  self.result_name + '.xlsx' ))
         except UserWarning as w:
             if self.logger:
                 self.logger.warning(w)
+            sys.exit(-1)
+        except IndexError as i:
+            if self.ingui:
+                print('Unable to save Excel file due to:',flush=True)
+                print(str(i) + '. ' + 
+                      'Ensure that output options gives at least one non-empty data set to output into one sheet in excel',
+                      flush=True)
+            if self.logger:
+                self.logger.error('Unable to save Excel file due to:')
+                self.logger.error(str(i) + '. ' + 
+                                  'Ensure that output options gives at least one non-empty data set to output into one sheet in excel')
             sys.exit(-1)
         except Exception as e:
             if self.ingui:

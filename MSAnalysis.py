@@ -262,14 +262,15 @@ class MS_Analysis():
         InputData = self._prepare_InputData()
         Output_df = InputData.get_table(column_name,is_numeric=True)
 
-        # Check for duplicate column names (transition names)
-        MSDuplicateCheck.check_duplicated_columns_in_wide_data(Output_df, column_name,
-                                                             logger = self.logger, ingui = True,
-                                                             allow_multiple_istd = False)
-        # Check for duplicate row names (sample names)
-        MSDuplicateCheck.check_duplicated_sample_names_in_wide_data(Output_df, column_name,
-                                                                  logger = self.logger, ingui = True,
-                                                                  allow_multiple_istd = False)
+        if not Output_df.empty:
+            # Check for duplicate column names (transition names)
+            MSDuplicateCheck.check_duplicated_columns_in_wide_data(Output_df, column_name,
+                                                                   logger = self.logger, ingui = True,
+                                                                   allow_multiple_istd = False)
+            # Check for duplicate row names (sample names)
+            MSDuplicateCheck.check_duplicated_sample_names_in_wide_data(Output_df, column_name,
+                                                                        logger = self.logger, ingui = True,
+                                                                        allow_multiple_istd = False)
 
         if allow_multiple_istd:
             #Get ISTD map df
@@ -286,17 +287,19 @@ class MS_Analysis():
             [ISTD_report,Transition_Name_dict] = ISTD_Operations.create_Transition_Name_dict(Output_df,self.ISTD_map_df,
                                                                                              logger=self.logger,ingui=False,
                                                                                              allow_multiple_istd = allow_multiple_istd)
+
             Output_df = ISTD_Operations.expand_Transition_Name_df(Output_df,Transition_Name_dict,
                                                                   logger=self.logger,ingui=self.ingui)
 
-            # Check for duplicate column names (transition names)
-            MSDuplicateCheck.check_duplicated_columns_in_wide_data(Output_df, column_name,
-                                                                 logger = self.logger, ingui = True,
-                                                                 allow_multiple_istd = True)
-            # Check for duplicate row names (sample names)
-            MSDuplicateCheck.check_duplicated_sample_names_in_wide_data(Output_df, column_name,
-                                                                      logger = self.logger, ingui = True,
-                                                                      allow_multiple_istd = True)
+            if not Output_df.empty:
+                # Check for duplicate column names (transition names)
+                MSDuplicateCheck.check_duplicated_columns_in_wide_data(Output_df, column_name,
+                                                                       logger = self.logger, ingui = True,
+                                                                       allow_multiple_istd = True)
+                # Check for duplicate row names (sample names)
+                MSDuplicateCheck.check_duplicated_sample_names_in_wide_data(Output_df, column_name,
+                                                                            logger = self.logger, ingui = True,
+                                                                            allow_multiple_istd = True)
 
         if self.LongTable:
             MS_Analysis._add_to_LongTable_df(self,Output_df,column_name,allow_multiple_istd)

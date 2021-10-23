@@ -3,6 +3,7 @@ import os
 from unittest.mock import patch
 import MSParser
 from MSOrganiser import no_concatenate_workflow
+from MSDataOutput import MSDataOutput_Excel
 
 NO_MS_FILE_JSONFILENAME = os.path.join(os.path.dirname(__file__),"testdata", 
                                        "test_bad_input", 'No_MS_File.json')
@@ -304,6 +305,56 @@ class Parsing_Issue_Test(unittest.TestCase):
         mock_print.assert_called_with('Output option Invalid Output Option ' + 
                                       'is not a valid column in MassHunter or not ' + 
                                       'available as a valid output for this program.',
+                                      flush=True)
+
+        self.patcher.stop()
+
+    def test_input_valid_output_option_agilent_no_data(self):
+        """Check if the software is able to detect if the input output option is valid
+           but the output option is not found in the input file.
+        """
+
+        # Replace the print function in MSDataOutput.py file to a mock
+        self.patcher = patch('MSDataOutput.print')
+        mock_print = self.patcher.start()
+
+        output_directory = os.path.join(os.path.dirname(__file__),"testdata", "test_bad_input")
+
+        stored_args = {
+            'MS_Files': [VALID_WIDETABLEFORM_FILENAME], 
+            'MS_FileType': 'Agilent Wide Table in csv', 
+            'Output_Directory': output_directory, 
+            'Output_Options': ['Area', 'S/N'], 
+            'Annot_File': "", 
+            'Output_Format': 'Excel', 
+            'Concatenate': 'No Concatenate', 
+            'Transpose_Results': False, 
+            'Allow_Multiple_ISTD': False, 
+            'Long_Table': False, 
+            'Long_Table_Annot': False, 
+            'Testing': False
+        }
+
+        [file_data_list, file_name] = no_concatenate_workflow(stored_args,testing = True)
+
+        #print(file_name)
+        #print(file_data_list[0][0][1])
+        #print(file_data_list[0][0][0])
+
+        DfOutput = MSDataOutput_Excel(stored_args['Output_Directory'], VALID_WIDETABLEFORM_FILENAME, 
+                                      result_name = "Results" ,
+                                      logger = None, ingui = True)
+        DfOutput.start_writer()
+        DfOutput.df_to_file("Area",file_data_list[0][0][0],
+                            transpose=stored_args['Transpose_Results'],
+                            allow_multiple_istd = False)
+        DfOutput.df_to_file("S/N",file_data_list[0][0][1],
+                            transpose=stored_args['Transpose_Results'],
+                            allow_multiple_istd = False)
+        DfOutput.end_writer(testing = True)
+
+        # Ensure that the warning was due to no data available for that output option
+        mock_print.assert_called_with('S/N has no data. Please check the input file',
                                       flush=True)
 
         self.patcher.stop()
