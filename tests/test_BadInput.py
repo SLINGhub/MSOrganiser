@@ -312,7 +312,7 @@ class Parsing_Issue_Test(unittest.TestCase):
 
     def test_input_valid_output_option_agilent_no_data_excel(self):
         """Check if the software is able to detect if the input output option is valid
-           but the output option is not found in the input file.
+           but the output option is not found in the input file when creating an excel file
         """
 
         # Replace the print function in MSDataOutput.py file to a mock
@@ -362,7 +362,7 @@ class Parsing_Issue_Test(unittest.TestCase):
 
     def test_input_valid_output_option_agilent_no_data_csv(self):
         """Check if the software is able to detect if the input output option is valid
-           but the output option is not found in the input file.
+           but the output option is not found in the input file when creating a csv file
         """
 
         # Replace the print function in MSDataOutput.py file to a mock
