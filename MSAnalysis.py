@@ -150,6 +150,9 @@ class MS_Analysis():
 
     def _add_to_LongTable_df(self,wide_df,column_name,allow_multiple_istd = False):
 
+        if wide_df.empty:
+            return
+
         if allow_multiple_istd:
             wide_df = pd.melt(wide_df,id_vars=["Sample_Name"],
                               var_name= ["Transition_Name","Transition_Name_ISTD"],

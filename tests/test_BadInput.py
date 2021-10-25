@@ -355,7 +355,7 @@ class Parsing_Issue_Test(unittest.TestCase):
         DfOutput.end_writer(testing = True)
 
         # Ensure that the warning was due to no data available for that output option
-        mock_print.assert_called_with('S/N has no data. Please check the input file',
+        mock_print.assert_called_with('S/N has no data. Please check the input file.',
                                       flush=True)
 
         self.patcher.stop()
@@ -375,28 +375,38 @@ class Parsing_Issue_Test(unittest.TestCase):
             'MS_Files': [VALID_WIDETABLEFORM_FILENAME], 
             'MS_FileType': 'Agilent Wide Table in csv', 
             'Output_Directory': output_directory, 
-            'Output_Options': ['Area', 'S/N'], 
+            'Output_Options': ['S/N'], 
             'Annot_File': "", 
             'Output_Format': 'Excel', 
             'Concatenate': 'No Concatenate', 
             'Transpose_Results': False, 
             'Allow_Multiple_ISTD': False, 
-            'Long_Table': False, 
+            'Long_Table': True, 
             'Long_Table_Annot': False, 
             'Testing': False
             }
         [file_data_list, file_name] = no_concatenate_workflow(stored_args,testing = True)
 
         DfOutput = MSDataOutput_csv(stored_args['Output_Directory'], VALID_WIDETABLEFORM_FILENAME, 
-                                    result_name = "" ,
-                                    logger = None, ingui = True)
+                                    result_name = "" , logger = None, ingui = True)
         DfOutput.start_writer()
-        DfOutput.df_to_file("S/N",file_data_list[0][0][1],
+        DfOutput.df_to_file("S/N",file_data_list[0][0][0],
                             transpose=stored_args['Transpose_Results'],
                             allow_multiple_istd = False)
             
         # Ensure that the warning was due to no data available for that output option
-        mock_print.assert_called_with('S/N has no data. Please check the input file',
+        mock_print.assert_called_with('S/N has no data. Please check the input file.',
+                                      flush=True)
+
+        #self.patcher.stop()
+
+        DfLongOutput = MSDataOutput_csv(stored_args['Output_Directory'], VALID_WIDETABLEFORM_FILENAME, 
+                                        result_name = "" , logger = None, ingui=True)
+        DfLongOutput.start_writer()
+        DfLongOutput.df_to_file("Long_Table",file_data_list[0][0][1])
+
+        # Ensure that the warning was due to no data available for that output option
+        mock_print.assert_called_with('Long_Table has no data. Please check the input file.',
                                       flush=True)
 
         self.patcher.stop()

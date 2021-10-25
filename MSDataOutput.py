@@ -95,9 +95,9 @@ class MSDataOutput:
         # If df is empty we send a warning and skip the df
         if df.empty:
             if logger:
-                logger.warning('%s has no data. Please check the input file',output_option)
+                logger.warning(output_option + ' has no data. Please check the input file.')
             if ingui:
-                print(output_option + ' has no data. Please check the input file',flush=True)
+                print(output_option + ' has no data. Please check the input file.',flush=True)
             return([df,output_option])
 
         # Replace '/' as excel cannot have this as sheet title or file name
@@ -106,7 +106,6 @@ class MSDataOutput:
 
         if transpose:
             df = MSDataOutput.transpose_MSdata(df,allow_multiple_istd)
-
         return([df,output_option])
 
 
@@ -249,6 +248,7 @@ class MSDataOutput_Excel(MSDataOutput):
 
         try:
             self.writer.save()
+            # https://stackoverflow.com/questions/61382815/resourcewarning-for-a-file-that-is-unclosed-but-unittest-is-throwing-it
             if testing == True:
                 # If running in unit test, 
                 # close the book to prevent ResourceWarning that the book is not closed
@@ -269,6 +269,13 @@ class MSDataOutput_Excel(MSDataOutput):
                 self.logger.error('Unable to save Excel file due to:')
                 self.logger.error(str(i) + '. ' + 
                                   'Ensure that output options gives at least one non-empty data set to output into one sheet in excel')
+            if testing == True:
+                # If running in unit test, 
+                # close the book to prevent ResourceWarning that the book is not closed
+                #self.writer.close()
+                # Delete the excel file
+                os.remove(os.path.join(self.output_directory, self.output_filename + '_' +  self.result_name + '.xlsx' ))
+                return
             sys.exit(-1)
         except Exception as e:
             if self.ingui:
