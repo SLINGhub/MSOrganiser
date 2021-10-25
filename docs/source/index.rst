@@ -21,9 +21,10 @@ Code Structure Outline
    :titlesonly:
    :caption: Code Structure Summary:
 
-   wrapper/index
-   parser/index
-   fileinput/index
    analysis/index
+   duplicatecheck/index
+   fileinput/index
    fileoutput/index
+   parser/index
    testunits/index
+   wrapper/index

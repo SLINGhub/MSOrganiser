@@ -99,6 +99,7 @@
     <Folder Include="docs\source\analysis\" />
     <Folder Include="docs\source\fileinput\" />
     <Folder Include="docs\source\fileoutput\" />
+    <Folder Include="docs\source\duplicatecheck\" />
     <Folder Include="docs\source\parser\" />
     <Folder Include="docs\source\testunits\" />
     <Folder Include="docs\source\wrapper\" />
@@ -307,6 +308,12 @@
     <Content Include="docs\source\analysis\index.rst" />
     <Content Include="docs\source\analysis\MSAnalysis.rst" />
     <Content Include="docs\source\analysis\MSCalculate.rst" />
+    <Content Include="docs\source\duplicatecheck\index.rst">
+      <SubType>Code</SubType>
+    </Content>
+    <Content Include="docs\source\duplicatecheck\MSDuplicateCheck.rst">
+      <SubType>Code</SubType>
+    </Content>
     <Content Include="docs\source\fileinput\Annotation.rst" />
     <Content Include="docs\source\fileinput\index.rst" />
     <Content Include="docs\source\fileinput\MSRawData.rst" />
@@ -318,11 +325,26 @@
     <Content Include="docs\source\parser\index.rst" />
     <Content Include="docs\source\parser\MSParser.rst" />
     <Content Include="docs\source\testunits\index.rst" />
+    <Content Include="docs\source\testunits\test_BadInput.rst">
+      <SubType>Code</SubType>
+    </Content>
     <Content Include="docs\source\testunits\test_ConcatenationColumn.rst" />
     <Content Include="docs\source\testunits\test_ConcatenationRow.rst" />
+    <Content Include="docs\source\testunits\test_DuplicateInput.rst">
+      <SubType>Code</SubType>
+    </Content>
+    <Content Include="docs\source\testunits\test_ISTDAnnot.rst">
+      <SubType>Code</SubType>
+    </Content>
     <Content Include="docs\source\testunits\test_MSAnalysis.rst" />
     <Content Include="docs\source\testunits\test_MSRawData.rst" />
     <Content Include="docs\source\testunits\test_NoConcatenation.rst" />
+    <Content Include="docs\source\testunits\test_SampleAnnot.rst">
+      <SubType>Code</SubType>
+    </Content>
+    <Content Include="docs\source\testunits\test_TransitionNameAnnot.rst">
+      <SubType>Code</SubType>
+    </Content>
     <Content Include="docs\source\wrapper\index.rst" />
     <Content Include="docs\source\wrapper\MSOrganiser.rst" />
     <Content Include="docs\~%24Organiser_Developer_Documentation.docx" />

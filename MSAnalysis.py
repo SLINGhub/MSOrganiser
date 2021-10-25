@@ -194,10 +194,11 @@ class MS_Analysis():
 
         #Check if the Long Table has data
         if self.LongTable_df.empty:
-            if self.logger:
-                self.logger.warning("Long Table has no data")
-            if self.ingui:
-                print("Long Table has no data",flush=True)
+            # No need to give warning as MSDataOutput.py will give this warning
+            #if self.logger:
+            #    self.logger.warning("Long Table has no data")
+            #if self.ingui:
+            #    print("Long Table has no data",flush=True)
             return self.LongTable_df
 
         #If we ask for the Sample Type and Transition Name ISTD to be present in the Long Table and an annotation file is given

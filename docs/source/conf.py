@@ -23,13 +23,13 @@ sys.path.append(os.path.abspath('../../tests'))
 # -- Project information -----------------------------------------------------
 
 project = 'MSOrganiser'
-copyright = '2018, SLING'
+copyright = '2021, SLING'
 author = 'SLING'
 
 # The short X.Y version
 version = ''
 # The full version, including alpha/beta/rc tags
-release = '0.0.1'
+release = '1.1.0'
 
 
 # -- General configuration ---------------------------------------------------
@@ -106,7 +106,8 @@ html_theme = 'sphinx_rtd_theme'
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ['_static']
+# https://djangocas.dev/blog/sphinx-doc-101-introduction-to-sphinx-doc/#warning-html_static_path-entry-_static-does-not-exist
+html_static_path = []
 
 # Custom sidebar templates, must be a dictionary that maps document names
 # to template names.

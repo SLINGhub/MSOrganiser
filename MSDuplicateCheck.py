@@ -4,6 +4,16 @@ from collections import Counter
 def check_duplicated_columns_in_wide_data(input_wide_data, output_option,
                                           logger = None, ingui = True,
                                           allow_multiple_istd = False):
+    """Function to check for duplicate column names (usually Transition Name) in a given wide data.
+
+    Args:
+        input_wide_data (pandas DataFrame): A data frame of sample as rows and transition names as columns
+        output_option (str): The name of the contents that the data frame contains. Example: Area, RT etc...
+        logger (object): logger object created by start_logger in MSOrganiser
+        ingui (bool): if True, print analysis status to screen
+        allow_multiple_istd (bool): if True, allow input_wide_data to have mulitple internal standards
+
+    """
 
     # Convert the dataframe column name to a list
     column_name_list = input_wide_data.columns.values.tolist()
@@ -39,6 +49,16 @@ def check_duplicated_columns_in_wide_data(input_wide_data, output_option,
 def check_duplicated_sample_names_in_wide_data(input_wide_data, output_option,
                                                logger = None, ingui = True,
                                                allow_multiple_istd = False):
+    """Function to check for duplicate sample names in a given wide data.
+
+    Args:
+        input_wide_data (pandas DataFrame): A data frame of sample as rows and transition names as columns
+        output_option (str): The name of the contents that the data frame contains. Example: Area, RT etc...
+        logger (object): logger object created by start_logger in MSOrganiser
+        ingui (bool): if True, print analysis status to screen
+        allow_multiple_istd (bool): if True, allow input_wide_data to have mulitple internal standards
+
+    """
 
     # Convert the sample name column to a list
     unique_Sample_Name_list = []
