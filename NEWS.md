@@ -1,18 +1,16 @@
-# MSOrganiser 1.0.0.9000 (development version)
+# MSOrganiser 1.1.0.9000 (development version)
 
 ## TODO
 
 * Find a way to make the documentation of the functions of `MSOrganiser` online.
-* Update MSTemplate_Creator changes to the Concentration Unit.
-* When reading data from Agilent Compound Table form, check if the number of transitions matches the number of rows of the extracted data
-* Add new feature by adding data from Compound Methods Table.
 
-## Completed
+## MSOrganiser 1.1.0
 
 * Added a logo.
 * Add warning message during concentration calculation when user input a sample that is found in the raw data but not found in the sample annotation file.
 * Add warning message when user input a sample annotation file with missing data file name or sample name.
 * Add warning message when user input a raw data file that has duplicate sample names or transition names with or without concatenation.
+* Update MSTemplate_Creator changes to the Concentration Unit.
 
 # MSOrganiser 1.0.0
 
