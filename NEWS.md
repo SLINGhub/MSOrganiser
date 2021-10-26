@@ -4,7 +4,7 @@
 
 * Find a way to make the documentation of the functions of `MSOrganiser` online.
 
-## MSOrganiser 1.1.0
+# MSOrganiser 1.1.0
 
 * Added a logo.
 * Add warning message during concentration calculation when user input a sample that is found in the raw data but not found in the sample annotation file.
