@@ -21,10 +21,11 @@ the software is also able to normalize the peak area with respect to the
 internal standard’s peak area and calculate the concentration of the
 analytes.
 
-# Table of Content
+![AboutMSOrganiser](docs/figures/README-AboutMSOrganiser.png) # Table of
+Content
 
 -   [MSOrganiser](#msorganiser)
--   [Table of Content](#table-of-content)
+-   \[Table of Content\]
 -   [Meta](#meta)
 -   [Overview](#overview)
 -   [Starting Up](#starting-up)
