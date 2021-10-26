@@ -150,7 +150,7 @@ class ISTDAnnot_Test(unittest.TestCase):
             mock_print.assert_called_with('Sheet ISTD_Annot\'s column Custom_Unit option ' +
                                           old_column_units_list[i] + ' ' +
                                           'is no longer accepted in MSOrganiser. ' +
-                                          'Please use a later version of MSTemplate_Creator (above 1.0.3).',
+                                          'Please use a later version of MSTemplate_Creator (above 1.0.1).',
                                           flush=True)
 
         AnnotationList = MS_Template(filepath = INVALIDCUSTOMUNIT_ANNOTATION,

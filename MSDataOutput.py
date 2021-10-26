@@ -181,8 +181,12 @@ class MSDataOutput_csv(MSDataOutput):
         try:
             df.to_csv(csv_filename,sep=',',index=False)
         except Exception as e:
-            print("Unable to write df to csv file name" + csv_filename,flush=True)
-            print(e,flush=True)
+            if self.logger:
+                self.logger.error('Unable to write df to csv file due to:')
+                self.logger.error(e)
+            if self.ingui:
+                print("Unable to write df to csv file due to:",flush=True)
+                print(e,flush=True)
 
 class MSDataOutput_Excel(MSDataOutput):
     """
@@ -268,7 +272,7 @@ class MSDataOutput_Excel(MSDataOutput):
             if self.logger:
                 self.logger.error('Unable to save Excel file due to:')
                 self.logger.error(str(i) + '. ' + 
-                                  'Ensure that output options gives at least one non-empty data set to output into one sheet in excel')
+                                  'Ensure that output options give at least one non-empty data set to output into one sheet in excel')
             if testing == True:
                 # If running in unit test, 
                 # close the book to prevent ResourceWarning that the book is not closed

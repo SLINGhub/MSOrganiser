@@ -42,7 +42,16 @@ INVALID_AGILENT_DATAFORM_FILENAME = os.path.join(os.path.dirname(__file__),"test
 INVALID_AGILENT_DATAFORM_FILENAME2 = os.path.join(os.path.dirname(__file__),"testdata", 
                                                   "test_bad_input", 'Invalid_WideTableForm2.csv')
 
-class Parsing_Issue_Test(unittest.TestCase):
+EMPTY_WIDETABLEFORM_FILENAME = os.path.join(os.path.dirname(__file__),"testdata", 
+                                            "test_bad_input", 'Empty_WideTableForm.csv')
+
+WRONG_EXTENTION_ANNOTATION_FILENAME = os.path.join(os.path.dirname(__file__),"testdata", 
+                                                   "test_bad_input", 'Valid_WideTableForm_Annot.csv')
+
+INPUT_ANNOTATION_FOLDERNAME = os.path.join(os.path.dirname(__file__),"testdata", 
+                                           "test_bad_input", 'input_annotation_folder')
+
+class Bad_Input_Json_Test(unittest.TestCase):
     # See https://realpython.com/lessons/mocking-print-unit-tests/
     # for more details on mock
     def test_invalid_json_file(self):
@@ -108,6 +117,9 @@ class Parsing_Issue_Test(unittest.TestCase):
 
         self.patcher.stop()
 
+class Bad_Input_File_Test(unittest.TestCase):
+    # See https://realpython.com/lessons/mocking-print-unit-tests/
+    # for more details on mock
     def test_wrong_file_extention(self):
         """Check if the software is able to detect wrong input file extention
 
@@ -244,6 +256,43 @@ class Parsing_Issue_Test(unittest.TestCase):
 
         self.patcher.stop()
 
+    def test_input_file_empty(self):
+        """Check if the software is able to detect if the Agilent input file in
+           Wide Table Form is empty and gives an error
+        """
+
+        # Replace the print function in MSRawData.py file to a mock
+        self.patcher = patch('MSRawData.print')
+        mock_print = self.patcher.start()
+
+        stored_args = {
+            'MS_Files': [EMPTY_WIDETABLEFORM_FILENAME], 
+            'MS_FileType': 'Agilent Wide Table in csv', 
+            'Output_Directory': 'D:\\MSOrganiser', 
+            'Output_Options': ['Area'], 
+            'Annot_File': "", 
+            'Output_Format': 'Excel', 
+            'Concatenate': 'No Concatenate', 
+            'Transpose_Results': False, 
+            'Allow_Multiple_ISTD': False, 
+            'Long_Table': False, 
+            'Long_Table_Annot': False, 
+            'Testing': False
+        }
+
+        with self.assertRaises(SystemExit) as cm:
+            [file_data_list, file_name] = no_concatenate_workflow(stored_args,testing = True)
+
+        # Ensure that the system ends with a -1 to indicate an error
+        self.assertEqual(cm.exception.code, -1)
+
+        # Ensure that the error was due to empty input data
+        mock_print.assert_called_with(EMPTY_WIDETABLEFORM_FILENAME +
+                                      ' is an empty file. Please check the input file.',
+                                      flush = True)
+
+        self.patcher.stop()
+
     def test_input_invalid_output_option(self):
         """Check if the software is able to detect if the input output options are valid.
            If not, gives an error and inform the user about this issue.
@@ -310,22 +359,20 @@ class Parsing_Issue_Test(unittest.TestCase):
 
         self.patcher.stop()
 
-    def test_input_valid_output_option_agilent_no_data_excel(self):
-        """Check if the software is able to detect if the input output option is valid
-           but the output option is not found in the input file when creating an excel file
+    def test_invalid_agilent_dataform(self):
+        """Check if the software is able to detect if the Agilent input file is
+           neither in Wide Table or Compound Table Form.
         """
 
-        # Replace the print function in MSDataOutput.py file to a mock
-        self.patcher = patch('MSDataOutput.print')
+        # Replace the print function in MSRawData.py file to a mock
+        self.patcher = patch('MSRawData.print')
         mock_print = self.patcher.start()
 
-        output_directory = os.path.join(os.path.dirname(__file__),"testdata", "test_bad_input")
-
         stored_args = {
-            'MS_Files': [VALID_WIDETABLEFORM_FILENAME], 
+            'MS_Files': [INVALID_AGILENT_DATAFORM_FILENAME], 
             'MS_FileType': 'Agilent Wide Table in csv', 
-            'Output_Directory': output_directory, 
-            'Output_Options': ['Area', 'S/N'], 
+            'Output_Directory': 'D:\\MSOrganiser', 
+            'Output_Options': ['Area'], 
             'Annot_File': "", 
             'Output_Format': 'Excel', 
             'Concatenate': 'No Concatenate', 
@@ -336,82 +383,53 @@ class Parsing_Issue_Test(unittest.TestCase):
             'Testing': False
         }
 
-        [file_data_list, file_name] = no_concatenate_workflow(stored_args,testing = True)
+        with self.assertRaises(SystemExit) as cm:
+            [file_data_list, file_name] = no_concatenate_workflow(stored_args,testing = True)
 
-        #print(file_name)
-        #print(file_data_list[0][0][1])
-        #print(file_data_list[0][0][0])
+        # Ensure that the system ends with a -1 to indicate an error
+        self.assertEqual(cm.exception.code, -1)
 
-        DfOutput = MSDataOutput_Excel(stored_args['Output_Directory'], VALID_WIDETABLEFORM_FILENAME, 
-                                      result_name = "Results" ,
-                                      logger = None, ingui = True)
-        DfOutput.start_writer()
-        DfOutput.df_to_file("Area",file_data_list[0][0][0],
-                            transpose=stored_args['Transpose_Results'],
-                            allow_multiple_istd = False)
-        DfOutput.df_to_file("S/N",file_data_list[0][0][1],
-                            transpose=stored_args['Transpose_Results'],
-                            allow_multiple_istd = False)
-        DfOutput.end_writer(testing = True)
-
-        # Ensure that the warning was due to no data available for that output option
-        mock_print.assert_called_with('S/N has no data. Please check the input file.',
+        # Ensure that the error was due to invalid Agilent input file 
+        # which is neither in Wide Table or Compound Table Form.
+        mock_print.assert_called_with(INVALID_AGILENT_DATAFORM_FILENAME + ' ' +
+                                      'is missing \"Sample\" at first row and column in Wide Table form ' + 
+                                      'or missing \"Compound Method\" at first row and column in Compound Table form. ' +
+                                      'Please check the input file.',
                                       flush=True)
 
-        self.patcher.stop()
-
-    def test_input_valid_output_option_agilent_no_data_csv(self):
-        """Check if the software is able to detect if the input output option is valid
-           but the output option is not found in the input file when creating a csv file
-        """
-
-        # Replace the print function in MSDataOutput.py file to a mock
-        self.patcher = patch('MSDataOutput.print')
-        mock_print = self.patcher.start()
-
-        output_directory = os.path.join(os.path.dirname(__file__),"testdata", "test_bad_input")
+        #self.patcher.stop()
 
         stored_args = {
-            'MS_Files': [VALID_WIDETABLEFORM_FILENAME], 
+            'MS_Files': [INVALID_AGILENT_DATAFORM_FILENAME2], 
             'MS_FileType': 'Agilent Wide Table in csv', 
-            'Output_Directory': output_directory, 
-            'Output_Options': ['S/N'], 
+            'Output_Directory': 'D:\\MSOrganiser', 
+            'Output_Options': ['Area'], 
             'Annot_File': "", 
             'Output_Format': 'Excel', 
             'Concatenate': 'No Concatenate', 
             'Transpose_Results': False, 
             'Allow_Multiple_ISTD': False, 
-            'Long_Table': True, 
+            'Long_Table': False, 
             'Long_Table_Annot': False, 
             'Testing': False
-            }
-        [file_data_list, file_name] = no_concatenate_workflow(stored_args,testing = True)
+        }
 
-        DfOutput = MSDataOutput_csv(stored_args['Output_Directory'], VALID_WIDETABLEFORM_FILENAME, 
-                                    result_name = "" , logger = None, ingui = True)
-        DfOutput.start_writer()
-        DfOutput.df_to_file("S/N",file_data_list[0][0][0],
-                            transpose=stored_args['Transpose_Results'],
-                            allow_multiple_istd = False)
-            
-        # Ensure that the warning was due to no data available for that output option
-        mock_print.assert_called_with('S/N has no data. Please check the input file.',
-                                      flush=True)
+        with self.assertRaises(SystemExit) as cm:
+            [file_data_list, file_name] = no_concatenate_workflow(stored_args,testing = True)
 
-        #self.patcher.stop()
+        # Ensure that the system ends with a -1 to indicate an error
+        self.assertEqual(cm.exception.code, -1)
 
-        DfLongOutput = MSDataOutput_csv(stored_args['Output_Directory'], VALID_WIDETABLEFORM_FILENAME, 
-                                        result_name = "" , logger = None, ingui=True)
-        DfLongOutput.start_writer()
-        DfLongOutput.df_to_file("Long_Table",file_data_list[0][0][1])
-
-        # Ensure that the warning was due to no data available for that output option
-        mock_print.assert_called_with('Long_Table has no data. Please check the input file.',
+        # Ensure that the error was due to invalid Agilent input file 
+        # which is neither in Wide Table or Compound Table Form.
+        mock_print.assert_called_with(INVALID_AGILENT_DATAFORM_FILENAME2 + ' ' +
+                                      'is missing \"Sample\" at first row and column in Wide Table form ' + 
+                                      'or missing \"Compound Method\" at first row and column in Compound Table form. ' +
+                                      'Please check the input file.',
                                       flush=True)
 
         self.patcher.stop()
-
-
+    
     def test_input_agilent_file_no_data_file(self):
         """Check if the software is able to detect if the Agilent input file in
            Wide Table Form or Compound Table Form have a Data File column 
@@ -517,20 +535,22 @@ class Parsing_Issue_Test(unittest.TestCase):
 
         self.patcher.stop()
 
-    def test_invalid_agilent_dataform(self):
-        """Check if the software is able to detect if the Agilent input file is
-           neither in Wide Table or Compound Table Form.
+    def test_input_valid_output_option_agilent_no_data_excel(self):
+        """Check if the software is able to detect if the input output option is valid
+           but the output option is not found in the input file when creating an excel file
         """
 
-        # Replace the print function in MSRawData.py file to a mock
-        self.patcher = patch('MSRawData.print')
+        # Replace the print function in MSDataOutput.py file to a mock
+        self.patcher = patch('MSDataOutput.print')
         mock_print = self.patcher.start()
 
+        output_directory = os.path.join(os.path.dirname(__file__),"testdata", "test_bad_input")
+
         stored_args = {
-            'MS_Files': [INVALID_AGILENT_DATAFORM_FILENAME], 
+            'MS_Files': [VALID_WIDETABLEFORM_FILENAME], 
             'MS_FileType': 'Agilent Wide Table in csv', 
-            'Output_Directory': 'D:\\MSOrganiser', 
-            'Output_Options': ['Area'], 
+            'Output_Directory': output_directory, 
+            'Output_Options': ['Area', 'S/N'], 
             'Annot_File': "", 
             'Output_Format': 'Excel', 
             'Concatenate': 'No Concatenate', 
@@ -541,28 +561,103 @@ class Parsing_Issue_Test(unittest.TestCase):
             'Testing': False
         }
 
-        with self.assertRaises(SystemExit) as cm:
-            [file_data_list, file_name] = no_concatenate_workflow(stored_args,testing = True)
+        [file_data_list, file_name] = no_concatenate_workflow(stored_args,testing = True)
 
-        # Ensure that the system ends with a -1 to indicate an error
-        self.assertEqual(cm.exception.code, -1)
+        #print(file_name)
+        #print(file_data_list[0][0][1])
+        #print(file_data_list[0][0][0])
 
-        # Ensure that the error was due to invalid Agilent input file 
-        # which is neither in Wide Table or Compound Table Form.
-        mock_print.assert_called_with(INVALID_AGILENT_DATAFORM_FILENAME + ' ' +
-                                      'is missing \"Sample\" at first row and column in Wide Table form ' + 
-                                      'or missing \"Compound Method\" at first row and column in Compound Table form. ' +
-                                      'Please check the input file.',
+        DfOutput = MSDataOutput_Excel(stored_args['Output_Directory'], VALID_WIDETABLEFORM_FILENAME, 
+                                      result_name = "Results" ,
+                                      logger = None, ingui = True)
+        DfOutput.start_writer()
+        DfOutput.df_to_file("Area",file_data_list[0][0][0],
+                            transpose=stored_args['Transpose_Results'],
+                            allow_multiple_istd = False)
+        DfOutput.df_to_file("S/N",file_data_list[0][0][1],
+                            transpose=stored_args['Transpose_Results'],
+                            allow_multiple_istd = False)
+        DfOutput.end_writer(testing = True)
+
+        # Ensure that the warning was due to no data available for that output option
+        mock_print.assert_called_with('S/N has no data. Please check the input file.',
+                                      flush=True)
+
+        self.patcher.stop()
+
+    def test_input_valid_output_option_agilent_no_data_csv(self):
+        """Check if the software is able to detect if the input output option is valid
+           but the output option is not found in the input file when creating a csv file
+        """
+
+        # Replace the print function in MSDataOutput.py file to a mock
+        self.patcher = patch('MSDataOutput.print')
+        mock_print = self.patcher.start()
+
+        output_directory = os.path.join(os.path.dirname(__file__),"testdata", "test_bad_input")
+
+        stored_args = {
+            'MS_Files': [VALID_WIDETABLEFORM_FILENAME], 
+            'MS_FileType': 'Agilent Wide Table in csv', 
+            'Output_Directory': output_directory, 
+            'Output_Options': ['S/N'], 
+            'Annot_File': "", 
+            'Output_Format': 'Excel', 
+            'Concatenate': 'No Concatenate', 
+            'Transpose_Results': False, 
+            'Allow_Multiple_ISTD': False, 
+            'Long_Table': True, 
+            'Long_Table_Annot': False, 
+            'Testing': False
+            }
+        [file_data_list, file_name] = no_concatenate_workflow(stored_args,testing = True)
+
+        DfOutput = MSDataOutput_csv(stored_args['Output_Directory'], VALID_WIDETABLEFORM_FILENAME, 
+                                    result_name = "" , logger = None, ingui = True)
+        DfOutput.start_writer()
+        DfOutput.df_to_file("S/N",file_data_list[0][0][0],
+                            transpose=stored_args['Transpose_Results'],
+                            allow_multiple_istd = False)
+            
+        # Ensure that the warning was due to no data available for that output option
+        mock_print.assert_called_with('S/N has no data. Please check the input file.',
                                       flush=True)
 
         #self.patcher.stop()
 
+        DfLongOutput = MSDataOutput_csv(stored_args['Output_Directory'], VALID_WIDETABLEFORM_FILENAME, 
+                                        result_name = "" , logger = None, ingui=True)
+        DfLongOutput.start_writer()
+        DfLongOutput.df_to_file("Long_Table",file_data_list[0][0][1])
+
+        # Ensure that the warning was due to no data available for that output option
+        mock_print.assert_called_with('Long_Table has no data. Please check the input file.',
+                                      flush=True)
+
+        self.patcher.stop()
+
+class Bad_Annotation_Test(unittest.TestCase):
+    # See https://realpython.com/lessons/mocking-print-unit-tests/
+    # for more details on mock
+
+    def test_input_annotation_cannot_be_found(self):
+        """Check if the software is able to detect if the input annotation file exists.
+           If not, gives an error and inform the user about this issue.
+
+        """
+
+        # Replace the print function in Annotation.py file to a mock
+        self.patcher = patch('Annotation.print')
+        mock_print = self.patcher.start()
+
+        output_directory = os.path.join(os.path.dirname(__file__),"testdata", "test_bad_input")
+
         stored_args = {
-            'MS_Files': [INVALID_AGILENT_DATAFORM_FILENAME2], 
+            'MS_Files': [VALID_WIDETABLEFORM_FILENAME], 
             'MS_FileType': 'Agilent Wide Table in csv', 
-            'Output_Directory': 'D:\\MSOrganiser', 
-            'Output_Options': ['Area'], 
-            'Annot_File': "", 
+            'Output_Directory': output_directory, 
+            'Output_Options': ['Area', 'normArea by ISTD'], 
+            'Annot_File': "non_existing_annot_file.xlsm", 
             'Output_Format': 'Excel', 
             'Concatenate': 'No Concatenate', 
             'Transpose_Results': False, 
@@ -578,13 +673,88 @@ class Parsing_Issue_Test(unittest.TestCase):
         # Ensure that the system ends with a -1 to indicate an error
         self.assertEqual(cm.exception.code, -1)
 
-        # Ensure that the error was due to invalid Agilent input file 
-        # which is neither in Wide Table or Compound Table Form.
-        mock_print.assert_called_with(INVALID_AGILENT_DATAFORM_FILENAME2 + ' ' +
-                                      'is missing \"Sample\" at first row and column in Wide Table form ' + 
-                                      'or missing \"Compound Method\" at first row and column in Compound Table form. ' +
-                                      'Please check the input file.',
-                                      flush=True)
+        # Ensure that the error was due to no Data File column in the Agilent Wide Table Form in csv
+        mock_print.assert_called_with('Input annotation ' + '\'non_existing_annot_file.xlsm\'' +
+                                      ' could not be found. ' +
+                                      'Please check the input file path.',
+                                      flush = True)
+
+        self.patcher.stop()
+
+    def test_input_annotation_wrong_file_extention(self):
+        """Check if the software is able to detect if the input annotation file
+           has the wrong file extension
+        """
+
+        # Replace the print function in Annotation.py file to a mock
+        self.patcher = patch('Annotation.print')
+        mock_print = self.patcher.start()
+
+        output_directory = os.path.join(os.path.dirname(__file__),"testdata", "test_bad_input")
+
+        stored_args = {
+            'MS_Files': [VALID_WIDETABLEFORM_FILENAME], 
+            'MS_FileType': 'Agilent Wide Table in csv', 
+            'Output_Directory': output_directory, 
+            'Output_Options': ['Area', 'normArea by ISTD'], 
+            'Annot_File': WRONG_EXTENTION_ANNOTATION_FILENAME, 
+            'Output_Format': 'Excel', 
+            'Concatenate': 'No Concatenate', 
+            'Transpose_Results': False, 
+            'Allow_Multiple_ISTD': False, 
+            'Long_Table': False, 
+            'Long_Table_Annot': False, 
+            'Testing': False
+        }
+
+        with self.assertRaises(SystemExit) as cm:
+            [file_data_list, file_name] = no_concatenate_workflow(stored_args,testing = True)
+
+        # Ensure that the system ends with a -1 to indicate an error
+        self.assertEqual(cm.exception.code, -1)
+
+        # Ensure that the error was due to no Data File column in the Agilent Wide Table Form in csv
+        mock_print.assert_called_with('This program no longer accepts csv file as input for the annotation file. Please use the excel template file given.',
+                                      flush = True)
+
+        self.patcher.stop()
+
+    def test_input_annotation_is_a_folder(self):
+        """Check if the software is able to detect a folder input when a system
+           file input is expected
+
+        """
+
+        # Replace the print function in Annotation.py file to a mock
+        self.patcher = patch('Annotation.print')
+        mock_print = self.patcher.start()
+
+        stored_args = {
+            'MS_Files': [VALID_WIDETABLEFORM_FILENAME],
+            'MS_FileType': 'Agilent Wide Table in csv', 
+            'Output_Directory': 'D:\\MSOrganiser', 
+            'Output_Options': ['Area', 'normArea by ISTD', 'normConc by ISTD'], 
+            'Annot_File': INPUT_ANNOTATION_FOLDERNAME, 
+            'Output_Format': 'Excel', 
+            'Concatenate': 'No Concatenate', 
+            'Transpose_Results': False, 
+            'Allow_Multiple_ISTD': False, 
+            'Long_Table': False, 
+            'Long_Table_Annot': False, 
+            'Testing': False
+        }
+
+        with self.assertRaises(SystemExit) as cm:
+            [file_data_list, file_name] = no_concatenate_workflow(stored_args,testing = True)
+
+        # Ensure that the system ends with a -1 to indicate an error
+        self.assertEqual(cm.exception.code, -1)
+
+        # Ensure that the error was due to input of a folder instead of a file
+        mock_print.assert_called_with('Input file path ' + '\'' + INPUT_ANNOTATION_FOLDERNAME + '\'' +
+                                      ' does not lead to a system file. ' + 
+                                      'Please check if the input file path is a system file and not a folder.',
+                                      flush = True)
 
         self.patcher.stop()
 

@@ -440,21 +440,20 @@ class AgilentMSRawData(MSRawData):
                 if self.__logger:
                     self.__logger.warning('Warning: Unable to read csv file using the %s encoder',encoder)
                 continue
+            except pd.errors.EmptyDataError:
+                # If the file has no content
+                if self.__logger:
+                    self.__logger.error(str(filepath) + ' is an empty file. Please check the input file.')
+                if self.__ingui:
+                    print(str(filepath) + ' is an empty file. Please check the input file.',flush=True)
+                sys.exit(-1)
         if all_encoders_fail:
             if self.__logger:
                 self.__logger.error('Unable to read csv file with the available encoders')
             if self.__ingui:
                 print('Unable to read csv file with the available encoders',flush=True)
             sys.exit(-1)
-
-        # Check if the file has content
-        if self.RawData.empty:
-            if self.__logger:
-                self.__logger.error('%s is an empty file. Please check the input file.',str(filepath))
-            if self.__ingui:
-                print(str(filepath) + ' is an empty file. Please check the input file.',flush=True)
-            sys.exit(-1)
-        
+       
         # On the first row, fill empty cells forward 
         self.RawData.iloc[0,:] = self.RawData.iloc[0,:].fillna(method='ffill')
 

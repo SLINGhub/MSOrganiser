@@ -4,6 +4,7 @@ import sys
 import re
 import os
 import logging
+from pathlib import Path
 
 from openpyxl import load_workbook
 
@@ -42,27 +43,50 @@ class MS_Template():
         return df
 
     def __filecheck(self,column_name):
+
+        # Taken care of by MSParser.py
         # Check if input is blank/None
-        if not self.filepath:
+        #if not self.filepath:
+        #    if self.__logger:
+        #        self.__logger.error('An annotation file is required to perform this calculation: %s', column_name)
+        #    if self.__ingui:
+        #        print('An annotation file is required to perform this calculation: ' + column_name,flush=True)
+        #    sys.exit(-1)
+
+        file_to_check = Path(self.filepath)
+
+        # Check if filepath exists and is a file
+        #if not os.path.isfile(self.filepath):
+        if not file_to_check.exists():
             if self.__logger:
-                self.__logger.error('A ISTD map file is required to perform this calculation: %s', column_name)
+                self.__logger.error('Input annotation ' + '\'' + self.filepath + '\'' +
+                                    ' could not be found. ' +
+                                    'Please check if the input file path.')
             if self.__ingui:
-                print('A ISTD map file is required to perform this calculation: ' + column_name,flush=True)
+                print('Input annotation ' + '\'' + self.filepath + '\'' +
+                      ' could not be found. ' +
+                      'Please check the input file path.',
+                      flush=True)
+            sys.exit(-1)
+        elif not file_to_check.is_file():
+            if self.__logger:
+                self.__logger.error('Input file path ' + '\'' + self.filepath + '\'' + 
+                                    ' does not lead to a system file. ' + 
+                                    'Please check if the input file path is a system file and not a folder.')
+            if self.__ingui:
+                print('Input file path ' + '\'' + self.filepath + '\'' + 
+                      ' does not lead to a system file. ' + 
+                      'Please check if the input file path is a system file and not a folder.',
+                      flush=True)
             sys.exit(-1)
 
-        # Check if file exists
-        if not os.path.isfile(self.filepath):
-            if self.__logger:
-                self.__logger.error('%s does not exists. Please check the input file',self.filepath)
-            if self.__ingui:
-                print(self.filepath + ' does not exists. Please check the input file',flush=True)
-            sys.exit(-1)
 
         if self.filepath.endswith('.csv'):
             if self.__logger:
-                self.__logger.error('This program no longer accept csv file as input for the ISTD map file. Please use the excel template file given')
+                self.__logger.error('This program no longer accepts csv file as input for the annotation file. Please use the excel template file given.')
             if self.__ingui:
-                print('This program no longer accept csv file as input for the ISTD map file. Please use the excel template file given',flush=True)
+                print('This program no longer accepts csv file as input for the annotation file. Please use the excel template file given.',
+                      flush=True)
             sys.exit(-1)
 
     def __readExcelWorkbook(self):
@@ -304,12 +328,12 @@ class MS_Template():
                 self.__logger.error('Sheet ISTD_Annot\'s column Custom_Unit option ' +
                                      worksheet["F3"].value + ' ' + 
                                     'is no longer accepted in MSOrganiser. ' +
-                                    'Please use a later version of MSTemplate_Creator (above 1.0.3).')
+                                    'Please use a later version of MSTemplate_Creator (above 1.0.1).')
             if self.__ingui:
                 print('Sheet ISTD_Annot\'s column Custom_Unit option ' +
                        worksheet["F3"].value + ' ' + 
                       'is no longer accepted in MSOrganiser. ' +
-                      'Please use a later version of MSTemplate_Creator (above 1.0.3).', 
+                      'Please use a later version of MSTemplate_Creator (above 1.0.1).', 
                       flush=True)
             sys.exit(-1)
 
