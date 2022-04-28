@@ -2,6 +2,7 @@ import unittest
 import os
 from unittest.mock import patch
 from Annotation import MS_Template
+from MSCalculate import ISTD_Operations
 
 INVALIDSHEETNAME_ANNOTATION = os.path.join(os.path.dirname(__file__),
                                            "testdata", "test_istd_annot", 
@@ -34,6 +35,10 @@ INVALIDCUSTOMUNIT_ANNOTATION = os.path.join(os.path.dirname(__file__),
 DUPLICATEISTD_ANNOTATION = os.path.join(os.path.dirname(__file__),
                                         "testdata", "test_istd_annot", 
                                         "WideTableForm_Annotation_DuplicateISTD.xlsx")
+
+WIDETABLEFORM_ANNOTATION_WITH_ISTD_NOT_IN_TRANSITION_ANNOT = os.path.join(os.path.dirname(__file__),
+                                                                          "testdata", "test_istd_annot", 
+                                                                          "WideTableForm_Anotation_ISTDNotInTransitionAnnot.xlsx")
 
 class ISTDAnnot_Test(unittest.TestCase):
     # See https://realpython.com/lessons/mocking-print-unit-tests/
@@ -201,6 +206,34 @@ class ISTDAnnot_Test(unittest.TestCase):
                                       self.valid_sheet_name + ' ' +
                                       'sheet has duplicates at row(s) 4, 5.', 
                                       flush = True)
+
+    def test_warn_ISTD_in_ISTD_Annot_but_not_in_Transition_Name_Annot(self):
+        """Check if the software is able to warn if the ISTD in the 
+           ISTD_Annot sheet is absent in the Transition_Name_Annot sheet 
+
+        * Read the file
+        * Warn if the ISTD in the ISTD_Annot is absent in the Transition_Name_Annot sheet
+
+        """
+
+        MS_FilePathList = ["WideTableForm.csv"]
+        excess_ISTD = ["LPC 20:0 (IS)"]
+
+        self.patcher = patch('MSCalculate.print')
+        mock_print = self.patcher.start()
+
+        Transition_Name_Annot_df = ISTD_Operations.read_ISTD_map(filepath = WIDETABLEFORM_ANNOTATION_WITH_ISTD_NOT_IN_TRANSITION_ANNOT,
+                                                                 column_name = "Area",
+                                                                 logger = None, ingui = True,
+                                                                 doing_normalization = False, 
+                                                                 allow_multiple_istd = False)
+
+        # Ensure that the warning was due to some Transition_Name_ISTD in ISTD_Annot not used in Transition_Name_Annot
+        mock_print.assert_called_with('There are Transition_Name_ISTD in ISTD_Annot not used in Transition_Name_Annot.\n' + 
+                                      "\n".join(excess_ISTD) + '\n' +
+                                      'Check that these ISTD are truly not needed.',
+                                      flush=True)
+
 
     def tearDown(self):
         self.patcher.stop()
