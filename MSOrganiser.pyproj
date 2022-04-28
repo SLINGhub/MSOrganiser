@@ -111,6 +111,7 @@
     <Folder Include="tests\__pycache__\" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include=".gitignore" />
     <Content Include="build.spec" />
     <Content Include="cairo_dll\libatk-1.0-0.dll" />
     <Content Include="cairo_dll\libatkmm-1.6-1.dll" />
