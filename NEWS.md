@@ -1,10 +1,11 @@
-# MSOrganiser 1.1.0.9000 (development version)
+# MSOrganiser 1.1.1.9000 (development version)
 
 ## TODO
 
 * Find a way to make the documentation of the functions of `MSOrganiser` online.
 
-## Done
+# MSOrganiser 1.1.1 
+
 * Updated code to work in the pandas version 1.4.2
 * Checked that the program works with GTK3 Version 3.24.31
 * Add a warning message when user has ISTDs in the ISTD_Annot sheet that is not in the Transition_Name_Annot sheet. Resulting merged sheet between Transition_Name_Annot and ISTD_Annot will not have these excess ISTDs
