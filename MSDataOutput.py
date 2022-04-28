@@ -213,10 +213,10 @@ class MSDataOutput_Excel(MSDataOutput):
         try:
             self.writer = pd.ExcelWriter(self.writer, engine = 'openpyxl', 
                                          #options = options,
-                                         engine_kwargs = {'options': {'strings_to_formulas': False,
-                                                                      'strings_to_urls' : False
-                                                                      }
-                                                         }
+                                         #engine_kwargs = {'options': {'strings_to_formulas': False,
+                                         #                             'strings_to_urls' : False
+                                         #                             }
+                                         #                }
                                          )
             #self.writer = pd.ExcelWriter(self.writer, engine = 'xlsxwriter', options = options)
         except UserWarning as w:

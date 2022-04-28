@@ -16,11 +16,6 @@ class ISTD_Operations():
         #Transition_Name_dict = {}
         #ISTD_report = []
 
-    #def remove_whiteSpaces(df):
-        ##Strip the whitespaces for each string columns of a df
-        #df[df.select_dtypes(['object']).columns] = df.select_dtypes(['object']).apply(lambda x: x.str.strip())
-        #return df
-
     def read_ISTD_map(filepath,column_name,logger=None,ingui=False,
                       doing_normalization = False, allow_multiple_istd = False):
         """Function to get the transition names annotation dataframe from the MS Template Creator annotation file.
@@ -44,12 +39,13 @@ class ISTD_Operations():
                                      allow_multiple_istd = allow_multiple_istd)
         Transition_Name_Annot_df = AnnotationList.Read_Transition_Name_Annot_Sheet()
         ISTD_Annot_df = AnnotationList.Read_ISTD_Annot_Sheet()
-        
+
         if not ISTD_Annot_df.empty:
             # Additional check to ensure each Transition_Name_ISTD in Transition_Name_Annot sheet 
             # also appears in the ISTD_Annot sheet
             ISTD_list_in_Transition_Name_Annot_sheet = list(filter(None,Transition_Name_Annot_df['Transition_Name_ISTD'].unique()))
             ISTD_list_in_Annot_sheet = list(filter(None,ISTD_Annot_df['Transition_Name_ISTD'].unique()))
+
             missing_ISTD = sorted(list(set(ISTD_list_in_Transition_Name_Annot_sheet).difference(ISTD_list_in_Annot_sheet)))
             if missing_ISTD:
                 if logger:
@@ -62,9 +58,27 @@ class ISTD_Operations():
                           "\n".join(missing_ISTD) + '\n' +
                           'Check that these ISTD are in the ISTD_Annot sheet.',
                           flush=True)
-            # Merge the two data frame by common ISTD
+
+            excess_ISTD = sorted(list(set(ISTD_list_in_Annot_sheet).difference(ISTD_list_in_Transition_Name_Annot_sheet)))
+            if excess_ISTD:
+                if logger:
+                    logger.warning('There are Transition_Name_ISTD in ISTD_Annot not used in Transition_Name_Annot.\n' +
+                                   "\n".join(excess_ISTD) + '\n' +
+                                   'Check that these ISTD are truly not needed.'
+                                   )
+                if ingui:
+                    print('There are Transition_Name_ISTD in ISTD_Annot not used in Transition_Name_Annot.\n' + 
+                          "\n".join(excess_ISTD) + '\n' +
+                          'Check that these ISTD are truly not needed.',
+                          flush=True)
+
             Transition_Name_Annot_df = pd.merge(Transition_Name_Annot_df, ISTD_Annot_df, 
-                                                on = 'Transition_Name_ISTD', how = 'outer')
+                                                on = 'Transition_Name_ISTD', 
+                                                how = 'outer')
+
+            # Remove rows with no transition name, even though it has an transition name istd
+            Transition_Name_Annot_df.dropna(subset = ['Transition_Name'], 
+                                            inplace = True)
 
         return Transition_Name_Annot_df
 
@@ -92,6 +106,18 @@ class ISTD_Operations():
         return Sample_Annot_df
 
     def _validate_Transition_Name_df(Transition_Name_df,logger=None,ingui=False):
+        """Function to validate if the input Transition_Name_df is valid.
+
+        Args:
+            Transition_Name_df (pandas DataFrame): A data frame of sample as rows and transition names as columns
+            logger (object): logger object created by start_logger in MSOrganiser
+            ingui (bool): if True, print analysis status to screen
+
+        Note:
+            Check if the column "Sample_Name" exists, otherwise, throw an error.
+
+        """
+
         if "Sample_Name" not in Transition_Name_df:
             if logger:
                 logger.error("The input data frame does not contain the column Sample_Name")
@@ -104,6 +130,18 @@ class ISTD_Operations():
             sys.exit(-1)
 
     def _validate_Sample_Annot_df(Sample_Annot_df,logger=None,ingui=False):
+        """Function to validate if the input Transition_Name_df is valid.
+
+        Args:
+            Sample_Annot_df (pandas DataFrame): A data frame showing the sample name annotation
+            logger (object): logger object created by start_logger in MSOrganiser
+            ingui (bool): if True, print analysis status to screen
+
+        Note:
+            Check if the column "Sample_Name" exists, otherwise, throw an error.
+
+        """
+
         if "Sample_Name" not in Sample_Annot_df:
             if logger:
                 logger.error("The sample annotation file does not contain the column Sample_Name")
@@ -128,8 +166,8 @@ class ISTD_Operations():
         Returns:
             (list): list containing:
 
-                * ISTD_report (pandas DataFrame): A data frame of with transition names, its corresponding ISTD as columns. This will be converted to a pdf file page
-                * Transition_Name_dict (dict): A python dictionary to map the Transition_Name to the Transition_Name_ISTD and an ISTD report to map Transition_Name_ISTD to Transition_Name
+                * ISTD_report_list (pandas DataFrame): An updated ISTD report to map Transition_Name_ISTD to Transition_Name
+                * Transition_Name_dict (dict): An updated python dictionary to map the Transition_Name to the Transition_Name_ISTD
         """
 
         #Create a dictionary to map the Transition_Name to the Transition_Name_ISTD and an ISTD report to map Transition_Name_ISTD to Transition_Name
@@ -139,13 +177,17 @@ class ISTD_Operations():
         Transition_Name_df_column_list = list(Transition_Name_df.columns.values)
 
         #Create the Transition_Name_dict and ISTD_report
-        Transition_Name_df.iloc[:,1:].apply(lambda x: ISTD_Operations._update_Transition_Name_dict(x=x,Transition_Name_Annot_df=Transition_Name_Annot_df,
-                                                                                                   Transition_Name_dict=Transition_Name_dict,
-                                                                                                   Transition_Name_df_column_list = Transition_Name_df_column_list,
-                                                                                                   ISTD_report_list = ISTD_report,
-                                                                                                   logger=logger,ingui=ingui,
-                                                                                                   allow_multiple_istd = allow_multiple_istd)
-                                            ,axis=0)
+        for Transition_Name in Transition_Name_df_column_list:
+            if Transition_Name != 'Sample_Name':
+                [ISTD_report,Transition_Name_dict] = ISTD_Operations._update_Transition_Name_dict(
+                    Transition_Name = Transition_Name,
+                    Transition_Name_Annot_df=Transition_Name_Annot_df,
+                    Transition_Name_dict=Transition_Name_dict,
+                    Transition_Name_df_column_list = Transition_Name_df_column_list,
+                    ISTD_report_list = ISTD_report,
+                    logger=logger,ingui=ingui,
+                    allow_multiple_istd = allow_multiple_istd
+                    )
 
         #Convert ISTD report from list to dataframe and report any warnings if any
         ISTD_report = pd.DataFrame(ISTD_report)
@@ -218,39 +260,45 @@ class ISTD_Operations():
             ingui (bool): if True, print analysis status to screen
             allow_multiple_istd (bool): if True, ISTD data can have mulitple internal standards for one transition
 
+        Notes:
+            It is actually one of the internal function of normalise_by_ISTD. An empty data frame of the same dimension as
+            Transition_Name_df is created, then, the first column "Sample_Name" is filled in. For the subsequent columns,
+            the ISTD area is placed based on what is provided in Transition_Name_dict
+
         Returns:
             (list): list containing:
 
-                * ISTD_report (pandas DataFrame): A data frame of with transition names, its corresponding ISTD as columns. This will be converted to a pdf file page
                 * ISTD_data (pandas DataFrame): A data frame of sample as rows and transition names as columns with the ISTD area as values. Output as excel only at testing mode
         """
 
         ISTD_data = pd.DataFrame(columns=Transition_Name_df.columns, index=Transition_Name_df.index)
-
-        #print(ISTD_data.columns.values)
 
         #Sample_Name must be present
         ISTD_Operations._validate_Transition_Name_df(Transition_Name_df,logger,ingui)
         
         #Create a ISTD table from the Transition_Name df
         ISTD_data["Sample_Name"] = Transition_Name_df["Sample_Name"]
-        ISTD_data.iloc[:,1:].apply(lambda x: ISTD_Operations._update_ISTD_data_from_Transition_Name_df(x=x,
-                                                                                                       Transition_Name_dict=Transition_Name_dict,
-                                                                                                       Transition_Name_df=Transition_Name_df,
-                                                                                                       logger=logger,ingui=ingui,
-                                                                                                       allow_multiple_istd = allow_multiple_istd),
-                                   axis=0)
+
+        ISTD_data = ISTD_data.apply(
+            lambda x: ISTD_Operations._update_ISTD_data_from_Transition_Name_df(
+                ISTD_data_column_data = x,
+                Transition_Name_dict=Transition_Name_dict,
+                Transition_Name_df=Transition_Name_df,
+                logger=logger,ingui=ingui,
+                allow_multiple_istd = allow_multiple_istd)
+                if x.name != 'Sample_Name' else x,
+                axis=0)
 
         return [ISTD_data]
 
-    def _update_Transition_Name_dict(x,Transition_Name_Annot_df,Transition_Name_dict,
+    def _update_Transition_Name_dict(Transition_Name,Transition_Name_Annot_df,Transition_Name_dict,
                                      Transition_Name_df_column_list, ISTD_report_list,
                                      logger=None,ingui=False,
                                      allow_multiple_istd = False):
-        """Updating the Transition_Name dict to map Transition_Name to their Transition_Name_ISTD
+        """Updating the Transition_Name dict and ISTD_report_list to map Transition_Name to their Transition_Name_ISTD given a Transition_Name
 
         Args:
-            x (pandas Series): A column from the ISTD_data to obtain the transition name
+            Transition_Name (str): Input transition name
             Transition_Name_Annot_df (pandas DataFrame): A data frame of showing the transition names annotation
             Transition_Name_dict (dict): A dictionary to map each transition name to its ISTD. To be updated by each x
             Transition_Name_df_column_list (list): A list of column names of Transition_Name_df
@@ -259,16 +307,20 @@ class ISTD_Operations():
             ingui (bool): if True, print analysis status to screen
             allow_multiple_istd (bool): if True, Transition_Name_dict can have mulitple internal standards for one transition
 
+        Notes:
+            It is actually one of the internal function of create_Transition_Name_dict. It is meant to be interated over each transition in the
+            Transition_Name_df_column_list
+
+        Returns:
+            (list): list containing:
+
+                * ISTD_report_list (pandas DataFrame): An updated ISTD report to map Transition_Name_ISTD to Transition_Name
+                * Transition_Name_dict (dict): An updated python dictionary to map the Transition_Name to the Transition_Name_ISTD
+
         """
 
         # Get the mapping of one Transition_Name to exactly one ISTD
-        ISTD_list = Transition_Name_Annot_df.loc[Transition_Name_Annot_df['Transition_Name']==x.name,"Transition_Name_ISTD"].tolist()
-
-        if not ISTD_list:
-            # ISTD_list None
-            Transition_Name_dict[x.name] = None
-            ISTD_report_list.append(("!Missing Transition_Name in Transition_Name_Annot sheet",x.name))
-            return
+        ISTD_list = Transition_Name_Annot_df.loc[Transition_Name_Annot_df['Transition_Name']==Transition_Name,"Transition_Name_ISTD"].tolist()
 
         if allow_multiple_istd:
             # Check if each ISTD in the ISTD_List is valid
@@ -279,13 +331,30 @@ class ISTD_Operations():
             #       LPC 18:0
             # Will give an error because of duplicate rows in
             # Annotation.py __validate_Transition_Name_Annot_sheet function
+
+            if ISTD_list is None:
+                # ISTD_list is None
+                #Append an empty ISTD, this is not done if we do not allow multiple ISTD
+                valid_ISTD.append("")
+                ISTD_report_list.append(("!Blank Transition_Name_ISTD in Transition_Name_Annot sheet", Transition_Name))
+                Transition_Name_dict[Transition_Name] = valid_ISTD
+                return [ISTD_report_list,Transition_Name_dict] 
+
+            if len(ISTD_list) == 0:
+                # ISTD_list is []
+                #Append an empty ISTD, this is not done if we do not allow multiple ISTD
+                valid_ISTD.append("")
+                ISTD_report_list.append(("!Blank Transition_Name_ISTD in Transition_Name_Annot sheet", Transition_Name))
+                Transition_Name_dict[Transition_Name] = valid_ISTD
+                return [ISTD_report_list,Transition_Name_dict] 
+
             for ISTD in ISTD_list:
 
                 if ISTD is None:
                     # ISTD may be None
                     #Append an empty ISTD, this is not done if we do not allow multiple ISTD
                     valid_ISTD.append("")
-                    ISTD_report_list.append(("!Blank Transition_Name_ISTD in Transition_Name_Annot sheet", x.name))
+                    ISTD_report_list.append(("!Blank Transition_Name_ISTD in Transition_Name_Annot sheet", Transition_Name))
                     continue
                 elif pd.isna(ISTD):
                     # Value may be [nan] which is a type float
@@ -293,13 +362,13 @@ class ISTD_Operations():
                     # else it gives an error
                     # TypeError: ufunc 'isnan' not supported for the input types, and the inputs could not 
                     # be safely coerced to any supported types according to the casting rule ''safe''
-                    ISTD_report_list.append(("!Blank Transition_Name_ISTD in Transition_Name_Annot sheet",x.name))
+                    ISTD_report_list.append(("!Blank Transition_Name_ISTD in Transition_Name_Annot sheet",Transition_Name))
                     continue
 
                 if not isinstance(ISTD,float):
                     if Transition_Name_df_column_list.count(ISTD) == 0:
                         # ISTD is used in Annotation File but not present in the input data
-                        ISTD_report_list.append(("!Missing Transition_Name_ISTD in input data", x.name))
+                        ISTD_report_list.append(("!Missing Transition_Name_ISTD in input data", Transition_Name))
                         valid_ISTD.append(ISTD)
                         continue
                     elif Transition_Name_df_column_list.count(ISTD) > 1:
@@ -318,43 +387,56 @@ class ISTD_Operations():
                     else:
                         # When we have a valid ISTD
                         valid_ISTD.append(ISTD)
-                        ISTD_report_list.append((ISTD,x.name))
+                        ISTD_report_list.append((ISTD,Transition_Name))
                 else:
                     if logger:
-                        logger.error(x.name + ' has an invalid Transition_Name_ISTD of ' + 
+                        logger.error(Transition_Name + ' has an invalid Transition_Name_ISTD of ' + 
                                      str(ISTD) + '. Please check ISTD map file')
                     if ingui:
-                        print(x.name + ' has an invalid Transition_Name_ISTD of ' + 
+                        print(Transition_Name + ' has an invalid Transition_Name_ISTD of ' + 
                               str(ISTD) + '. Please check ISTD map file',
                               flush=True)
                     sys.exit(-1)
 
-            Transition_Name_dict[x.name] = valid_ISTD
-            return
+            Transition_Name_dict[Transition_Name] = valid_ISTD
+            return [ISTD_report_list,Transition_Name_dict]
+
+        # Case of not using multiple ISTD
+        if ISTD_list is None:
+            # ISTD_list None
+            Transition_Name_dict[Transition_Name] = None
+            ISTD_report_list.append(("!Missing Transition_Name in Transition_Name_Annot sheet",Transition_Name))
+            return [ISTD_report_list,Transition_Name_dict]
+
+        if len(ISTD_list) == 0:
+            # ISTD_list is []
+            Transition_Name_dict[Transition_Name] = None
+            ISTD_report_list.append(("!Missing Transition_Name in Transition_Name_Annot sheet",Transition_Name))
+            return [ISTD_report_list,Transition_Name_dict]
 
         if ISTD_list[0] is None:
             # ISTD_list may be [None]
-            Transition_Name_dict[x.name] = None
-            ISTD_report_list.append(("!Blank Transition_Name_ISTD in Transition_Name_Annot sheet",x.name))
-            return
+            Transition_Name_dict[Transition_Name] = None
+            ISTD_report_list.append(("!Blank Transition_Name_ISTD in Transition_Name_Annot sheet",Transition_Name))
+            return [ISTD_report_list,Transition_Name_dict] 
         elif pd.isna(ISTD_list[0]):
             # Value may be [np.NaN] which is a type float
             # Unfortunately, np.isnan must be the last condition
             # else it gives an error
             # TypeError: ufunc 'isnan' not supported for the input types, and the inputs could not 
             # be safely coerced to any supported types according to the casting rule ''safe''
-            Transition_Name_dict[x.name] = None
-            ISTD_report_list.append(("!Blank Transition_Name_ISTD in Transition_Name_Annot sheet",x.name))
-            return
+            Transition_Name_dict[Transition_Name] = None
+            ISTD_report_list.append(("!Blank Transition_Name_ISTD in Transition_Name_Annot sheet",Transition_Name))
+            return [ISTD_report_list,Transition_Name_dict] 
 
         if not isinstance(ISTD_list[0],float):
             # When we have only one valid ISTD
             # Check if the ISTD is valid in the input data set
             if Transition_Name_df_column_list.count(ISTD_list[0]) == 0:
                 # ISTD is used in Annotation File but not present in the input data
-                Transition_Name_dict[x.name] = ISTD_list[0]
-                ISTD_report_list.append(("!Missing Transition_Name_ISTD in input data", x.name))
-                return
+                Transition_Name_dict[Transition_Name] = ISTD_list[0]
+                ISTD_report_list.append(("!Missing Transition_Name_ISTD in input data", Transition_Name))
+                return [ISTD_report_list,Transition_Name_dict] 
             elif Transition_Name_df_column_list.count(ISTD_list[0]) > 1:
                 # ISTD is used in Annotation File but has duplicates in the input data
                 # This check may be redundant because the
@@ -370,128 +452,146 @@ class ISTD_Operations():
                 sys.exit(-1)
             else:
                 # When we have a valid ISTD
-                Transition_Name_dict[x.name] = ISTD_list[0]
-                ISTD_report_list.append((ISTD_list[0],x.name))
-                return
+                Transition_Name_dict[Transition_Name] = ISTD_list[0]
+                ISTD_report_list.append((ISTD_list[0],Transition_Name))
+                return [ISTD_report_list,Transition_Name_dict] 
         else:
             if logger:
-                logger.error(x.name + ' has an invalid Transition_Name_ISTD of ' + 
+                logger.error(Transition_Name + ' has an invalid Transition_Name_ISTD of ' + 
                              str(ISTD_list[0]) + '. Please check the Transition_Name_Annot sheet')
             if ingui:
-                print(x.name + ' has an invalid Transition_Name_ISTD of ' + 
+                print(Transition_Name + ' has an invalid Transition_Name_ISTD of ' + 
                       str(ISTD_list[0]) + '. Please check the Transition_Name_Annot sheet',
                       flush=True)
             sys.exit(-1)
 
 
-    def _update_Transition_Name_df(x,Transition_Name_df,logger=None):
+    def _update_expanded_Transition_Name_df(expanded_Transition_Name_df_column_data,Transition_Name_df,logger=None):
         """Update the new Transition_Name df for each Transition_Name so that it can be used for normalisation of multiple ISTD
 
         Args:
-            x (pandas Series): A column from the new Transition_Name df to be updated with its corresponding Tranition_Name df values
+            expanded_Transition_Name_df_column_data (pandas Series): A column from the new Transition_Name df to be updated with its corresponding Tranition_Name df values
             Transition_Name_df (pandas DataFrame): A data frame of sample as rows and transition names as columns
             logger (object): logger object created by start_logger in MSOrganiser
+
+        Notes:
+            It is actually one of the internal function of expand_Transition_Name_df. 
+            It is meant to be interated over each column of expanded_Transition_Name_df_column_data.
+            expanded_Transition_Name_df_column_data.name should be a Transition_Name that can be found in the columns of Transition_Name_df  
+
+        Returns:
+            expanded_Transition_Name_df_column_data.values (pandas Series): Values remain unchanged if no Transition_Name can be found. 
+            Otherwise the values will be replaced with the Transition_Name values provided by Transition_Name_df
         
         """
 
-        if not x.name[0]:
-            return
-        if list(Transition_Name_df.columns.values).count(x.name[0]) == 1:
-                x.update(Transition_Name_df.loc[:, x.name[0] ])
-        elif list(Transition_Name_df.columns.values).count(x.name[0]) > 1 :
+        if expanded_Transition_Name_df_column_data.name[0] is None:
+            return(expanded_Transition_Name_df_column_data.values)
+
+        if list(Transition_Name_df.columns.values).count(expanded_Transition_Name_df_column_data.name[0]) == 1:
+            return(Transition_Name_df.loc[:, expanded_Transition_Name_df_column_data.name[0] ])
+        elif list(Transition_Name_df.columns.values).count(expanded_Transition_Name_df_column_data.name[0]) > 1 :
             # This check may be redundant because the
             # duplicate Transition_Name in input data has been taken care
             # by DuplicateCheck.py
             if logger:
-                logger.warning(x.name[0] + ' appears more than once in the input data frame. ' + 
+                logger.warning(expanded_Transition_Name_df_column_data.name[0] + ' appears more than once in the input data frame. ' + 
                                'Ignore updating Transition_Name_df.')
             if ingui:
-                print(x.name[0] + ' appears more than once in the input data frame. ' + 
+                print(expanded_Transition_Name_df_column_data.name[0] + ' appears more than once in the input data frame. ' + 
                       'Ignore updating Transition_Name_df.',
                       flush = True)
         else:
             # This check may be redundant because the
             # x is iterated from the columns of Transition_Name_df
             if logger:
-                logger.warning(x.name[0] + ' cannot be found in the input data frame. ' +
+                logger.warning(expanded_Transition_Name_df_column_data.name[0] + ' cannot be found in the input data frame. ' +
                                'Ignore updating Transition_Name_df.')
             if ingui:
-                print(x.name[0] + ' cannot be found in the input data frame. ' +
+                print(expanded_Transition_Name_df_column_data.name[0] + ' cannot be found in the input data frame. ' +
                      'Ignore updating Transition_Name_df.',
                      flush = True)
-        return
+        return(expanded_Transition_Name_df_column_data.values)
 
-    def _update_ISTD_data_from_Transition_Name_df(x,Transition_Name_dict,Transition_Name_df,
+    def _update_ISTD_data_from_Transition_Name_df(ISTD_data_column_data,
+                                                  Transition_Name_dict,Transition_Name_df,
                                                   logger=None,ingui=False,
                                                   allow_multiple_istd = False):
         """Update the ISTD data for each Transition_Name. Value remains as NAN when there is an issue
 
         Args:
-            x (pandas Series): A column from the ISTD_data to be updated with its corresponding ISTD values
+            ISTD_data_column_data (pandas Series): A column from the ISTD_data to be updated with its corresponding ISTD values
             Transition_Name_dict (dict): A dictionary to map each transition name to its ISTD
             Transition_Name_df (pandas DataFrame): A data frame of sample as rows and transition names as columns
             logger (object): logger object created by start_logger in MSOrganiser
             ingui (bool): if True, print analysis status to screen
             allow_multiple_istd (bool): if True, Transition_Name_dict can have mulitple internal standards for one transition
         
+        Returns:
+            ISTD_data_column_data.values (pandas Series): Values remain unchanged if no Transition_Name_ISTD can be found. 
+            Otherwise the values will be replaced with the Transition_Name_ISTD values provided by Transition_Name_df
+
         """
 
-        #When a Transition_Name name has no/duplicate Transition_Name_ISTD or not found in the map file, just leave the funtion
-        #A warning is already given in update_Transition_Name_dict so we do not need to write this again
+        # When a Transition_Name name has no/duplicate Transition_Name_ISTD or not found in the map file, just leave the funtion
+        # A warning is already given in update_Transition_Name_dict so we do not need to write this again
 
         #If we do not allow multiple istd, Transition_Name_dict[x.name] will be a string or None
         if not allow_multiple_istd:
-            # x.name is the Transition_Name
-            # Transition_Name_dict[x.name] is Transition_Name_ISTD
-            if not Transition_Name_dict[x.name]:
-                return
-            if list(Transition_Name_df.columns.values).count(Transition_Name_dict[x.name]) == 1:
-                x.update(Transition_Name_df.loc[:, Transition_Name_dict[x.name] ])
-            elif list(Transition_Name_df.columns.values).count(Transition_Name_dict[x.name]) > 1 :
+            # ISTD_data_column_data.name is the Transition_Name
+            # Transition_Name_dict[ISTD_data_column_data.name] is Transition_Name_ISTD
+            if Transition_Name_dict[ISTD_data_column_data.name] is None:
+                return(ISTD_data_column_data.values)
+            if list(Transition_Name_df.columns.values).count(Transition_Name_dict[ISTD_data_column_data.name]) == 1:
+                return(Transition_Name_df.loc[:, Transition_Name_dict[ISTD_data_column_data.name] ])
+            elif list(Transition_Name_df.columns.values).count(Transition_Name_dict[ISTD_data_column_data.name]) > 1 :
                 # This check may be redundant because the
                 # duplicate Transition_Name_ISTD in input data has been taken care
                 # by DuplicateCheck.py
                 if logger:
-                    logger.warning(Transition_Name_dict[x.name] + ' appears more than once in the input data frame. ' +
-                                   'Ignore normalisation in this column ' + x.name)
+                    logger.warning(Transition_Name_dict[ISTD_data_column_data.name] + ' appears more than once in the input data frame. ' +
+                                   'Ignore normalisation in this column ' + ISTD_data_column_data.name)
                 if ingui:
-                    print(Transition_Name_dict[x.name] + ' appears more than once in the input data frame. ' +
-                          'Ignore normalisation in this column ' + x.name, 
+                    print(Transition_Name_dict[ISTD_data_column_data.name] + ' appears more than once in the input data frame. ' +
+                          'Ignore normalisation in this column ' + ISTD_data_column_data.name, 
                           flush = True)
             else:
                 if logger:
-                    logger.warning(Transition_Name_dict[x.name] + ' cannot be found in the input data frame. ' +
-                                   'Ignore normalisation in this column ' + x.name)
+                    logger.warning(Transition_Name_dict[ISTD_data_column_data.name] + ' cannot be found in the input data frame. ' +
+                                   'Ignore normalisation in this column ' + ISTD_data_column_data.name)
                 if ingui:
-                    print(Transition_Name_dict[x.name] + ' cannot be found in the input data frame. ' +
-                          'Ignore normalisation in this column ' + x.name, 
+                    print(Transition_Name_dict[ISTD_data_column_data.name] + ' cannot be found in the input data frame. ' +
+                          'Ignore normalisation in this column ' + ISTD_data_column_data.name, 
                           flush = True)
-            return
+            return(ISTD_data_column_data.values)
         else:
-            # x.name is of the tuple form (Transition_Name, Transition_Name_ISTD)
+            # ISTD_data_column_data.name is of the tuple form (Transition_Name, Transition_Name_ISTD)
             # Transition_Name_dict is not used in this case
-            if not x.name[1]:
-                return
-            if list(Transition_Name_df.columns.values).count((x.name[1],x.name[1])) == 1:
-                x.update(Transition_Name_df.loc[:, (x.name[1],x.name[1]) ])
-            elif list(Transition_Name_df.columns.values).count((x.name[1],x.name[1])) > 1 :
+            # ISTD_data_column_data.name[1] will be a string or None
+            if not ISTD_data_column_data.name[1]:
+                return(ISTD_data_column_data.values)
+
+            if list(Transition_Name_df.columns.values).count((ISTD_data_column_data.name[1],ISTD_data_column_data.name[1])) == 1:
+                return(Transition_Name_df.loc[:, (ISTD_data_column_data.name[1],ISTD_data_column_data.name[1]) ])
+            elif list(Transition_Name_df.columns.values).count((ISTD_data_column_data.name[1],ISTD_data_column_data.name[1])) > 1 :
                 # This check may be redundant because the
                 # duplicate Transition_Name_ISTD in input data has been taken care
                 # by DuplicateCheck.py
                 if logger:
-                    logger.warning(x.name[1] + ' appears more than once in the input data frame. ' +
-                                   'Ignore normalisation in this column ' + str(x.name))
+                    logger.warning(ISTD_data_column_data.name[1] + ' appears more than once in the input data frame. ' +
+                                   'Ignore normalisation in this column ' + str(ISTD_data_column_data.name))
                 if ingui:
-                    print(x.name[1] + ' appears more than once in the input data frame. ' +
-                          'Ignore normalisation in this column ' + str(x.name), flush = True)
+                    print(ISTD_data_column_data.name[1] + ' appears more than once in the input data frame. ' +
+                          'Ignore normalisation in this column ' + str(ISTD_data_column_data.name), flush = True)
             else:
                 if logger:
-                    logger.warning(x.name[1] + ' cannot be found in the input data frame. ' + 
-                                   'Ignore normalisation in this column ' + str(x.name))
+                    logger.warning(ISTD_data_column_data.name[1] + ' cannot be found in the input data frame. ' + 
+                                   'Ignore normalisation in this column ' + str(ISTD_data_column_data.name))
                 if ingui:
-                    print(x.name[1] + ' cannot be found in the input data frame. ' + 
-                          'Ignore normalisation in this column ' + str(x.name), 
+                    print(ISTD_data_column_data.name[1] + ' cannot be found in the input data frame. ' + 
+                          'Ignore normalisation in this column ' + str(ISTD_data_column_data.name), 
                           flush = True)
+            return(ISTD_data_column_data.values)
 
     def expand_Transition_Name_df(Transition_Name_df,Transition_Name_dict,
                                   logger=None,ingui=False):
@@ -523,11 +623,14 @@ class ISTD_Operations():
 
         expanded_Transition_Name_df = pd.DataFrame(columns=column_index, index=Transition_Name_df.index)
         expanded_Transition_Name_df["Sample_Name"] = Transition_Name_df["Sample_Name"]
-        expanded_Transition_Name_df.iloc[:,1:].apply(lambda x: ISTD_Operations._update_Transition_Name_df(
-                x=x,
+
+        expanded_Transition_Name_df = expanded_Transition_Name_df.apply(
+            lambda x: ISTD_Operations._update_expanded_Transition_Name_df(
+                expanded_Transition_Name_df_column_data=x,
                 Transition_Name_df=Transition_Name_df,
-                logger=logger),
-                                                     axis=0)
+                logger=logger)
+                if x.name != 'Sample_Name' else x,
+                axis=0)
 
         return expanded_Transition_Name_df
 
@@ -632,10 +735,7 @@ class ISTD_Operations():
                 #which share the same transition name
                 if row['Transition_Name'] in ISTD_Conc.columns:
                     ISTD_Conc[row['Transition_Name']] = row[ISTD_column]
-
-        #print(ISTD_Annot_df)
-        #exit(0)
-        
+                    
         return(ISTD_Conc)
 
     def getConc_by_ISTD(Transition_Name_df,ISTD_Annot_df,Sample_Annot_df,
@@ -816,7 +916,8 @@ class ISTD_Operations():
                              how="left", on="Sample_Name")
 
         ISTD_Samp_Ratio_df = pd.DataFrame(index=Transition_Name_df.index, columns=Transition_Name_df.columns, dtype='float64')
-        ISTD_Samp_Ratio_df.apply(lambda x: x.update(merged_df["ISTD_to_Sample_Amount_Ratio"]) , axis=0)
+        #ISTD_Samp_Ratio_df.apply(lambda x: x.update(merged_df["ISTD_to_Sample_Amount_Ratio"]) , axis=0)
+        ISTD_Samp_Ratio_df = ISTD_Samp_Ratio_df.apply(lambda x: merged_df["ISTD_to_Sample_Amount_Ratio"] , axis=0)
 
         #Assignment of string must come after df apply
         ISTD_Samp_Ratio_df['Sample_Name'] = Transition_Name_df['Sample_Name']
