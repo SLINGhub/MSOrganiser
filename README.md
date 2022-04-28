@@ -153,7 +153,7 @@ In the `Data_extraction` section, click on `normArea by ISTD` and
 `normConc by ISTD`. Load the annotation file onto `Annot_File` and press
 `Start` to let the program run.
 
-![OutputOptions\_normArea\_and\_normConc](docs/figures/README-OutputOptions_normArea_and_normConc.PNG)
+![OutputOptions_normArea_and_normConc](docs/figures/README-OutputOptions_normArea_and_normConc.PNG)
 
 When the program has finished running, the results will contain the
 following sheets including the normalised area and concentration.
@@ -245,7 +245,7 @@ In this example, the following annotation file will be used
 
 Load the annotation file onto `Annot_File` and press `Start`
 
-![OutputOptions\_normArea\_and\_normConc\_MultipleISTD](docs/figures/README-OutputOptions_normArea_and_normConc_MultipleISTD.PNG)
+![OutputOptions_normArea_and_normConc_MultipleISTD](docs/figures/README-OutputOptions_normArea_and_normConc_MultipleISTD.PNG)
 
 The main changes in the results are as follows
 
@@ -290,11 +290,11 @@ or csv files such as `ISTD_Area`, `ISTD_Conc` and
 
 ![TestingMode](docs/figures/README-TestingMode.PNG)
 
-![ResultsISTD\_Area](docs/figures/README-ResultsISTD_Area.PNG)
+![ResultsISTD_Area](docs/figures/README-ResultsISTD_Area.PNG)
 
-![ResultsISTD\_Conc](docs/figures/README-ResultsISTD_Conc.PNG)
+![ResultsISTD_Conc](docs/figures/README-ResultsISTD_Conc.PNG)
 
-![ResultsISTD\_to\_Samp\_Amt\_Ratio](docs/figures/README-ResultsISTD_to_Samp_Amt_Ratio.PNG)
+![ResultsISTD_to_Samp_Amt_Ratio](docs/figures/README-ResultsISTD_to_Samp_Amt_Ratio.PNG)
 
 It is easier to explain how the values in `ISTD_Area`, `ISTD_Conc` and
 `ISTD_to_Samp_Amt_Ratio` are created. With these additional info, we can
