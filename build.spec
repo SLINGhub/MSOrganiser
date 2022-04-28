@@ -30,22 +30,12 @@ def _get_report_dir(dir_name):
 
 os.environ['PATH'] = _get_report_dir('cairo_dll') + os.pathsep + os.environ['PATH']
 
-#To remove the @font-face not available in Windows warning
-with warnings.catch_warnings():
-    warnings.filterwarnings("ignore", category=UserWarning)
-    import cairocffi
-    import cairosvg
-
 gooey_root = os.path.dirname(gooey.__file__)
 gooey_languages = Tree(os.path.join(gooey_root, 'languages'), prefix = 'gooey/languages')
 gooey_images = Tree(os.path.join(gooey_root, 'images'), prefix = 'gooey/images')
 
 pyphen_root = os.path.dirname(pyphen.__file__)
 pyphen_dictionaries = Tree(os.path.join(pyphen_root, 'dictionaries'), prefix = 'pyphen/dictionaries')
-
-cairocffi_root = os.path.dirname(cairocffi.__file__)
-
-cairosvg_root = os.path.dirname(cairosvg.__file__)
 
 #tinycss2_root = os.path.dirname(tinycss2.__file__)
 
@@ -59,10 +49,9 @@ a = Analysis(['MSOrganiser.py'],
              hookspath=None,
              runtime_hooks=None,
              binaries=[],
-             datas=[ (os.path.join(cairocffi_root, 'VERSION'), 'cairocffi'),
-                     (os.path.join(cairosvg_root, 'VERSION'), 'cairosvg')
-                     #(os.path.join(tinycss2_root, 'VERSION'), 'tinycss2')
-			 ],
+             #datas=[
+             #        (os.path.join(tinycss2_root, 'VERSION'), 'tinycss2')
+			 #],
              )
 
 pyz = PYZ(a.pure)
