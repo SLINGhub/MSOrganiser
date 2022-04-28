@@ -1,5 +1,5 @@
 test\_ConcatenationColumn
-======================
+============================
 
 .. automodule:: test_ConcatenationColumn
     :members:

@@ -23,7 +23,7 @@ sys.path.append(os.path.abspath('../../tests'))
 # -- Project information -----------------------------------------------------
 
 project = 'MSOrganiser'
-copyright = '2021, SLING'
+copyright = '2022, SLING'
 author = 'SLING'
 
 # The short X.Y version

@@ -1,5 +1,5 @@
 test\_TransitionNameAnnot
-======================
+===========================
 
 .. automodule:: test_TransitionNameAnnot
     :members:

@@ -1,5 +1,5 @@
 test\_ConcatenationRow
-======================
+=========================
 
 .. automodule:: test_ConcatenationRow
     :members:
