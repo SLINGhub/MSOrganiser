@@ -336,7 +336,7 @@ class ISTD_Operations():
                 # ISTD_list is None
                 #Append an empty ISTD, this is not done if we do not allow multiple ISTD
                 valid_ISTD.append("")
-                ISTD_report_list.append(("!Blank Transition_Name_ISTD in Transition_Name_Annot sheet", Transition_Name))
+                ISTD_report_list.append(("!Missing Transition_Name in Transition_Name_Annot sheet", Transition_Name))
                 Transition_Name_dict[Transition_Name] = valid_ISTD
                 return [ISTD_report_list,Transition_Name_dict] 
 
@@ -344,7 +344,7 @@ class ISTD_Operations():
                 # ISTD_list is []
                 #Append an empty ISTD, this is not done if we do not allow multiple ISTD
                 valid_ISTD.append("")
-                ISTD_report_list.append(("!Blank Transition_Name_ISTD in Transition_Name_Annot sheet", Transition_Name))
+                ISTD_report_list.append(("!Missing Transition_Name in Transition_Name_Annot sheet", Transition_Name))
                 Transition_Name_dict[Transition_Name] = valid_ISTD
                 return [ISTD_report_list,Transition_Name_dict] 
 
