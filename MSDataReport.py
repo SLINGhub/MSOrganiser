@@ -6,7 +6,7 @@ from jinja2 import Environment, FileSystemLoader
 def __is_frozen():
     return getattr(sys, 'frozen', False)
 
-#This is to fixed the error of not able to find cairo dll files
+#This is to fixed the error of not able to find files in the msreport folder
 #C:\Users\bchjjs\AppData\Local\Temp
 def _get_report_dir(dir_name):
     if __is_frozen():
@@ -26,7 +26,8 @@ def _get_report_dir(dir_name):
         resource_dir = os.path.dirname('__file__')
     return os.path.join(resource_dir, dir_name)
 
-os.environ['PATH'] = _get_report_dir('cairo_dll') + os.pathsep + os.environ['PATH']
+#os.environ['PATH'] = _get_report_dir('cairo_dll') + os.pathsep + os.environ['PATH']
+os.environ['PATH'] = _get_report_dir('etc') + os.pathsep + os.environ['PATH']
 
 #To remove the @font-face not available in Windows warning
 #with warnings.catch_warnings():
