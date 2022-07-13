@@ -168,8 +168,14 @@ class MS_Template():
         #Reset the row index
         Transition_Name_Annot_df = Transition_Name_Annot_df.reset_index(drop=True)
 
-        #Remove rows with all None, NA,NaN
+        #Remove rows with all None, NA or NaN
         Transition_Name_Annot_df = Transition_Name_Annot_df.dropna(axis=0, how='all')
+
+        #Remove columns with column name set as None, NA or NaN
+        Transition_Name_Annot_df = Transition_Name_Annot_df.loc[:, Transition_Name_Annot_df.columns.notna()]
+        #tmp = Transition_Name_Annot_df[Transition_Name_Annot_df.columns.difference(["Transition_Name", "Transition_Name_Annot"])].isna().all()
+        #Transition_Name_Annot_df = Transition_Name_Annot_df.drop(tmp.index[tmp], axis=1)
+        #Transition_Name_Annot_df = Transition_Name_Annot_df.dropna(axis=1, how='all')
 
         #Validate the Transition_Name_Annot sheet is valid (Has the Transition_Name and Transition_Name_ISTD columns are not empty)
         self.__validate_Transition_Name_Annot_sheet("Transition_Name_Annot",Transition_Name_Annot_df, 
@@ -180,11 +186,6 @@ class MS_Template():
 
         #Remove whitespace for each string column
         Transition_Name_Annot_df = MS_Template.remove_whiteSpaces(Transition_Name_Annot_df)
-
-        #Remove columns with all None, NA,NaN except Transition_Name and Transition_Name_ISTD 
-        tmp = Transition_Name_Annot_df[Transition_Name_Annot_df.columns.difference(["Transition_Name", "Transition_Name_Annot"])].isna().all()
-        Transition_Name_Annot_df = Transition_Name_Annot_df.drop(tmp.index[tmp], axis=1)
-        #Transition_Name_Annot_df = Transition_Name_Annot_df.dropna(axis=1, how='all')
 
         # Remove Rows with ISTD with no Transition_Names
         # A bit redundant as error has been given in __validate_Transition_Name_Annot_sheet
