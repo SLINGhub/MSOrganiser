@@ -8,7 +8,7 @@ import tinycss2
 def __is_frozen():
     return getattr(sys, 'frozen', False)
 
-#This is to fixed the error of not able to find cairo dll files
+#This is to fixed the error of not able to find files in the msreport folder
 #C:\Users\bchjjs\AppData\Local\Temp
 def _get_report_dir(dir_name):
     if __is_frozen():
@@ -28,7 +28,7 @@ def _get_report_dir(dir_name):
         resource_dir = os.path.dirname('__file__')
     return os.path.join(resource_dir, dir_name)
 
-os.environ['PATH'] = _get_report_dir('cairo_dll') + os.pathsep + os.environ['PATH']
+os.environ['PATH'] = _get_report_dir('etc') + os.pathsep + os.environ['PATH']
 
 gooey_root = os.path.dirname(gooey.__file__)
 gooey_languages = Tree(os.path.join(gooey_root, 'languages'), prefix = 'gooey/languages')
@@ -39,7 +39,7 @@ pyphen_dictionaries = Tree(os.path.join(pyphen_root, 'dictionaries'), prefix = '
 
 #tinycss2_root = os.path.dirname(tinycss2.__file__)
 
-cairo_toc = Tree(os.path.join(os.getcwd(),'cairo_dll'), prefix = 'cairo_dll' )
+etc_toc = Tree(os.path.join(os.getcwd(),'etc'), prefix = 'etc' )
 extras_toc = Tree(os.path.join(os.getcwd(),'msreport'), prefix = 'msreport' )
 #print(extras_toc)
 
@@ -67,7 +67,7 @@ exe = EXE(pyz,
           gooey_languages, # Add them in to collected files
           gooey_images, # Same here.
 		  pyphen_dictionaries,
-		  cairo_toc,
+          etc_toc,
 		  extras_toc,
           name='MSOrganiser',
           debug=False,

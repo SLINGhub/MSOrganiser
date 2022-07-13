@@ -1,14 +1,22 @@
-# MSOrganiser 1.1.1.9000 (development version)
+# MSOrganiser 1.1.2.9000 (development version)
 
 ## TODO
 
 * Find a way to make the documentation of the functions of `MSOrganiser` online.
+* Find a way to generate report in html instead of pdf.
+
+# MSOrganiser 1.1.2
+
+* Add a test unit to ensure the software gives warning messages when there are transition names in the input data but not presence in the Transition_Name_Annot sheet.
+* Update code that read Transition_Name_Annot sheet to remove columns with column name set as None, NA or NaN.
+* Remove dependecies from cairo.dll from GTK3
+* Updated some Python packages and Developer documentation.
 
 # MSOrganiser 1.1.1 
 
-* Updated code to work in the pandas version 1.4.2
-* Checked that the program works with GTK3 Version 3.24.31
-* Add a warning message when user has ISTDs in the ISTD_Annot sheet that is not in the Transition_Name_Annot sheet. Resulting merged sheet between Transition_Name_Annot and ISTD_Annot will not have these excess ISTDs
+* Updated code to work in the pandas version 1.4.2.
+* Checked that the program works with GTK3 Version 3.24.31.
+* Add a warning message when user has ISTDs in the ISTD_Annot sheet that is not in the Transition_Name_Annot sheet. Resulting merged sheet between Transition_Name_Annot and ISTD_Annot will not have these excess ISTDs.
 * Updated documentation to include an updated version for ISTD concentration calculation.
 
 # MSOrganiser 1.1.0
