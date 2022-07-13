@@ -53,6 +53,11 @@ WIDETABLEFORM_ANNOTATION_WITH_TRANSITIONNAME_ONLY_IN_RAWDATA = os.path.join(os.p
                                                                             "testdata", "test_transition_annot", 
                                                                             "WideTableForm_Annotation_TransitionName_only_in_InputData.xlsx")
 
+WIDETABLEFORM_ANNOTATION_WITH_TRANSITIONNAME_ONLY_IN_RAWDATA_MULTIPLEISTD = os.path.join(os.path.dirname(__file__),
+                                                                                         "testdata", "test_transition_annot", 
+                                                                                         "WideTableForm_Annotation_TransitionName_only_in_InputData_MultipleISTD.xlsx")
+
+
 WIDETABLEFORM_ANNOTATION_ISTD_NOT_IN_INPUTDATA = os.path.join(os.path.dirname(__file__),
                                                               "testdata", "test_transition_annot", 
                                                               "WideTableForm_Annotation_ISTD_not_in_InputData.xlsx")
@@ -385,6 +390,48 @@ class TransitionNameAnnot_Test(unittest.TestCase):
                                                                                          logger = False, 
                                                                                          ingui = True,
                                                                                          allow_multiple_istd = False)
+
+        # Ensure that the warning was due to some transition names not having a blank ISTD
+        mock_print.assert_called_with('There are transitions in the input data set not mentioned ' + 
+                                      'in the Transition_Name column of the Transition_Name_Annot sheet.\n' +
+                                      '\"LPC 20:0 (IS)\"\n' + 
+                                      '\"MHC d18:1/24:0\"', 
+                                      flush = True)
+
+    def test_warn_TransitionName_in_Input_Data_but_not_in_Transition_Name_Annot_multiple_ISTD(self):
+        """Check if the software is able to warn if there are transition names in the 
+           input data but not in the Transition_Name_Annot sheet (Multiple ISTD case)
+
+        * Read the file
+        * Warn if there are transition names in the input data but not in the Transition_Name_Annot sheet
+        """
+
+        MS_FilePathList = ["WideTableForm.csv"]
+
+        self.patcher = patch('MSCalculate.print')
+        mock_print = self.patcher.start()
+
+        # Multiple ISTD Annotation Case
+
+        MyWideData = MS_Analysis(MS_FilePath = WIDETABLEFORM_FILENAME,
+                                 MS_FileType = 'Agilent Wide Table in csv',
+                                 Annotation_FilePath = WIDETABLEFORM_ANNOTATION_WITH_TRANSITIONNAME_ONLY_IN_RAWDATA ,
+                                 ingui = True)
+
+        Area_df = MyWideData._get_Area_df_for_normalisation(using_multiple_input_files = False)
+
+        
+        Transition_Name_Annot_df = ISTD_Operations.read_ISTD_map(filepath = WIDETABLEFORM_ANNOTATION_WITH_TRANSITIONNAME_ONLY_IN_RAWDATA_MULTIPLEISTD , 
+                                                                 column_name = "Area",
+                                                                 logger = None, ingui = True,
+                                                                 doing_normalization = False, 
+                                                                 allow_multiple_istd = True)
+
+        [ISTD_report,Transition_Name_dict] = ISTD_Operations.create_Transition_Name_dict(Transition_Name_df = Area_df,
+                                                                                         Transition_Name_Annot_df = Transition_Name_Annot_df,
+                                                                                         logger = False, 
+                                                                                         ingui = True,
+                                                                                         allow_multiple_istd = True)
 
         # Ensure that the warning was due to some transition names not having a blank ISTD
         mock_print.assert_called_with('There are transitions in the input data set not mentioned ' + 
