@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MSOrganiser &mdash; MSOrganiser 1.1.0 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="prev" title="Wrapper Modules" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> MSOrganiser
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Code Structure Summary:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../analysis/index.html">Analysis Modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../duplicatecheck/index.html">Duplicate Check Modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../fileinput/index.html">File Input Modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../fileoutput/index.html">File Output Modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../parser/index.html">Parser Modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../testunits/index.html">Test Unit Modules</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Wrapper Modules</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">MSOrganiser</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">MSOrganiser</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="index.html">Wrapper Modules</a> &raquo;</li>
+      <li>MSOrganiser</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/wrapper/MSOrganiser.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="msorganiser">
+<h1>MSOrganiser<a class="headerlink" href="#msorganiser" title="Permalink to this headline"></a></h1>
+<dl class="py function">
+<dt class="sig sig-object py">
+<span class="sig-prename descclassname"><span class="pre">MSOrganiser.</span></span><span class="sig-name descname"><span class="pre">start_logger</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">log_directory_path</span></span></em><span class="sig-paren">)</span></dt>
+<dd><p>To set up the log file folder and default configuration give a log directory path</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>log_directory_path</strong> (<em>str</em>) – The directory path to create a folder containing the log files.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>logger (object)</em> – A logger object used for the MSOrganiser software.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py">
+<span class="sig-prename descclassname"><span class="pre">MSOrganiser.</span></span><span class="sig-name descname"><span class="pre">get_Parameters_df</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stored_args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">MS_FilePath</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">MS_FilePaths</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">using_multiple_input_files</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span></dt>
+<dd><p>To set up a pandas dataframe storing the input parameters, This data frame will be converted to a PDF page</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>stored_args</strong> (<em>dict</em>) – A dictionary storing the input parameters. The dictionary is created in MSParser</p></li>
+<li><p><strong>MS_FilePath</strong> (<em>str</em>) – The file path to the MRM transition name file.</p></li>
+<li><p><strong>MS_FilePaths</strong> (<em>list</em>) – A list of file path to the MRM transition name file.</p></li>
+<li><p><strong>using_multiple_input_files</strong> (<em>bool</em>) – if True, the Input_File parameter will be constructed from multiple input files, denoted in MS_FilePaths (in development)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>Parameters_df (pandas DataFrame)</em> – A dataframe storing the input parameters</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py">
+<span class="sig-prename descclassname"><span class="pre">MSOrganiser.</span></span><span class="sig-name descname"><span class="pre">output_concatenated_wide_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stored_args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">concatenate_df_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">concatenate_df_sheet_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py">
+<span class="sig-prename descclassname"><span class="pre">MSOrganiser.</span></span><span class="sig-name descname"><span class="pre">output_concatenated_long_table</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stored_args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">concatenate_df_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">concatenate_df_sheet_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py">
+<span class="sig-prename descclassname"><span class="pre">MSOrganiser.</span></span><span class="sig-name descname"><span class="pre">no_concatenate_workflow</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stored_args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">testing</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py">
+<span class="sig-prename descclassname"><span class="pre">MSOrganiser.</span></span><span class="sig-name descname"><span class="pre">concatenate_along_rows_workflow</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stored_args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">testing</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py">
+<span class="sig-prename descclassname"><span class="pre">MSOrganiser.</span></span><span class="sig-name descname"><span class="pre">concatenate_along_columns_workflow</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stored_args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">testing</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span></dt>
+<dd></dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="index.html" class="btn btn-neutral float-left" title="Wrapper Modules" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, SLING.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

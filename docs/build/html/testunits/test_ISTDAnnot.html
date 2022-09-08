@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>test_ISTDAnnot &mdash; MSOrganiser 1.1.0 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="test_MSAnalysis" href="test_MSAnalysis.html" />
+    <link rel="prev" title="test_DuplicateInput" href="test_DuplicateInput.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> MSOrganiser
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Code Structure Summary:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../analysis/index.html">Analysis Modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../duplicatecheck/index.html">Duplicate Check Modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../fileinput/index.html">File Input Modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../fileoutput/index.html">File Output Modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../parser/index.html">Parser Modules</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Test Unit Modules</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="test_BadInput.html">test_BadInput</a></li>
+<li class="toctree-l2"><a class="reference internal" href="test_ConcatenationColumn.html">test_ConcatenationColumn</a></li>
+<li class="toctree-l2"><a class="reference internal" href="test_ConcatenationRow.html">test_ConcatenationRow</a></li>
+<li class="toctree-l2"><a class="reference internal" href="test_DuplicateInput.html">test_DuplicateInput</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">test_ISTDAnnot</a></li>
+<li class="toctree-l2"><a class="reference internal" href="test_MSAnalysis.html">test_MSAnalysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="test_MSRawData.html">test_MSRawData</a></li>
+<li class="toctree-l2"><a class="reference internal" href="test_NoConcatenation.html">test_NoConcatenation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="test_SampleAnnot.html">test_SampleAnnot</a></li>
+<li class="toctree-l2"><a class="reference internal" href="test_TransitionNameAnnot.html">test_TransitionNameAnnot</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../wrapper/index.html">Wrapper Modules</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">MSOrganiser</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="index.html">Test Unit Modules</a> &raquo;</li>
+      <li>test_ISTDAnnot</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/testunits/test_ISTDAnnot.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-test_ISTDAnnot">
+<span id="test-istdannot"></span><h1>test_ISTDAnnot<a class="headerlink" href="#module-test_ISTDAnnot" title="Permalink to this headline"></a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="test_ISTDAnnot.ISTDAnnot_Test">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">test_ISTDAnnot.</span></span><span class="sig-name descname"><span class="pre">ISTDAnnot_Test</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">methodName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'runTest'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#test_ISTDAnnot.ISTDAnnot_Test" title="Permalink to this definition"></a></dt>
+<dd><dl class="py method">
+<dt class="sig sig-object py" id="test_ISTDAnnot.ISTDAnnot_Test.setUp">
+<span class="sig-name descname"><span class="pre">setUp</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#test_ISTDAnnot.ISTDAnnot_Test.setUp" title="Permalink to this definition"></a></dt>
+<dd><p>Hook method for setting up the test fixture before exercising it.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="test_ISTDAnnot.ISTDAnnot_Test.test_validation_InvalidSheetName">
+<span class="sig-name descname"><span class="pre">test_validation_InvalidSheetName</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#test_ISTDAnnot.ISTDAnnot_Test.test_validation_InvalidSheetName" title="Permalink to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>Check if the software is able to check if the Annotation file has</dt><dd><p>the correct ISTD_Annot sheet name.</p>
+</dd>
+</dl>
+<ul class="simple">
+<li><p>Read the file</p></li>
+<li><p>Highlight the sheet name should be “ISTD_Annot”, not something else.</p></li>
+</ul>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="test_ISTDAnnot.ISTDAnnot_Test.test_validation_MissingColumnNames">
+<span class="sig-name descname"><span class="pre">test_validation_MissingColumnNames</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#test_ISTDAnnot.ISTDAnnot_Test.test_validation_MissingColumnNames" title="Permalink to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>Check if the software is able to check if the ISTD Annotation file has</dt><dd><p>missing column which are actually required.</p>
+</dd>
+</dl>
+<ul class="simple">
+<li><p>Read the file</p></li>
+<li><p>Highlight the presence of missing columns and the need to to have them</p></li>
+</ul>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="test_ISTDAnnot.ISTDAnnot_Test.test_validation_CustomUnit">
+<span class="sig-name descname"><span class="pre">test_validation_CustomUnit</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#test_ISTDAnnot.ISTDAnnot_Test.test_validation_CustomUnit" title="Permalink to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>Check if the software is able to check if ISTD Annotation file’s</dt><dd><p>Custom_Unit column details is correct. “[?M] or [?mol/uL]” is valid
+If the value is in the form “[?M]” or “[?M] or [?mol/mL]”,
+highlight to use a later version of the software.
+If the value is in other forms, highlight that it is invalid.</p>
+</dd>
+</dl>
+<ul class="simple">
+<li><p>Read the file</p></li>
+<li><p>If the value is in the form “[?M]” or “[?M] or [?mol/mL]”,
+highlight to use a later version of the software.</p></li>
+<li><p>If the value is in other forms, highlight that it is invalid.</p></li>
+</ul>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="test_ISTDAnnot.ISTDAnnot_Test.test_validation_DuplicateISTD">
+<span class="sig-name descname"><span class="pre">test_validation_DuplicateISTD</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#test_ISTDAnnot.ISTDAnnot_Test.test_validation_DuplicateISTD" title="Permalink to this definition"></a></dt>
+<dd><p>Check if the software is able to check if ISTD Annotation has duplicate ISTD.</p>
+<ul class="simple">
+<li><p>Read the file</p></li>
+<li><p>If there are duplicate ISTD, stop the program and inform where the duplicate is.</p></li>
+</ul>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="test_ISTDAnnot.ISTDAnnot_Test.test_warn_ISTD_in_ISTD_Annot_but_not_in_Transition_Name_Annot">
+<span class="sig-name descname"><span class="pre">test_warn_ISTD_in_ISTD_Annot_but_not_in_Transition_Name_Annot</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#test_ISTDAnnot.ISTDAnnot_Test.test_warn_ISTD_in_ISTD_Annot_but_not_in_Transition_Name_Annot" title="Permalink to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>Check if the software is able to warn if the ISTD in the</dt><dd><p>ISTD_Annot sheet is absent in the Transition_Name_Annot sheet</p>
+</dd>
+</dl>
+<ul class="simple">
+<li><p>Read the file</p></li>
+<li><p>Warn if the ISTD in the ISTD_Annot is absent in the Transition_Name_Annot sheet</p></li>
+</ul>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="test_ISTDAnnot.ISTDAnnot_Test.tearDown">
+<span class="sig-name descname"><span class="pre">tearDown</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#test_ISTDAnnot.ISTDAnnot_Test.tearDown" title="Permalink to this definition"></a></dt>
+<dd><p>Hook method for deconstructing the test fixture after testing it.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="test_DuplicateInput.html" class="btn btn-neutral float-left" title="test_DuplicateInput" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="test_MSAnalysis.html" class="btn btn-neutral float-right" title="test_MSAnalysis" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, SLING.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

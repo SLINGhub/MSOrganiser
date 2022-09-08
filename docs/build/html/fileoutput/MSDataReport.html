@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MSDataReport &mdash; MSOrganiser 1.1.0 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Parser Modules" href="../parser/index.html" />
+    <link rel="prev" title="MSDataOutput" href="MSDataOutput.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> MSOrganiser
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Code Structure Summary:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../analysis/index.html">Analysis Modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../duplicatecheck/index.html">Duplicate Check Modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../fileinput/index.html">File Input Modules</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">File Output Modules</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="MSDataOutput.html">MSDataOutput</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">MSDataReport</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../parser/index.html">Parser Modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../testunits/index.html">Test Unit Modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../wrapper/index.html">Wrapper Modules</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">MSOrganiser</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="index.html">File Output Modules</a> &raquo;</li>
+      <li>MSDataReport</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/fileoutput/MSDataReport.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-MSDataReport">
+<span id="msdatareport"></span><h1>MSDataReport<a class="headerlink" href="#module-MSDataReport" title="Permalink to this headline"></a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="MSDataReport.MSDataReport">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">MSDataReport.</span></span><span class="sig-name descname"><span class="pre">MSDataReport</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">output_directory</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_file_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ingui</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#MSDataReport.MSDataReport" title="Permalink to this definition"></a></dt>
+<dd><p>A class to describe the general setup for Data Reporting</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>output_directory</strong> (<em>str</em>) – directory path to output the data</p></li>
+<li><p><strong>input_file_path</strong> (<em>str</em>) – file path of the input MRM transition name file. To be used for the output filename</p></li>
+<li><p><strong>logger</strong> (<em>object</em>) – logger object created by start_logger in MSOrganiser</p></li>
+<li><p><strong>ingui</strong> (<em>bool</em>) – if True, print analysis status to screen</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="MSDataReport.MSDataReport_PDF">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">MSDataReport.</span></span><span class="sig-name descname"><span class="pre">MSDataReport_PDF</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">output_directory</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_file_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ingui</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">testing</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#MSDataReport.MSDataReport_PDF" title="Permalink to this definition"></a></dt>
+<dd><p>A class to describe the general setup for Data Reporting in pdf</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>output_directory</strong> (<em>str</em>) – directory path to output the data</p></li>
+<li><p><strong>input_file_path</strong> (<em>str</em>) – file path of the input MRM transition name file. To be used for the output filename</p></li>
+<li><p><strong>logger</strong> (<em>object</em>) – logger object created by start_logger in MSOrganiser</p></li>
+<li><p><strong>ingui</strong> (<em>bool</em>) – if True, print analysis status to screen</p></li>
+</ul>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Make sure that the directory msreport is in the same directory as this code
+See for more info <a class="reference external" href="https://pbpython.com/pdf-reports.html">https://pbpython.com/pdf-reports.html</a> on creating html template</p>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="MSDataReport.MSDataReport_PDF.create_parameters_report">
+<span class="sig-name descname"><span class="pre">create_parameters_report</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Parameters_df</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#MSDataReport.MSDataReport_PDF.create_parameters_report" title="Permalink to this definition"></a></dt>
+<dd><p>A function to generate the parameter inputs from dataframe to html and store it in a list self.__pdf_pages.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>Parameters_df</strong> (<em>pandas DataFrame</em>) – A dataframe storing the input parameters</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="MSDataReport.MSDataReport_PDF.create_ISTD_report">
+<span class="sig-name descname"><span class="pre">create_ISTD_report</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ISTD_Report</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#MSDataReport.MSDataReport_PDF.create_ISTD_report" title="Permalink to this definition"></a></dt>
+<dd><p>A function to generate ISTD normalisation report from dataframe to html and store it in a list self.__pdf_pages.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>ISTD_Report</strong> (<em>pandas DataFrame</em>) – A data frame of with transition names, its corresponding ISTD as columns.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="MSDataReport.MSDataReport_PDF.output_to_PDF">
+<span class="sig-name descname"><span class="pre">output_to_PDF</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#MSDataReport.MSDataReport_PDF.output_to_PDF" title="Permalink to this definition"></a></dt>
+<dd><p>A function to convert the list of html in self.__pdf_pages to pages in pdf</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="MSDataOutput.html" class="btn btn-neutral float-left" title="MSDataOutput" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../parser/index.html" class="btn btn-neutral float-right" title="Parser Modules" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, SLING.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

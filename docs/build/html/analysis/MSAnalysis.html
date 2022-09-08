@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MSAnalysis &mdash; MSOrganiser 1.1.0 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="MSCalculate" href="MSCalculate.html" />
+    <link rel="prev" title="Analysis Modules" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> MSOrganiser
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Code Structure Summary:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Analysis Modules</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">MSAnalysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="MSCalculate.html">MSCalculate</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../duplicatecheck/index.html">Duplicate Check Modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../fileinput/index.html">File Input Modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../fileoutput/index.html">File Output Modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../parser/index.html">Parser Modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../testunits/index.html">Test Unit Modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../wrapper/index.html">Wrapper Modules</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">MSOrganiser</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="index.html">Analysis Modules</a> &raquo;</li>
+      <li>MSAnalysis</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/analysis/MSAnalysis.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-MSAnalysis">
+<span id="msanalysis"></span><h1>MSAnalysis<a class="headerlink" href="#module-MSAnalysis" title="Permalink to this headline"></a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="MSAnalysis.MS_Analysis">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">MSAnalysis.</span></span><span class="sig-name descname"><span class="pre">MS_Analysis</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">MS_FilePath</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">MS_FilePaths</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">MS_FileType</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Annotation_FilePath</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ingui</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">longtable</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">longtable_annot</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#MSAnalysis.MS_Analysis" title="Permalink to this definition"></a></dt>
+<dd><p>A class to set up the right configurations before performing data analysis</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>MS_FilePath</strong> (<em>str</em>) – File path of the input MRM transition name file</p></li>
+<li><p><strong>MS_FilePaths</strong> (<em>str</em>) – File paths of the input MRM transition name file (multiple)</p></li>
+<li><p><strong>MS_FileType</strong> (<em>str</em>) – File type of the input MRM transition name file</p></li>
+<li><p><strong>Annotation_FilePath</strong> (<em>str</em>) – The file path to the MS Template Creator annotation file if provided</p></li>
+<li><p><strong>Area_df</strong> (<em>pandas DataFrame</em>) – A data frame of sample as rows and transition names as columns with area as values</p></li>
+<li><p><strong>logger</strong> (<em>object</em>) – logger object created by start_logger in MSOrganiser</p></li>
+<li><p><strong>ingui</strong> (<em>bool</em>) – if True, print analysis status to screen</p></li>
+<li><p><strong>longtable</strong> (<em>bool</em>) – if True, prepare a dataframe to store results in long table</p></li>
+<li><p><strong>longtable_annot</strong> (<em>bool</em>) – if True, prepare a dataframe to store annotation details in long table</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="MSAnalysis.MS_Analysis.get_Long_Table">
+<span class="sig-name descname"><span class="pre">get_Long_Table</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">allow_multiple_istd</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">concatenation_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#MSAnalysis.MS_Analysis.get_Long_Table" title="Permalink to this definition"></a></dt>
+<dd><p>Function to get the long table of the extracted or calculated MRM transition name data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>allow_multiple_istd</strong> (<em>bool</em>) – if True, allow Transition_Annot data by to have mulitple internal standards (in development)</p></li>
+<li><p><strong>concatenation_type</strong> (<em>str</em>) – “rows or columns or None” to indicate if how Sample_Annot should be cleaned before merging with the Long_Table.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>Output_df (pandas DataFrame)</em> – A long data frame of with column name Sample_Name, Transition_Name and other relevant data</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="MSAnalysis.MS_Analysis.get_from_Input_Data">
+<span class="sig-name descname"><span class="pre">get_from_Input_Data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">column_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outputdata</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allow_multiple_istd</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#MSAnalysis.MS_Analysis.get_from_Input_Data" title="Permalink to this definition"></a></dt>
+<dd><p>Function to get a specific column from the input MRM transition name data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>column_name</strong> (<em>str</em>) – The name of the column given in the Output_Options.</p></li>
+<li><p><strong>outputdata</strong> (<em>bool</em>) – if True, return the results as a pandas dataframe. Else, nothing is returned</p></li>
+<li><p><strong>allow_multiple_istd</strong> (<em>bool</em>) – if True, allow normalisation of peak area by mulitple internal standards which leads to an expansion of the Output_df</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>Output_df (pandas DataFrame)</em> – A data frame of sample as rows and transition names as columns with values from the chosen column name</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="MSAnalysis.MS_Analysis.get_Normalised_Area">
+<span class="sig-name descname"><span class="pre">get_Normalised_Area</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">analysis_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outputdata</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allow_multiple_istd</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">using_multiple_input_files</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">concatenation_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'rows'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#MSAnalysis.MS_Analysis.get_Normalised_Area" title="Permalink to this definition"></a></dt>
+<dd><p>Function to calculate the normalised area from the input MRM transition name data and MS Template Creator annotation file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>analysis_name</strong> (<em>str</em>) – The name of the column given in the Output_Options. Should be “normArea by ISTD”</p></li>
+<li><p><strong>outputdata</strong> (<em>bool</em>) – if True, return the results as a pandas dataframe. Else, nothing is returned</p></li>
+<li><p><strong>allow_multiple_istd</strong> (<em>bool</em>) – if True, allow normalisation of peak area by mulitple internal standards (in development)</p></li>
+<li><p><strong>using_multiple_input_files</strong> (<em>bool</em>) – if True, the Area df will be constructed from multiple input files, denoted in MS_FilePaths (in development)</p></li>
+<li><p><strong>concatenation_type</strong> (<em>str</em>) – “rows or columns” to indicate if the Area_df is to be concatenated by row wise or column wise respectively</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><p><em>(list)</em> –</p>
+<p>list containing:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>norm_Area_df (pandas DataFrame): A data frame of sample as rows and transition names as columns with the normalised area as values</p></li>
+<li><p>ISTD_Area (pandas DataFrame): A data frame of sample as rows and transition names as columns with the ISTD area as values. Output as excel only at testing mode</p></li>
+<li><p>ISTD_map_df (pandas DataFrame): A data frame of showing the transition names annotation</p></li>
+<li><p>ISTD_Report (pandas DataFrame): A data frame of with transition names, its corresponding ISTD as columns. This will be converted to a pdf file page</p></li>
+</ul>
+</div></blockquote>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="MSAnalysis.MS_Analysis.get_Analyte_Concentration">
+<span class="sig-name descname"><span class="pre">get_Analyte_Concentration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">analysis_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outputdata</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allow_multiple_istd</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">using_multiple_input_files</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">concatenation_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'rows'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#MSAnalysis.MS_Analysis.get_Analyte_Concentration" title="Permalink to this definition"></a></dt>
+<dd><p>Function to calculate the transition names concentration from the input MRM transition name data and MS Template Creator annotation file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>analysis_name</strong> (<em>str</em>) – The name of the column given in the Output_Options. Should be “normConc by ISTD”</p></li>
+<li><p><strong>outputdata</strong> (<em>bool</em>) – if True, return the results as a pandas dataframe. Else, nothing is returned</p></li>
+<li><p><strong>allow_multiple_istd</strong> (<em>bool</em>) – if True, allow normalisation of peak area by mulitple internal standards</p></li>
+<li><p><strong>using_multiple_input_files</strong> (<em>bool</em>) – if True, the Area df will be constructed from multiple input files, denoted in MS_FilePaths (in development)</p></li>
+<li><p><strong>concatenation_type</strong> (<em>str</em>) – “rows or columns” to indicate if the Area_df is to be concatenated by row wise or column wise respectively</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><p><em>(list)</em> –</p>
+<p>list containing:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>norm_Conc_df (pandas DataFrame): A data frame of sample as rows and transition names as columns with the transition name concentration as values</p></li>
+<li><p>ISTD_Conc_df (pandas DataFrame): A data frame of sample as rows and transition names as columns with the ISTD concentration as values</p></li>
+<li><p>ISTD_Samp_Ratio_df (pandas DataFrame): A data frame of with transition names, its corresponding ISTD and ISTD to Sample ratio as columns</p></li>
+<li><p>Sample_Annot_df (pandas DataFrame): A data frame showing the samples annotation</p></li>
+</ul>
+</div></blockquote>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="index.html" class="btn btn-neutral float-left" title="Analysis Modules" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="MSCalculate.html" class="btn btn-neutral float-right" title="MSCalculate" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, SLING.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

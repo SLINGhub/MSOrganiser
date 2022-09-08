@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MSRawData &mdash; MSOrganiser 1.1.0 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Annotation" href="Annotation.html" />
+    <link rel="prev" title="File Input Modules" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> MSOrganiser
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Code Structure Summary:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../analysis/index.html">Analysis Modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../duplicatecheck/index.html">Duplicate Check Modules</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">File Input Modules</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">MSRawData</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Annotation.html">Annotation</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../fileoutput/index.html">File Output Modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../parser/index.html">Parser Modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../testunits/index.html">Test Unit Modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../wrapper/index.html">Wrapper Modules</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">MSOrganiser</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="index.html">File Input Modules</a> &raquo;</li>
+      <li>MSRawData</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/fileinput/MSRawData.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-MSRawData">
+<span id="msrawdata"></span><h1>MSRawData<a class="headerlink" href="#module-MSRawData" title="Permalink to this headline"></a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="MSRawData.MSRawData">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">MSRawData.</span></span><span class="sig-name descname"><span class="pre">MSRawData</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filepath</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ingui</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#MSRawData.MSRawData" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A class to describe raw data obtained from the MS machine</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filePath</strong> (<em>str</em>) – file path of the input MRM transition name file</p></li>
+<li><p><strong>logger</strong> (<em>object</em>) – logger object created by start_logger in MSOrganiser</p></li>
+<li><p><strong>ingui</strong> (<em>bool</em>) – if True, print analysis status to screen</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="MSRawData.MSRawData.remove_whiteSpaces">
+<span class="sig-name descname"><span class="pre">remove_whiteSpaces</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#MSRawData.MSRawData.remove_whiteSpaces" title="Permalink to this definition"></a></dt>
+<dd><p>Strip the whitespaces for each string columns of a df</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>df</strong> (<em>pandas DataFrame</em>) – A panda data frame</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>df (pandas DataFrame)</em> – A panda data frame with white space removed</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="MSRawData.AgilentMSRawData">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">MSRawData.</span></span><span class="sig-name descname"><span class="pre">AgilentMSRawData</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filepath</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ingui</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#MSRawData.AgilentMSRawData" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#MSRawData.MSRawData" title="MSRawData.MSRawData"><code class="xref py py-class docutils literal notranslate"><span class="pre">MSRawData.MSRawData</span></code></a></p>
+<p>To describe raw data obtained from the Agilent MS machine</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filePath</strong> (<em>str</em>) – file path of the input MRM transition name file</p></li>
+<li><p><strong>logger</strong> (<em>object</em>) – logger object created by start_logger in MSOrganiser</p></li>
+<li><p><strong>ingui</strong> (<em>bool</em>) – if True, print analysis status to screen</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="MSRawData.AgilentMSRawData.get_table">
+<span class="sig-name descname"><span class="pre">get_table</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">column_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_numeric</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#MSRawData.AgilentMSRawData.get_table" title="Permalink to this definition"></a></dt>
+<dd><p>Function to get the table from MassHunter Raw Data</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>column_name</strong> (<em>str</em>) – The name of the column given in the Output_Options.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A data frame of sample as rows and transition names as columns with values from the chosen column name</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="MSRawData.SciexMSRawData">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">MSRawData.</span></span><span class="sig-name descname"><span class="pre">SciexMSRawData</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filepath</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ingui</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#MSRawData.SciexMSRawData" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#MSRawData.MSRawData" title="MSRawData.MSRawData"><code class="xref py py-class docutils literal notranslate"><span class="pre">MSRawData.MSRawData</span></code></a></p>
+<p>To describe raw data obtained from the Sciex MS machine</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filePath</strong> (<em>str</em>) – file path of the input MRM transition name file</p></li>
+<li><p><strong>logger</strong> (<em>object</em>) – logger object created by start_logger in MSOrganiser</p></li>
+<li><p><strong>ingui</strong> (<em>bool</em>) – if True, print analysis status to screen</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="MSRawData.SciexMSRawData.get_table">
+<span class="sig-name descname"><span class="pre">get_table</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">column_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_numeric</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#MSRawData.SciexMSRawData.get_table" title="Permalink to this definition"></a></dt>
+<dd><p>Function to get the table from Sciex MultiQuant Raw Data</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>column_name</strong> (<em>str</em>) – The name of the column given in the Output_Options.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A data frame of sample as rows and transition names as columns with values from the chosen column name</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="MSRawData.SciexMSRawData.AgilentColumnName_to_SciexColumnName">
+<span class="sig-name descname"><span class="pre">AgilentColumnName_to_SciexColumnName</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">column_name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#MSRawData.SciexMSRawData.AgilentColumnName_to_SciexColumnName" title="Permalink to this definition"></a></dt>
+<dd><p>Function to convert the column_name (Output Option) from Agilent to Sciex form</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>By default the Output Option name follows Agilent.</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>column_name</strong> (<em>str</em>) – The name of the column given in the Output_Options.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>column_name (str)</em> – Name converted to Sciex form</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="index.html" class="btn btn-neutral float-left" title="File Input Modules" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="Annotation.html" class="btn btn-neutral float-right" title="Annotation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, SLING.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

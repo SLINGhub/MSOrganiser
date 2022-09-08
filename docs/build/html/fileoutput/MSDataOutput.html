@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MSDataOutput &mdash; MSOrganiser 1.1.0 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="MSDataReport" href="MSDataReport.html" />
+    <link rel="prev" title="File Output Modules" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> MSOrganiser
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Code Structure Summary:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../analysis/index.html">Analysis Modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../duplicatecheck/index.html">Duplicate Check Modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../fileinput/index.html">File Input Modules</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">File Output Modules</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">MSDataOutput</a></li>
+<li class="toctree-l2"><a class="reference internal" href="MSDataReport.html">MSDataReport</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../parser/index.html">Parser Modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../testunits/index.html">Test Unit Modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../wrapper/index.html">Wrapper Modules</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">MSOrganiser</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="index.html">File Output Modules</a> &raquo;</li>
+      <li>MSDataOutput</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/fileoutput/MSDataOutput.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-MSDataOutput">
+<span id="msdataoutput"></span><h1>MSDataOutput<a class="headerlink" href="#module-MSDataOutput" title="Permalink to this headline"></a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="MSDataOutput.MSDataOutput">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">MSDataOutput.</span></span><span class="sig-name descname"><span class="pre">MSDataOutput</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">output_directory</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_file_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">result_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Results'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ingui</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#MSDataOutput.MSDataOutput" title="Permalink to this definition"></a></dt>
+<dd><p>A class to describe the general setup for Data Output.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>output_directory</strong> (<em>str</em>) – directory path to output the data</p></li>
+<li><p><strong>input_file_path</strong> (<em>str</em>) – file path of the input MRM transition name file. To be used for the output filename</p></li>
+<li><p><strong>logger</strong> (<em>object</em>) – logger object created by start_logger in MSOrganiser</p></li>
+<li><p><strong>ingui</strong> (<em>bool</em>) – if True, print analysis status to screen</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="MSDataOutput.MSDataOutput.transpose_MSdata">
+<span class="sig-name descname"><span class="pre">transpose_MSdata</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">allow_multiple_istd</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#MSDataOutput.MSDataOutput.transpose_MSdata" title="Permalink to this definition"></a></dt>
+<dd><p>Function to transpose data</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>MS_df</strong> (<em>pandas DataFrame</em>) – A panda data frame</p></li>
+<li><p><strong>allow_multiple_istd</strong> (<em>bool</em>) – if True, display the Transition_Name_ISTD as well besides the Transition_Name</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>MS_df (pandas DataFrame)</em> – A panda data frame with data transposed</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="MSDataOutput.MSDataOutput.start_writer">
+<span class="sig-name descname"><span class="pre">start_writer</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#MSDataOutput.MSDataOutput.start_writer" title="Permalink to this definition"></a></dt>
+<dd><p>Function to open a writer object</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="MSDataOutput.MSDataOutput.df_to_file_preparation">
+<span class="sig-name descname"><span class="pre">df_to_file_preparation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transpose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ingui</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allow_multiple_istd</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#MSDataOutput.MSDataOutput.df_to_file_preparation" title="Permalink to this definition"></a></dt>
+<dd><p>Function to check and set up the settings needed before writing to a file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>output_option</strong> (<em>str</em>) – the Output_Options value given to MSOrganiser.</p></li>
+<li><p><strong>df</strong> (<em>pandas DataFrame</em>) – A panda data frame to output</p></li>
+<li><p><strong>transpose</strong> (<em>bool</em>) – if True, transpose the dataframe first before writing to the Excel sheet</p></li>
+<li><p><strong>logger</strong> (<em>object</em>) – logger object created by start_logger in MSOrganiser</p></li>
+<li><p><strong>ingui</strong> (<em>bool</em>) – if True, print analysis status to screen</p></li>
+<li><p><strong>allow_multiple_istd</strong> (<em>bool</em>) – if True, display the Transition_Name_ISTD as well besides the Transition_Name</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><p><em>(list)</em> –</p>
+<p>list containing:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>df (pandas DataFrame): A panda data frame to output. Transposed if transpose is set to True</p></li>
+<li><p>output_option (str): Updated output options if changes are required E.g S/N to S_to_N</p></li>
+</ul>
+</div></blockquote>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="MSDataOutput.MSDataOutput.df_to_file">
+<span class="sig-name descname"><span class="pre">df_to_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">output_option</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transpose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allow_multiple_istd</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#MSDataOutput.MSDataOutput.df_to_file" title="Permalink to this definition"></a></dt>
+<dd><p>Funtion to write a df to a csv file named {input file name}_{output_option}_{result filename}.csv .</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>output_option</strong> (<em>str</em>) – the name of the result csv file. MSOrganiser puts it as the Output_Options value</p></li>
+<li><p><strong>df</strong> (<em>pandas DataFrame</em>) – A panda data frame to output to csv</p></li>
+<li><p><strong>transpose</strong> (<em>bool</em>) – if True, transpose the dataframe first before writing to the Excel sheet</p></li>
+<li><p><strong>allow_multiple_istd</strong> (<em>bool</em>) – if True, display the Transition_Name_ISTD as well besides the Transition_Name</p></li>
+</ul>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>For the output option S/N, it will be changed to S_to_N as filenames does not accept slashes. This is done in the function df_to_file_preparation</p>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="MSDataOutput.MSDataOutput_csv">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">MSDataOutput.</span></span><span class="sig-name descname"><span class="pre">MSDataOutput_csv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">output_directory</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_file_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">result_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Results'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ingui</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#MSDataOutput.MSDataOutput_csv" title="Permalink to this definition"></a></dt>
+<dd><p>A class to describe the general setup for Data Output to csv.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>output_directory</strong> (<em>str</em>) – directory path to output the data</p></li>
+<li><p><strong>input_file_path</strong> (<em>str</em>) – file path of the input MRM transition name file. To be used for the output filename</p></li>
+<li><p><strong>logger</strong> (<em>object</em>) – logger object created by start_logger in MSOrganiser</p></li>
+<li><p><strong>ingui</strong> (<em>bool</em>) – if True, print analysis status to screen</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="MSDataOutput.MSDataOutput_csv.df_to_file">
+<span class="sig-name descname"><span class="pre">df_to_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">output_option</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transpose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allow_multiple_istd</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#MSDataOutput.MSDataOutput_csv.df_to_file" title="Permalink to this definition"></a></dt>
+<dd><p>Funtion to write a df to an excel file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>output_option</strong> (<em>str</em>) – the name of the sheet</p></li>
+<li><p><strong>df</strong> (<em>pandas DataFrame</em>) – A panda data frame to output to Excel</p></li>
+<li><p><strong>transpose</strong> (<em>bool</em>) – if True, transpose the dataframe first before writing to the Excel sheet</p></li>
+<li><p><strong>allow_multiple_istd</strong> (<em>bool</em>) – if True, display the Transition_Name_ISTD as well besides the Transition_Name</p></li>
+</ul>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>For the output option S/N, it will be changed to S_to_N as excel does not accept slashes. This is done in the function df_to_file_preparation</p>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="MSDataOutput.MSDataOutput_Excel">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">MSDataOutput.</span></span><span class="sig-name descname"><span class="pre">MSDataOutput_Excel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">output_directory</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_file_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">result_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Results'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ingui</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#MSDataOutput.MSDataOutput_Excel" title="Permalink to this definition"></a></dt>
+<dd><p>A class to describe the general setup for Data Output to Excel.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>output_directory</strong> (<em>str</em>) – directory path to output the data</p></li>
+<li><p><strong>input_file_path</strong> (<em>str</em>) – file path of the input MRM transition name file. To be used for the output filename</p></li>
+<li><p><strong>logger</strong> (<em>object</em>) – logger object created by start_logger in MSOrganiser</p></li>
+<li><p><strong>ingui</strong> (<em>bool</em>) – if True, print analysis status to screen</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="MSDataOutput.MSDataOutput_Excel.start_writer">
+<span class="sig-name descname"><span class="pre">start_writer</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#MSDataOutput.MSDataOutput_Excel.start_writer" title="Permalink to this definition"></a></dt>
+<dd><p>Function to open an Excel writer object using openpyxl</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="MSDataOutput.MSDataOutput_Excel.end_writer">
+<span class="sig-name descname"><span class="pre">end_writer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">testing</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#MSDataOutput.MSDataOutput_Excel.end_writer" title="Permalink to this definition"></a></dt>
+<dd><p>Function to close an Excel writer object</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="MSDataOutput.MSDataOutput_Excel.df_to_file">
+<span class="sig-name descname"><span class="pre">df_to_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">output_option</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transpose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allow_multiple_istd</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#MSDataOutput.MSDataOutput_Excel.df_to_file" title="Permalink to this definition"></a></dt>
+<dd><p>Funtion to write a df to an excel file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>output_option</strong> (<em>str</em>) – the name of the sheet</p></li>
+<li><p><strong>df</strong> (<em>pandas DataFrame</em>) – A panda data frame to output to Excel</p></li>
+<li><p><strong>transpose</strong> (<em>bool</em>) – if True, transpose the dataframe first before writing to the Excel sheet</p></li>
+<li><p><strong>allow_multiple_istd</strong> (<em>bool</em>) – if True, display the Transition_Name_ISTD as well besides the Transition_Name</p></li>
+</ul>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>For the output option S/N, it will be changed to S_to_N as excel does not accept slashes. This is done in the function df_to_file_preparation</p>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="index.html" class="btn btn-neutral float-left" title="File Output Modules" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="MSDataReport.html" class="btn btn-neutral float-right" title="MSDataReport" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, SLING.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

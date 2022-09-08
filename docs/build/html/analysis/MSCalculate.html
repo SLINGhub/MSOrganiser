@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MSCalculate &mdash; MSOrganiser 1.1.0 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Duplicate Check Modules" href="../duplicatecheck/index.html" />
+    <link rel="prev" title="MSAnalysis" href="MSAnalysis.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> MSOrganiser
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Code Structure Summary:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Analysis Modules</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="MSAnalysis.html">MSAnalysis</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">MSCalculate</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../duplicatecheck/index.html">Duplicate Check Modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../fileinput/index.html">File Input Modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../fileoutput/index.html">File Output Modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../parser/index.html">Parser Modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../testunits/index.html">Test Unit Modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../wrapper/index.html">Wrapper Modules</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">MSOrganiser</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="index.html">Analysis Modules</a> &raquo;</li>
+      <li>MSCalculate</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/analysis/MSCalculate.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-MSCalculate">
+<span id="mscalculate"></span><h1>MSCalculate<a class="headerlink" href="#module-MSCalculate" title="Permalink to this headline"></a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="MSCalculate.ISTD_Operations">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">MSCalculate.</span></span><span class="sig-name descname"><span class="pre">ISTD_Operations</span></span><a class="headerlink" href="#MSCalculate.ISTD_Operations" title="Permalink to this definition"></a></dt>
+<dd><p>A collection of functions to perform calculation relating to ISTD</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="MSCalculate.ISTD_Operations.read_ISTD_map">
+<span class="sig-name descname"><span class="pre">read_ISTD_map</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">column_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ingui</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">doing_normalization</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allow_multiple_istd</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#MSCalculate.ISTD_Operations.read_ISTD_map" title="Permalink to this definition"></a></dt>
+<dd><p>Function to get the transition names annotation dataframe from the MS Template Creator annotation file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filepath</strong> (<em>str</em>) – The file path to the MS Template Creator annotation file</p></li>
+<li><p><strong>column_name</strong> (<em>str</em>) – The name of the column given in the Output_Options.</p></li>
+<li><p><strong>logger</strong> (<em>object</em>) – logger object created by start_logger in MSOrganiser</p></li>
+<li><p><strong>ingui</strong> (<em>bool</em>) – if True, print analysis status to screen</p></li>
+<li><p><strong>doing_normalization</strong> (<em>bool</em>) – if True, check if input file has data. If no data, throws an error</p></li>
+<li><p><strong>allow_multiple_istd</strong> (<em>bool</em>) – if True, allow normalization of data by mulitple internal standards</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>Transition_Name_Annot_df (pandas DataFrame)</em> – A data frame of showing the transition names annotation</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="MSCalculate.ISTD_Operations.read_Sample_Annot">
+<span class="sig-name descname"><span class="pre">read_Sample_Annot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">MS_FilePathList</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">column_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ingui</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#MSCalculate.ISTD_Operations.read_Sample_Annot" title="Permalink to this definition"></a></dt>
+<dd><p>Function to get the sample names annotation dataframe from the MS Template Creator annotation file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filepath</strong> (<em>str</em>) – The file path to the MS Template Creator annotation file</p></li>
+<li><p><strong>MS_FilePathList</strong> (<em>list</em>) – A list of MRM transition name file names.</p></li>
+<li><p><strong>column_name</strong> (<em>str</em>) – The name of the column given in the Output_Options.</p></li>
+<li><p><strong>logger</strong> (<em>object</em>) – logger object created by start_logger in MSOrganiser</p></li>
+<li><p><strong>ingui</strong> (<em>bool</em>) – if True, print analysis status to screen</p></li>
+</ul>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The list of MRM transition name file names names is to help the program properly filter
+the Sample annotation such that we only pick rows whose Data_File_Name values is in the list.
+Currently, our input is set as [os.path.basename(self.MS_FilePath)] from MSAnalysis.</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><em>Sample_Annot_df (pandas DataFrame)</em> – A data frame of showing the sample names annotation</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="MSCalculate.ISTD_Operations.create_Transition_Name_dict">
+<span class="sig-name descname"><span class="pre">create_Transition_Name_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Transition_Name_Annot_df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ingui</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allow_multiple_istd</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#MSCalculate.ISTD_Operations.create_Transition_Name_dict" title="Permalink to this definition"></a></dt>
+<dd><p>Create a dictionary to map the Transition_Name to the Transition_Name_ISTD and an ISTD report to map Transition_Name_ISTD to Transition_Name</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>Transition_Name_df</strong> (<em>pandas DataFrame</em>) – A data frame of sample as rows and transition names as columns</p></li>
+<li><p><strong>Transition_Name_Annot_df</strong> (<em>pandas DataFrame</em>) – A data frame of showing the transition names annotation</p></li>
+<li><p><strong>logger</strong> (<em>object</em>) – logger object created by start_logger in MSOrganiser</p></li>
+<li><p><strong>ingui</strong> (<em>bool</em>) – if True, print analysis status to screen</p></li>
+<li><p><strong>allow_multiple_istd</strong> (<em>bool</em>) – if True, ISTD data can have mulitple internal standards for one transition</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><p><em>(list)</em> –</p>
+<p>list containing:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>ISTD_report_list (pandas DataFrame): An updated ISTD report to map Transition_Name_ISTD to Transition_Name</p></li>
+<li><p>Transition_Name_dict (dict): An updated python dictionary to map the Transition_Name to the Transition_Name_ISTD</p></li>
+</ul>
+</div></blockquote>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="MSCalculate.ISTD_Operations.expand_Transition_Name_df">
+<span class="sig-name descname"><span class="pre">expand_Transition_Name_df</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Transition_Name_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ingui</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#MSCalculate.ISTD_Operations.expand_Transition_Name_df" title="Permalink to this definition"></a></dt>
+<dd><p>Expand Transition_Name_df so that it can be normalised by multiple ISTD</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>Transition_Name_df</strong> (<em>pandas DataFrame</em>) – A data frame of sample as rows and transition names as columns</p></li>
+<li><p><strong>Transition_Name_dict</strong> (<em>dict</em>) – A python dictionary to map the Transition_Name to the Transition_Name_ISTD and an ISTD report to map Transition_Name_ISTD to Transition_Name</p></li>
+<li><p><strong>logger</strong> (<em>object</em>) – logger object created by start_logger in MSOrganiser</p></li>
+<li><p><strong>ingui</strong> (<em>bool</em>) – if True, print analysis status to screen</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><p><em>(list)</em> –</p>
+<dl class="simple">
+<dt>list containing:</dt><dd><ul class="simple">
+<li><p>expanded_Transition_Name_df (pandas DataFrame): A data frame of sample as rows and transition names as columns suited for normalisation by multiple ISTD</p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="MSCalculate.ISTD_Operations.normalise_by_ISTD">
+<span class="sig-name descname"><span class="pre">normalise_by_ISTD</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Transition_Name_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ingui</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allow_multiple_istd</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#MSCalculate.ISTD_Operations.normalise_by_ISTD" title="Permalink to this definition"></a></dt>
+<dd><p>Perform normalisation using the values from the Transition_Name_ISTD</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>Transition_Name_df</strong> (<em>pandas DataFrame</em>) – A data frame of sample as rows and transition names as columns</p></li>
+<li><p><strong>Transition_Name_dict</strong> (<em>dict</em>) – A python dictionary to map the Transition_Name to the Transition_Name_ISTD and an ISTD report to map Transition_Name_ISTD to Transition_Name</p></li>
+<li><p><strong>logger</strong> (<em>object</em>) – logger object created by start_logger in MSOrganiser</p></li>
+<li><p><strong>ingui</strong> (<em>bool</em>) – if True, print analysis status to screen</p></li>
+<li><p><strong>allow_multiple_istd</strong> (<em>bool</em>) – if True, allow normalisation of Transition_Name_df mulitple internal standards (in development)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><p><em>(list)</em> –</p>
+<dl class="simple">
+<dt>list containing:</dt><dd><ul class="simple">
+<li><p>norm_Transition_Name_df (pandas DataFrame): A data frame of sample as rows and transition names as columns with the normalised values</p></li>
+<li><p>ISTD_data (pandas DataFrame): A data frame of sample as rows and transition names as columns with the ISTD area as values. Output as excel only at testing mode</p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="MSCalculate.ISTD_Operations.getConc_by_ISTD">
+<span class="sig-name descname"><span class="pre">getConc_by_ISTD</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ISTD_Annot_df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Sample_Annot_df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ingui</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allow_multiple_istd</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allow_multiple_data_file_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#MSCalculate.ISTD_Operations.getConc_by_ISTD" title="Permalink to this definition"></a></dt>
+<dd><p>Perform calculation of analyte concentration using values from Transition_Name_Annot_ISTD</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>Transition_Name_df</strong> (<em>pandas DataFrame</em>) – A data frame of sample as rows and transition names as columns</p></li>
+<li><p><strong>ISTD_Annot_df</strong> (<em>pandas DataFrame</em>) – A data frame showing the ISTD annotation</p></li>
+<li><p><strong>Sample_Annot_df</strong> (<em>pandas DataFrame</em>) – A data frame showing the sample name annotation</p></li>
+<li><p><strong>logger</strong> (<em>object</em>) – logger object created by start_logger in MSOrganiser</p></li>
+<li><p><strong>ingui</strong> (<em>bool</em>) – if True, print analysis status to screen</p></li>
+<li><p><strong>allow_multiple_istd</strong> (<em>bool</em>) – if True, allow normalisation of Transition_Name_df mulitple internal standards</p></li>
+<li><p><strong>allow_multiple_data_file_path</strong> (<em>bool</em>) – if True, allow calculation of concentration using Sample_Annot_df that has more than one data file name</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><p><em>(list)</em> –</p>
+<p>list containing:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Conc_df (pandas DataFrame): A data frame of sample as rows and transition names as columns with the transition name concentration as values</p></li>
+<li><p>ISTD_Conc_df (pandas DataFrame): A data frame of sample as rows and transition names as columns with the ISTD concentration as values</p></li>
+<li><p>ISTD_Samp_Ratio_df (pandas DataFrame): A data frame of with transition names, its corresponding ISTD and ISTD to Sample ratio as columns</p></li>
+</ul>
+</div></blockquote>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="MSAnalysis.html" class="btn btn-neutral float-left" title="MSAnalysis" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../duplicatecheck/index.html" class="btn btn-neutral float-right" title="Duplicate Check Modules" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, SLING.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
